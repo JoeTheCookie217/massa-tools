@@ -85,7 +85,7 @@
 	<p>loading...</p>
 {:then}
 	{#if properties}
-		<h2>Properties</h2>
+		<h2 class="text-6xl">Properties</h2>
 		<p>Symbol: {properties.symbol}</p>
 		<p>Name: {properties.name}</p>
 		<p>
