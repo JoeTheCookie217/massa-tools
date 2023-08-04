@@ -1,2 +1,8 @@
-<h1>Welcome to SvelteKit</h1>
-<a href="/xxx">slug</a>
+<script lang="ts">
+	let address: string;
+</script>
+
+<input bind:value={address} />
+<button>
+	<a href="/{address}"> Lookup address</a>
+</button>
