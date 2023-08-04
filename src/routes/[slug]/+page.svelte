@@ -10,18 +10,20 @@
 		address: string;
 		value: bigint;
 	};
-
 	type PropertyEntry = {
-		address: string;
-		value: string;
+		decimals: number;
+		name: string;
+		symbol: string;
+		totalSupply: bigint;
+		owner: string;
 	};
 
 	let balances: BalanceEntry[];
-	let properties: PropertyEntry[];
+	let properties: PropertyEntry | undefined;
 
 	async function getDatastore() {
 		const balancesTmp: BalanceEntry[] = [];
-		const propertiesTmp: PropertyEntry[] = [];
+		let propertiesTmp: PropertyEntry = {} as PropertyEntry;
 
 		const keys = await client
 			.publicApi()
@@ -46,29 +48,31 @@
 							continue;
 						}
 						if (erc20Keys.includes(key)) {
-							if (key === 'TOTAL_SUPPLY') {
-								propertiesTmp.push({
-									address: key,
-									value: bytesToU64(res).toString()
-								});
-							} else if (key === 'DECIMALS') {
-								propertiesTmp.push({
-									address: key,
-									value: byteToU8(res).toString()
-								});
-							} else {
-								propertiesTmp.push({
-									address: key,
-									value: bytesToStr(res)
-								});
+							switch (key) {
+								case 'SYMBOL':
+									propertiesTmp.symbol = bytesToStr(res);
+									break;
+								case 'NAME':
+									propertiesTmp.name = bytesToStr(res);
+									break;
+								case 'OWNER':
+									propertiesTmp.owner = bytesToStr(res);
+									break;
+								case 'TOTAL_SUPPLY':
+									propertiesTmp.totalSupply = bytesToU64(res);
+									break;
+								case 'DECIMALS':
+									propertiesTmp.decimals = byteToU8(res);
+									break;
+								default:
+									break;
 							}
-							continue;
 						}
 					}
 				}
 			});
 
-		balances = balancesTmp;
+		balances = balancesTmp.sort((a, b) => Number(b.value - a.value));
 		properties = propertiesTmp;
 	}
 </script>
@@ -80,17 +84,28 @@
 {#await getDatastore()}
 	<p>loading...</p>
 {:then}
-	{#if balances.length > 0}
-		<h2>Balances</h2>
-		{#each balances as { address, value }}
-			<p>{address}: {value}</p>
-		{/each}
-	{/if}
-	{#if properties.length > 0}
+	{#if properties}
 		<h2>Properties</h2>
-		{#each properties as { address, value }}
-			<p>{address}: {value}</p>
-		{/each}
+		<p>Symbol: {properties.symbol}</p>
+		<p>Name: {properties.name}</p>
+		<p>
+			Total supply: {(properties.totalSupply / 10n ** BigInt(properties.decimals)).toLocaleString()}
+			({properties.decimals}
+			decimals)
+		</p>
+		<p>Owner: {properties.owner}</p>
+		<p>Holders: {balances.length}</p>
+		{#if balances.length > 0}
+			<h2>Balances</h2>
+			{#each balances as { address, value }}
+				{@const balance = Number(value / 10n ** BigInt(properties.decimals))}
+				{@const share =
+					(balance / Number(properties.totalSupply / 10n ** BigInt(properties.decimals))) * 100}
+				<p>
+					{address}: {balance.toLocaleString()} ({share.toFixed(4)}%)
+				</p>
+			{/each}
+		{/if}
 	{/if}
 {:catch error}
 	<p style="color: red">{error.message}</p>
