@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { byteToU8, bytesToStr, bytesToU64, strToBytes } from '@massalabs/massa-web3';
+import { byteToU8, bytesToStr, bytesToU256, bytesToU64, strToBytes } from '@massalabs/massa-web3';
 import { client } from '../../utils/client';
 
 type BalanceEntry = {
@@ -24,65 +24,65 @@ const erc20Keys = ['DECIMALS', 'SYMBOL', 'NAME', 'TOTAL_SUPPLY', 'OWNER'];
 
 export async function load({ params }): Promise<MyPageLoad> {
 	const address = params.slug;
-	console.log(address);
 
-	// const keys = await client
-	// 		.publicApi()
-	// 		.getAddresses([address])
-	// 		.then(async (res) => {
-	// 			if (!res[0]) throw new Error('No such address');
-	// 			return res[0].candidate_datastore_keys.map((key) => String.fromCharCode(...key));
-	// 		});
+	const keys = await client
+		.publicApi()
+		.getAddresses([address])
+		.then(async (res) => {
+			if (!res[0]) throw new Error('No such address');
+			return res[0].candidate_datastore_keys.map((key) => String.fromCharCode(...key));
+		});
 
-	// const balancesTmp: BalanceEntry[] = [];
-	// 	let propertiesTmp: PropertyEntry = {} as PropertyEntry;
+	let balances: BalanceEntry[] = [];
+	let properties: Properties = {} as Properties;
 
-	// 	await client
-	// 		.publicApi()
-	// 		.getDatastoreEntries(keys.map((k) => ({ address, key: strToBytes(k) })))
-	// 		.then((r) => {
-	// 			for (let i = 0; i < r.length; i++) {
-	// 				const key = keys[i];
-	// 				const res = r[i].final_value;
-	// 				if (res) {
-	// 					if (key.startsWith('BALANCE')) {
-	// 						balancesTmp.push({
-	// 							address: key.slice(7),
-	// 							value: bytesToU64(res)
-	// 						});
-	// 						continue;
-	// 					}
-	// 					if (erc20Keys.includes(key)) {
-	// 						switch (key) {
-	// 							case 'SYMBOL':
-	// 								propertiesTmp.symbol = bytesToStr(res);
-	// 								break;
-	// 							case 'NAME':
-	// 								propertiesTmp.name = bytesToStr(res);
-	// 								break;
-	// 							case 'OWNER':
-	// 								propertiesTmp.owner = bytesToStr(res);
-	// 								break;
-	// 							case 'TOTAL_SUPPLY':
-	// 								propertiesTmp.totalSupply = bytesToU64(res);
-	// 								break;
-	// 							case 'DECIMALS':
-	// 								propertiesTmp.decimals = byteToU8(res);
-	// 								break;
-	// 							default:
-	// 								break;
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		});
+	await client
+		.publicApi()
+		.getDatastoreEntries(keys.map((k) => ({ address, key: strToBytes(k) })))
+		.then((r) => {
+			for (let i = 0; i < r.length; i++) {
+				const key = keys[i];
+				const res = r[i].final_value;
+				if (res) {
+					if (key.startsWith('BALANCE')) {
+						balances.push({
+							address: key.slice(7),
+							value: bytesToU256(res)
+							// value: bytesToU64(res)
+						});
+						continue;
+					}
+					if (erc20Keys.includes(key)) {
+						switch (key) {
+							case 'SYMBOL':
+								properties.symbol = bytesToStr(res);
+								break;
+							case 'NAME':
+								properties.name = bytesToStr(res);
+								break;
+							case 'OWNER':
+								properties.owner = bytesToStr(res);
+								break;
+							case 'TOTAL_SUPPLY':
+								properties.totalSupply = bytesToU256(res);
+								break;
+							case 'DECIMALS':
+								properties.decimals = byteToU8(res);
+								break;
+							default:
+								break;
+						}
+					}
+				}
+			}
+		});
 
-	// 	balances = balancesTmp.sort((a, b) => Number(b.value - a.value));
-	// 	properties = propertiesTmp;
+	balances = balances.sort((a, b) => Number(b.value - a.value));
+	properties = properties;
 
 	return {
-		balances: [],
-		properties: { address } as Properties
+		balances,
+		properties
 	};
 
 	// throw error(404, 'Smart contract not found');

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { deploySC } from '@massalabs/massa-sc-deployer';
 	import { publicApi } from '../../utils/client';
 
 	async function deploy() {

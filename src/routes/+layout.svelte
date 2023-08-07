@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { providers as getProviders } from '@massalabs/wallet-provider';
+	// import { providers as getProviders } from '@massalabs/wallet-provider';
 	import '../app.css';
 
-	const getConnectedAddress = async () => {
-		const providers = await getProviders();
-		console.log(providers);
-		return '0x123';
-	};
+	// const getConnectedAddress = async () => {
+	// 	const providers = await getProviders();
+	// 	console.log(providers);
+	// 	return '0x123';
+	// };
 </script>
 
 <header class="flex justify-around p-2">
@@ -19,7 +19,9 @@
 	</nav>
 </header>
 
-<slot />
+<slot>
+	<main>X</main>
+</slot>
 
 <footer>
 	<p>
