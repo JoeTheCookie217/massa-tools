@@ -33,6 +33,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@massalabs/massa-web3": "^1.23.0"
+		"@massalabs/massa-sc-deployer": "^0.6.0",
+		"@massalabs/massa-web3": "^1.23.0",
+		"@massalabs/wallet-provider": "^1.2.0"
 	}
 }

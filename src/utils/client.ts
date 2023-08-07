@@ -1,8 +1,10 @@
-import { Client, ProviderType } from '@massalabs/massa-web3';
+import { Client, DefaultProviderUrls, ProviderType } from '@massalabs/massa-web3';
+
+export const publicApi = DefaultProviderUrls.BUILDNET;
 
 const providers = [
-	{ url: 'https://buildnet.massa.net/api/v2', type: ProviderType.PUBLIC },
-	{ url: 'https://buildnet.massa.net/api/v2', type: ProviderType.PRIVATE }
+	{ url: publicApi, type: ProviderType.PUBLIC },
+	{ url: publicApi, type: ProviderType.PRIVATE }
 ];
 
 export let client = new Client({

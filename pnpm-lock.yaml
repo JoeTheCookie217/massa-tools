@@ -1,9 +1,15 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@massalabs/massa-sc-deployer':
+    specifier: ^0.6.0
+    version: 0.6.0(@babel/core@7.22.9)(jest@29.6.2)
   '@massalabs/massa-web3':
     specifier: ^1.23.0
-    version: 1.23.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2)
+    version: 1.23.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2)
+  '@massalabs/wallet-provider':
+    specifier: ^1.2.0
+    version: 1.2.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2)
 
 devDependencies:
   '@sveltejs/adapter-auto':
@@ -1024,10 +1030,57 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /@massalabs/massa-web3@1.23.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2):
+  /@massalabs/as-types@1.0.1:
+    resolution: {integrity: sha512-F0N/g2OxdNX0SGJ5RKhbn7/UG9KkaEDDXBXugrh9JtBIckGOnjsk03FcJEA8TBDoPRoJdWDf8d30UElcI/YdLA==}
+    dependencies:
+      as-bignum: 0.2.40
+      assemblyscript: 0.25.2
+    dev: false
+
+  /@massalabs/massa-as-sdk@2.4.0:
+    resolution: {integrity: sha512-0DY96TpMt4lMdwgX2WsXOOgsfLsGu7OZxj2CkcD48AINQOvx298Cvm7zlQLgBTuNxT4jARNbk45oAwuqlVjyCw==}
+    dev: false
+
+  /@massalabs/massa-sc-compiler@0.1.0:
+    resolution: {integrity: sha512-k3TyDiD91xw9KRZgTv3Vh/zDmkh5nEk2DAxBqLjS8KiFFzi5soPFcNaXS8+zejX1LBPd6paOJgosjr3qlt5/SQ==}
+    hasBin: true
+    dependencies:
+      assemblyscript: 0.25.2
+      yargs: 17.7.2
+    dev: false
+
+  /@massalabs/massa-sc-deployer@0.6.0(@babel/core@7.22.9)(jest@29.6.2):
+    resolution: {integrity: sha512-s+I/cGaiLWaqhhgmOgFeVKiLtJzbg9nZ77jS2eaB6+MUA4i4QCM1icg/vwUcTYiLciUfC20a8GDLdIYDurkB0Q==}
+    dependencies:
+      '@massalabs/as-types': 1.0.1
+      '@massalabs/massa-as-sdk': 2.4.0
+      '@massalabs/massa-sc-compiler': 0.1.0
+      '@massalabs/massa-web3': 1.23.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2)
+      '@types/node': 18.17.3
+      assemblyscript: 0.25.2
+      rimraf: 5.0.1
+      typescript: 5.1.6
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@jest/types'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@webpack-cli/generators'
+      - babel-jest
+      - canvas
+      - debug
+      - esbuild
+      - jest
+      - supports-color
+      - uglify-js
+      - webpack-bundle-analyzer
+      - webpack-dev-server
+    dev: false
+
+  /@massalabs/massa-web3@1.23.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2):
     resolution: {integrity: sha512-+gCdo0FPZhDh/LQBqdIjBbU15whQWokjJ0PQ3JFMym+f4clw643nfst3JsL3niCpnysNLNNrh8Ja2PlywODJyw==}
     dependencies:
-      '@massalabs/wallet-provider': 1.2.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2)
+      '@massalabs/wallet-provider': 1.2.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2)
       '@noble/ed25519': 1.7.3
       '@noble/hashes': 1.3.0
       '@types/ws': 8.5.4
@@ -1066,10 +1119,41 @@ packages:
       - webpack-dev-server
     dev: false
 
+  /@massalabs/wallet-provider@1.2.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2):
+    resolution: {integrity: sha512-fYY5lPsi1Hy4XE78/RTQUFf558Thl6hl3clpVYj2KwlWYGfh7P+33MdFwQrN3K0gr7x6O1pXnchg/55h29EkNA==}
+    dependencies:
+      '@massalabs/massa-web3': 1.23.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2)
+      '@massalabs/web3-utils': 1.2.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2)
+      axios: 0.26.1
+      bignumber.js: 9.1.1
+      buffer: 6.0.3
+      esmify: 2.1.1
+      uid: 2.0.2
+    optionalDependencies:
+      bufferutil: 4.0.7
+      utf-8-validate: 6.0.3
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@jest/types'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - '@webpack-cli/generators'
+      - babel-jest
+      - canvas
+      - debug
+      - esbuild
+      - jest
+      - supports-color
+      - uglify-js
+      - webpack-bundle-analyzer
+      - webpack-dev-server
+    dev: false
+
   /@massalabs/wallet-provider@1.2.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2):
     resolution: {integrity: sha512-fYY5lPsi1Hy4XE78/RTQUFf558Thl6hl3clpVYj2KwlWYGfh7P+33MdFwQrN3K0gr7x6O1pXnchg/55h29EkNA==}
     dependencies:
-      '@massalabs/massa-web3': 1.23.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2)
+      '@massalabs/massa-web3': 1.23.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2)
       '@massalabs/web3-utils': 1.2.0(@babel/core@7.22.9)(@types/node@20.2.5)(jest@29.6.2)
       axios: 0.26.1
       bignumber.js: 9.1.1
@@ -1092,6 +1176,37 @@ packages:
       - esbuild
       - jest
       - supports-color
+      - uglify-js
+      - webpack-bundle-analyzer
+      - webpack-dev-server
+    dev: false
+
+  /@massalabs/web3-utils@1.2.0(@babel/core@7.22.9)(@types/node@18.17.3)(jest@29.6.2):
+    resolution: {integrity: sha512-lS9vDDBRyFMMS7d38ZHmxxdY6dAHfB96+FTcHgynfmLCcj1XMhInEbWmHN4bFlVYcP5jwWIRZUuPotKYsT++kg==}
+    dependencies:
+      buffer: 6.0.3
+      events: 3.3.0
+      npm-run-all: 4.1.5
+      rimraf: 5.0.1
+      string_decoder: 1.3.0
+      ts-jest: 29.1.1(@babel/core@7.22.9)(jest@29.6.2)(typescript@4.9.5)
+      ts-loader: 9.4.4(typescript@4.9.5)(webpack@5.88.2)
+      ts-node: 10.9.1(@types/node@18.17.3)(typescript@4.9.5)
+      typedoc: 0.23.28(typescript@4.9.5)
+      typescript: 4.9.5
+      util: 0.12.5
+      webpack: 5.88.2(webpack-cli@5.1.4)
+      webpack-cli: 5.1.4(webpack@5.88.2)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@jest/types'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - '@webpack-cli/generators'
+      - babel-jest
+      - esbuild
+      - jest
       - uglify-js
       - webpack-bundle-analyzer
       - webpack-dev-server
@@ -1393,6 +1508,10 @@ packages:
 
   /@types/json-schema@7.0.12:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
+
+  /@types/node@18.17.3:
+    resolution: {integrity: sha512-2x8HWtFk0S99zqVQABU9wTpr8wPoaDHZUcAkoTKH+nL7kPv3WUI9cRi/Kk5Mz4xdqXSqTkKP7IWNoQQYCnDsTA==}
+    dev: false
 
   /@types/node@20.2.5:
     resolution: {integrity: sha512-JJulVEQXmiY9Px5axXHeYGLSjhkZEnD+MDPDGbCbIAbMslkKwmygtZFy1X6s/075Yo94sf8GuSlFfPzysQrWZQ==}
@@ -1889,6 +2008,10 @@ packages:
       is-shared-array-buffer: 1.0.2
     dev: false
 
+  /as-bignum@0.2.40:
+    resolution: {integrity: sha512-fql9j63qUCmWwgWB3qW7+S8vp1DUrqSgFnpn/L3O2bjHMW52GZ0H/DfwLCQUAgQS15gsMsjwzMT14A2KCxu0cA==}
+    dev: false
+
   /asn1.js@5.4.1:
     resolution: {integrity: sha512-+I//4cYPccV8LdmBLiX8CYvf9Sp3vQsrqu2QNXRcrbiWvcx/UdlFiqUJJzxRQxgsZmvhXhn4cSKeSmoFjVdupA==}
     dependencies:
@@ -1897,6 +2020,15 @@ packages:
       minimalistic-assert: 1.0.1
       safer-buffer: 2.1.2
     dev: true
+
+  /assemblyscript@0.25.2:
+    resolution: {integrity: sha512-67TQOMvKo23htvSK6lhOzsoQjnplNKkdwgq925uBvQZLDbg9pHfAWhg/R8i8tqKrtk6GH8haOJbQY4oNSQqehA==}
+    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
+    hasBin: true
+    dependencies:
+      binaryen: 110.0.0-nightly.20221105
+      long: 5.2.3
+    dev: false
 
   /assert@2.0.0:
     resolution: {integrity: sha512-se5Cd+js9dXJnu6Ag2JFc00t+HmHOen+8Q+L7O9zI0PqQXr20uk2J0XQqMxZEeo5U50o8Nvmmx7dZrl+Ufr35A==}
@@ -2100,6 +2232,11 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
     dev: true
+
+  /binaryen@110.0.0-nightly.20221105:
+    resolution: {integrity: sha512-OBESOc51q3SwgG8Uv8nMzGnSq7LJpSB/Fu8B3AjlZg6YtCEwRnlDWlnwNB6mdql+VdexfKmNcsrs4K7MYidmdQ==}
+    hasBin: true
+    dev: false
 
   /bip39@3.1.0:
     resolution: {integrity: sha512-c9kiwdk45Do5GL0vJMe7tS95VjCii65mYAH7DfWl3uW8AVzXKQVUm64i3hzVybBDMp9r7j9iNxR85+ul8MdN/A==}
@@ -4512,6 +4649,10 @@ packages:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
 
+  /long@5.2.3:
+    resolution: {integrity: sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==}
+    dev: false
+
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
@@ -5512,6 +5653,7 @@ packages:
     hasBin: true
     dependencies:
       lru-cache: 6.0.0
+    dev: true
 
   /semver@7.5.4:
     resolution: {integrity: sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==}
@@ -6163,7 +6305,7 @@ packages:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 29.6.2(@types/node@20.2.5)
-      jest-util: 29.5.0
+      jest-util: 29.6.2
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
@@ -6182,9 +6324,40 @@ packages:
       chalk: 4.1.2
       enhanced-resolve: 5.15.0
       micromatch: 4.0.5
-      semver: 7.5.1
+      semver: 7.5.4
       typescript: 4.9.5
       webpack: 5.88.2(webpack-cli@5.1.4)
+    dev: false
+
+  /ts-node@10.9.1(@types/node@18.17.3)(typescript@4.9.5):
+    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
+    hasBin: true
+    peerDependencies:
+      '@swc/core': '>=1.2.50'
+      '@swc/wasm': '>=1.2.50'
+      '@types/node': '*'
+      typescript: '>=2.7'
+    peerDependenciesMeta:
+      '@swc/core':
+        optional: true
+      '@swc/wasm':
+        optional: true
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.9
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 18.17.3
+      acorn: 8.8.2
+      acorn-walk: 8.2.0
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 4.9.5
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
     dev: false
 
   /ts-node@10.9.1(@types/node@20.2.5)(typescript@4.9.5):
@@ -6335,6 +6508,12 @@ packages:
     engines: {node: '>=12.20'}
     hasBin: true
     dev: true
+
+  /typescript@5.1.6:
+    resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+    dev: false
 
   /uid@2.0.2:
     resolution: {integrity: sha512-u3xV3X7uzvi5b1MncmZo3i2Aw222Zk1keqLA1YkHldREkAhAqi65wuPfe7lHx8H/Wzy+8CE7S7uS3jekIM5s8g==}
