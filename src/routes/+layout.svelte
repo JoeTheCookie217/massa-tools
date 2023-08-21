@@ -41,7 +41,9 @@
 	<footer class="text-center p-2">
 		<p>
 			Made with ❤️ by
-			<a href="https://github.com/JoeTheCookie217">JoeTheCookie217</a>
+			<a class="hover:underline" target="_blank" href="https://github.com/JoeTheCookie217"
+				>JoeTheCookie217</a
+			>
 		</p>
 	</footer>
 
