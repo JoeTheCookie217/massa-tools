@@ -9,23 +9,27 @@
 	// };
 </script>
 
-<header class="flex justify-around p-2">
-	<h1>
-		<a href="/">Massa Labs</a>
-	</h1>
-	<nav>
-		<a href="/">Explorer</a>
-		<a href="/create">Create</a>
-	</nav>
-</header>
+<main class="h-screen flex flex-col">
+	<header class="flex justify-around items-center p-2">
+		<h1>
+			<a class="text-2xl" href="/">Massa Tools</a>
+		</h1>
+		<nav class="flex gap-4">
+			<a href="/explorer">Explorer</a>
+			<a href="/create">Create</a>
+			<a href="/multisig">Multisig</a>
+			<a href="/staking">Staking</a>
+		</nav>
+	</header>
 
-<slot>
-	<main>X</main>
-</slot>
+	<section class="grow grid place-items-center">
+		<slot />
+	</section>
 
-<footer>
-	<p>
-		2023
-		<a href="https://massalabs.com">Massa Labs</a>
-	</p>
-</footer>
+	<footer class="text-center p-2">
+		<p>
+			Made with ❤️ by
+			<a href="https://github.com/JoeTheCookie217">JoeTheCookie217</a>
+		</p>
+	</footer>
+</main>
