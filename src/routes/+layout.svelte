@@ -46,6 +46,6 @@
 	</footer>
 
 	{#if showModal}
-		<Modal show={showModal} on:close={handleClose} />
+		<Modal on:close={handleClose} />
 	{/if}
 </main>

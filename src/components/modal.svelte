@@ -6,7 +6,6 @@
 	import Button from './button.svelte';
 	import { printAddress } from '../utils/methods';
 
-	export let show = false;
 	const dispatch = createEventDispatcher();
 
 	let connectedAddress: string | null = null;
@@ -71,17 +70,18 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-	class="absolute h-full w-full bg-black bg-opacity-50 z-50 grid place-items-center"
-	on:click={(e) => {
-		e.stopPropagation();
-		closeModal();
-	}}
+	class="absolute h-full w-full bg-black bg-opacity-90 z-50 grid place-items-center"
+	on:click={closeModal}
 >
-	<div class="h-80 w-80 bg-gray-500">
+	<div class="h-80 w-80 bg-gray-700 rounded-md">
 		<div class="flex justify-between items-center p-2">
 			<span>Connect Wallet</span>
-			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<span on:click={closeModal}>X</span>
+			<button
+				on:click={(e) => {
+					e.stopPropagation();
+					closeModal();
+				}}>X</button
+			>
 		</div>
 		{#if connectedAddress}
 			<div class="flex justify-between items-center p-2">

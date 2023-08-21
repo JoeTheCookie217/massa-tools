@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { byteToU8, bytesToStr, bytesToU256, bytesToU64, strToBytes } from '@massalabs/massa-web3';
+import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
 import { client } from '../../utils/client';
+import { bytesToNumber } from '../../utils/methods';
 
 type BalanceEntry = {
 	address: string;
@@ -47,8 +48,7 @@ export async function load({ params }): Promise<MyPageLoad> {
 					if (key.startsWith('BALANCE')) {
 						balances.push({
 							address: key.slice(7),
-							value: bytesToU256(res)
-							// value: bytesToU64(res)
+							value: bytesToNumber(res)
 						});
 						continue;
 					}
@@ -64,7 +64,7 @@ export async function load({ params }): Promise<MyPageLoad> {
 								properties.owner = bytesToStr(res);
 								break;
 							case 'TOTAL_SUPPLY':
-								properties.totalSupply = bytesToU256(res);
+								properties.totalSupply = bytesToNumber(res);
 								break;
 							case 'DECIMALS':
 								properties.decimals = byteToU8(res);
@@ -77,13 +77,12 @@ export async function load({ params }): Promise<MyPageLoad> {
 			}
 		});
 
+	if (Object.keys(properties).length === 0) throw error(404, 'ERC20 not found');
 	balances = balances.sort((a, b) => Number(b.value - a.value));
-	properties = properties;
+	properties.address = address;
 
 	return {
 		balances,
 		properties
 	};
-
-	// throw error(404, 'Smart contract not found');
 }

@@ -6,3 +6,11 @@ body {
 	@apply bg-gray-900;
 	@apply text-slate-300;
 }
+
+input {
+	@apply bg-gray-800;
+	@apply text-slate-300;
+	@apply border-gray-700;
+	@apply focus:border-gray-500;
+	@apply focus:ring-gray-500;
+}

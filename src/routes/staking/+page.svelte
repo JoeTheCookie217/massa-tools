@@ -6,8 +6,8 @@
 	const stakingAddress = 'AS12148EJam1pa9F9FtfvbWVyLaGtxf9Zocer2HvEDJxuPGumUQAT';
 
 	let massaClient: IClient | null = null;
-	clientStore.subscribe((c) => {
-		if (c) massaClient = c;
+	clientStore.subscribe((client) => {
+		massaClient = client;
 	});
 
 	const deposit = () => {

@@ -1,8 +1,12 @@
 <script lang="ts">
 	export let text: string;
 	export let onClick: () => void;
+	export let disabled = false;
 </script>
 
-<button on:click={onClick} class="bg-purple-300 text-gray-800 ml-1.5 p-1.5 rounded-md"
+<button
+	{disabled}
+	on:click={onClick}
+	class="bg-purple-300 text-gray-800 ml-1.5 p-1.5 rounded-md disabled:bg-gray-300 disabled:text-gray-500"
 	>{text}</button
 >
