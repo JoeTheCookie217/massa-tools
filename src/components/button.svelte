@@ -7,6 +7,6 @@
 <button
 	{disabled}
 	on:click={onClick}
-	class="bg-purple-300 text-gray-800 ml-1.5 p-1.5 rounded-md disabled:bg-gray-300 disabled:text-gray-500"
+	class="bg-purple-300 text-gray-800 mx-1.5 p-1.5 rounded-md disabled:bg-gray-300 disabled:text-gray-500"
 	>{text}</button
 >

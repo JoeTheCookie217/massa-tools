@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
 	import Button from '../../components/button.svelte';
 	import { printAddress } from '../../utils/methods';
 	import type { MyPageLoad } from './+page';
@@ -13,9 +14,11 @@
 		massaClient = client;
 	});
 
-	let transferReceiver = '';
-	let transferAmount = 0;
+	let transferReceiver: string;
+	let transferAmount: number;
 	$: disabledTransfer = !transferReceiver || transferAmount == 0 || !massaClient;
+
+	const token = new Token(ChainId.BUILDNET, properties.address, properties.decimals);
 
 	const transfer = async () => {
 		if (!massaClient) return;
@@ -57,12 +60,14 @@
 	{#if balances.length > 0}
 		<h2 class="text-2xl">Balances</h2>
 		{#each balances as { address, value }}
-			{@const balance = Number(value / 10n ** BigInt(properties.decimals))}
-			{@const share =
-				(balance / Number(properties.totalSupply / 10n ** BigInt(properties.decimals))) * 100}
-			<p>
-				{printAddress(address)}: {balance.toLocaleString()} ({share.toFixed(4)}%)
-			</p>
+			{@const balance = new TokenAmount(token, value)}
+			{@const share = balance.multiply(100n).divide(new TokenAmount(token, properties.totalSupply))}
+
+			{#if balance.raw !== 0n}
+				<p>
+					{printAddress(address)}: {balance.toSignificant()} ({share.toSignificant(2)}%)
+				</p>
+			{/if}
 		{/each}
 	{/if}
 	<h2 class="text-2xl">Actions</h2>
