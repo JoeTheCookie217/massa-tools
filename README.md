@@ -1,12 +1,14 @@
 ## General 
-- [ ] connect Bearby or MassaStation
+- [ ] connect Bearby
+- [x] connect MassaStation
   
 ## Create
-- [ ] create an ERC20/ERC721
+- [ ] deploy an ERC20
+- [ ] deploy an ERC721
 
 ## Explorer (token)
-- [ ] view its datastore (balance, allowance)
-- [ ] interact with it (transfer, approve, mint, burn)
+- [x] view its datastore (balance, allowance)
+- [x] interact with it (transfer, approve, mint, burn)
 
 ## Multisig
 - [ ] create a multisig wallet
