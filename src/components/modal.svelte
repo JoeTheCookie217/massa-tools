@@ -8,11 +8,13 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { accountStore, clientStore } from '../store/account';
 	import Button from './button.svelte';
-	import { printAddress } from '../utils/methods';
+	import { printAddress, printMasBalance } from '../utils/methods';
 
-	let connectedAddress: string | null = null;
-	accountStore.subscribe((account) => {
-		if (account?.address()) connectedAddress = account.address();
+	let connectedAddress: string | undefined;
+	let balance: string | undefined;
+	accountStore.subscribe(async (account) => {
+		connectedAddress = account?.address();
+		balance = await account?.balance().then((res) => res.finalBalance);
 	});
 
 	let providers: IProvider[] = [];
@@ -84,7 +86,10 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="absolute h-full w-full bg-black bg-opacity-90 z-50 grid place-items-center">
+<div
+	class="absolute h-full w-full bg-black bg-opacity-90 z-50 grid place-items-center"
+	on:click={(e) => e.currentTarget === e.target && closeModal()}
+>
 	<div class="flex flex-col h-80 w-80 p-4 bg-gray-700 rounded-md">
 		<div class="flex justify-between items-center p-2">
 			{#if !connectedAddress}
@@ -100,10 +105,17 @@
 			>
 		</div>
 		{#if connectedAddress}
-			<div class="flex justify-between items-center p-2">
-				<span>{printAddress(connectedAddress)}</span>
-				<Button text={copied ? 'Copied' : 'Copy'} onClick={copy} />
-				<Button text="Disconnect" onClick={disconnect} />
+			<div class="">
+				<div>
+					<span>{printAddress(connectedAddress)}</span>
+					{#if balance}
+						<span>{printMasBalance(balance)}</span>
+					{/if}
+				</div>
+				<div>
+					<Button text={copied ? 'Copied' : 'Copy'} onClick={copy} />
+					<Button text="Disconnect" onClick={disconnect} />
+				</div>
 			</div>
 		{:else if !accounts}
 			<div class="flex flex-col gap-4 grow py-6">
@@ -125,7 +137,7 @@
 				<div class="flex justify-between items-center p-2">
 					<span>{printAddress(account.address())}</span>
 					{#await account.balance() then balance}
-						<span>{balance.finalBalance}</span>
+						<span>{printMasBalance(balance.finalBalance)}</span>
 					{:catch error}
 						<span>{error.message}</span>
 					{/await}
