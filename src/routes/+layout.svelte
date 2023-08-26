@@ -3,17 +3,64 @@
 	import { printAddress } from '../utils/methods';
 	import { onMount } from 'svelte';
 	import Modal from '../components/modal.svelte';
-	import { accountStore } from '../store/account';
+	import { accountStore, clientStore } from '../store/account';
 	import Button from '../components/button.svelte';
+	import {
+		providers as getProviders,
+		type IAccount,
+		type IProvider
+	} from '@massalabs/wallet-provider';
+	import { ClientFactory } from '@massalabs/massa-web3';
 
 	let showModal = false;
-	let connectedAddress: string | null = null;
-	accountStore.subscribe((account) => {
-		connectedAddress = account?.address() || null;
+	let connectedAddress: string | undefined;
+	let balance: string | undefined;
+	accountStore.subscribe(async (account) => {
+		connectedAddress = account?.address();
+		balance = await account?.balance().then((res) => res.finalBalance);
 	});
+	let accounts: IAccount[];
+	let selectedWallet: IProvider;
+	let stationWallet: IProvider | undefined;
+	let bearbyWallet: IProvider | undefined;
 
-	const onClick = () => (showModal = true);
-	const handleClose = () => (showModal = false);
+	const connect = async (wallet: IProvider | undefined) => {
+		if (!wallet) return;
+
+		const _accounts = await wallet.accounts();
+		if (!_accounts?.length) return;
+
+		selectedWallet = wallet;
+		accounts = _accounts;
+		return accounts;
+	};
+
+	const select = async (selectedAccount: IAccount) => {
+		accountStore.set(selectedAccount);
+		const client = await ClientFactory.fromWalletProvider(selectedWallet, selectedAccount);
+		clientStore.set(client);
+		closeModal();
+	};
+
+	const disconnect = () => {
+		accountStore.set(null);
+	};
+
+	const closeModal = () => {
+		document.body.style.overflow = 'auto';
+		showModal = false;
+	};
+
+	onMount(async () => {
+		const providers = await getProviders();
+		const _stationWallet = providers.find((provider) => provider.name() === 'MASSASTATION');
+		stationWallet = _stationWallet;
+		const _bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
+		bearbyWallet = _bearbyWallet;
+		const acc = await connect(stationWallet || bearbyWallet);
+		console.log(acc);
+		acc?.length && select(acc[0]);
+	});
 </script>
 
 <main class="h-screen flex flex-col">
@@ -28,7 +75,7 @@
 			<a href="/staking">Staking</a>
 
 			<Button
-				{onClick}
+				onClick={() => (showModal = true)}
 				text={connectedAddress ? printAddress(connectedAddress) : 'Connect Wallet'}
 			/>
 		</nav>
@@ -50,6 +97,16 @@
 	</footer>
 
 	{#if showModal}
-		<Modal on:close={handleClose} />
+		<Modal
+			{closeModal}
+			{connect}
+			{disconnect}
+			{accounts}
+			{select}
+			{connectedAddress}
+			{balance}
+			{stationWallet}
+			{bearbyWallet}
+		/>
 	{/if}
 </main>

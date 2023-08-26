@@ -1,6 +1,7 @@
 ## General 
 - [ ] connect
   - [x] account of choice
+  - [x] persist on refresh 
   - [x] with Massa Station
   - [ ] with Bearby
 - [x] disconnect
