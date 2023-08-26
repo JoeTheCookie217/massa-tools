@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { ClientFactory } from '@massalabs/massa-web3';
-	import { providers as getProviders, type IProvider } from '@massalabs/wallet-provider';
+	import {
+		providers as getProviders,
+		type IAccount,
+		type IProvider
+	} from '@massalabs/wallet-provider';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { accountStore, clientStore } from '../store/account';
 	import Button from './button.svelte';
 	import { printAddress } from '../utils/methods';
 
-	const dispatch = createEventDispatcher();
-
 	let connectedAddress: string | null = null;
 	accountStore.subscribe((account) => {
-		console.log(account);
 		if (account?.address()) connectedAddress = account.address();
 	});
 
@@ -18,9 +19,12 @@
 	getProviders().then((res) => {
 		providers = res;
 	});
+	let accounts: IAccount[];
+	let selectedWallet: IProvider;
 	$: stationWallet = providers.find((provider) => provider.name() === 'MASSASTATION');
 	$: bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
 
+	const dispatch = createEventDispatcher();
 	const closeModal = () => {
 		document.body.style.overflow = 'auto';
 		dispatch('close');
@@ -30,6 +34,15 @@
 		if (e.key === 'Escape') {
 			closeModal();
 		}
+	};
+
+	let copied = false;
+	const copy = () => {
+		copied = true;
+		connectedAddress && navigator.clipboard.writeText(connectedAddress);
+		setTimeout(() => {
+			copied = false;
+		}, 1000);
 	};
 
 	onMount(() => {
@@ -50,13 +63,17 @@
 		// const stationAccounts = await stationWallet?.accounts();
 		// const bearbyAccounts = await bearbyWallet?.accounts();
 		// if (!bearbyAccounts?.length && !stationAccounts?.length) return;
-		const accounts = await wallet.accounts();
-		console.log(accounts);
-		if (!accounts?.length) return;
+		const _accounts = await wallet.accounts();
+		if (!_accounts?.length) return;
 
-		const selectedAccount = accounts[0];
+		selectedWallet = wallet;
+		accounts = _accounts;
+	};
+
+	const select = async (selectedAccount: IAccount) => {
+		console.log(selectedAccount);
 		accountStore.set(selectedAccount);
-		const client = await ClientFactory.fromWalletProvider(wallet, selectedAccount);
+		const client = await ClientFactory.fromWalletProvider(selectedWallet, selectedAccount);
 		clientStore.set(client);
 		closeModal();
 	};
@@ -67,13 +84,14 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div
-	class="absolute h-full w-full bg-black bg-opacity-90 z-50 grid place-items-center"
-	on:click={closeModal}
->
-	<div class="flex flex-col h-80 w-80 bg-gray-700 rounded-md">
+<div class="absolute h-full w-full bg-black bg-opacity-90 z-50 grid place-items-center">
+	<div class="flex flex-col h-80 w-80 p-4 bg-gray-700 rounded-md">
 		<div class="flex justify-between items-center p-2">
-			<span>Connect Wallet</span>
+			{#if !connectedAddress}
+				<span>Connect Wallet</span>
+			{:else}
+				<span>Connected</span>
+			{/if}
 			<button
 				on:click={(e) => {
 					e.stopPropagation();
@@ -84,21 +102,36 @@
 		{#if connectedAddress}
 			<div class="flex justify-between items-center p-2">
 				<span>{printAddress(connectedAddress)}</span>
+				<Button text={copied ? 'Copied' : 'Copy'} onClick={copy} />
 				<Button text="Disconnect" onClick={disconnect} />
 			</div>
-		{:else}
-			<div class="flex flex-col gap-4 grow">
+		{:else if !accounts}
+			<div class="flex flex-col gap-4 grow py-6">
 				<Button
+					class="grow"
 					disabled={stationWallet === undefined}
 					text="Massa Station"
 					onClick={() => connect(stationWallet)}
 				/>
 				<Button
+					class="grow"
 					disabled={bearbyWallet === undefined}
 					text="Bearby"
 					onClick={() => connect(bearbyWallet)}
 				/>
 			</div>
+		{:else}
+			{#each accounts as account}
+				<div class="flex justify-between items-center p-2">
+					<span>{printAddress(account.address())}</span>
+					{#await account.balance() then balance}
+						<span>{balance.finalBalance}</span>
+					{:catch error}
+						<span>{error.message}</span>
+					{/await}
+					<Button text="Connect" onClick={() => select(account)} />
+				</div>
+			{/each}
 		{/if}
 	</div>
 </div>
