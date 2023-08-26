@@ -4,9 +4,11 @@
 	import { printAddress } from '../../utils/methods';
 	import type { MyPageLoad } from './+page';
 	import { clientStore } from '../../store/account';
-	import { Args, type IClient } from '@massalabs/massa-web3';
+	import type { IClient } from '@massalabs/massa-web3';
 	import { fetchTokenAllowances, fetchTokenBalance } from '../../services/datastore';
 	import type { Allowance } from '../../utils/types';
+	import { buildDecreaseAllowance, buildTransfer } from '../../services/serialize';
+	import { sendTx } from '../../hooks/sendTx';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -45,51 +47,15 @@
 
 	const token = new Token(ChainId.BUILDNET, tokenAddress, properties.decimals);
 
+	const { send } = sendTx();
 	const transfer = async () => {
-		if (!massaClient) return;
-
 		const amount = BigInt(transferAmount * 10 ** properties.decimals);
-		console.log(amount);
-
-		const txId = await massaClient
-			.smartContracts()
-			.callSmartContract({
-				targetAddress: tokenAddress,
-				functionName: 'transfer',
-				parameter: new Args()
-					.addString(transferReceiver)
-					.addU256(BigInt(transferAmount * 10 ** properties.decimals)),
-				coins: 0n,
-				maxGas: 100_000_000n,
-				fee: 0n
-			})
-			.then((txId) => {
-				console.log(txId);
-			})
-			.catch((e) => {
-				console.log(e);
-			});
+		const transferData = buildTransfer(amount, tokenAddress, transferReceiver);
+		send(transferData);
 	};
-
 	const revokeAllowance = async (spender: string, amount: bigint) => {
-		if (!massaClient) return;
-
-		const txId = await massaClient
-			.smartContracts()
-			.callSmartContract({
-				targetAddress: tokenAddress,
-				functionName: 'decreaseAllowance',
-				parameter: new Args().addString(spender).addU256(amount),
-				coins: 0n,
-				maxGas: 100_000_000n,
-				fee: 0n
-			})
-			.then((txId) => {
-				console.log(txId);
-			})
-			.catch((e) => {
-				console.log(e);
-			});
+		const revokeData = buildDecreaseAllowance(amount, tokenAddress, spender);
+		send(revokeData);
 	};
 </script>
 

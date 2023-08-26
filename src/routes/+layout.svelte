@@ -11,6 +11,10 @@
 		type IProvider
 	} from '@massalabs/wallet-provider';
 	import { ClientFactory } from '@massalabs/massa-web3';
+	import { SvelteToast } from '@zerodevx/svelte-toast';
+	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
+
+	const options: SvelteToastOptions = {};
 
 	let showModal = false;
 	let connectedAddress: string | undefined;
@@ -35,10 +39,11 @@
 		return accounts;
 	};
 
-	const select = async (selectedAccount: IAccount) => {
+	const select = async (selectedAccount: IAccount, index: number) => {
 		accountStore.set(selectedAccount);
 		const client = await ClientFactory.fromWalletProvider(selectedWallet, selectedAccount);
 		clientStore.set(client);
+		localStorage.setItem('accountIndex', index.toString());
 		closeModal();
 	};
 
@@ -58,8 +63,8 @@
 		const _bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
 		bearbyWallet = _bearbyWallet;
 		const acc = await connect(stationWallet || bearbyWallet);
-		console.log(acc);
-		acc?.length && select(acc[0]);
+		const accountIndex = Number(localStorage.getItem('accountIndex')) ?? '0';
+		acc?.length && select(acc[accountIndex], accountIndex);
 	});
 </script>
 
@@ -110,3 +115,4 @@
 		/>
 	{/if}
 </main>
+<SvelteToast {options} />

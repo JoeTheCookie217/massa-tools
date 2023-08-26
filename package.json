@@ -35,6 +35,8 @@
 	"dependencies": {
 		"@dusalabs/sdk": "^0.2.6",
 		"@massalabs/massa-web3": "1.24.2",
-		"@massalabs/wallet-provider": "1.3.2"
+		"@massalabs/wallet-provider": "1.3.2",
+		"@zerodevx/svelte-toast": "^0.9.5",
+		"dayjs": "^1.11.9"
 	}
 }

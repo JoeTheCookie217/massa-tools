@@ -10,7 +10,7 @@
 	export let closeModal: () => void;
 	export let connect: (wallet: IProvider | undefined) => void;
 	export let disconnect: () => void;
-	export let select: (selectedAccount: IAccount) => {};
+	export let select: (selectedAccount: IAccount, index: number) => {};
 	export let accounts: IAccount[];
 	export let stationWallet: IProvider | undefined;
 	export let bearbyWallet: IProvider | undefined;
@@ -87,7 +87,7 @@
 				/>
 			</div>
 		{:else}
-			{#each accounts as account}
+			{#each accounts as account, index}
 				<div class="flex justify-between items-center p-2">
 					<span>{printAddress(account.address())}</span>
 					{#await account.balance() then balance}
@@ -95,7 +95,7 @@
 					{:catch error}
 						<span>{error.message}</span>
 					{/await}
-					<Button text="Connect" onClick={() => select(account)} />
+					<Button text="Connect" onClick={() => select(account, index)} />
 				</div>
 			{/each}
 		{/if}

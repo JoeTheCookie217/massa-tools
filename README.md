@@ -1,10 +1,11 @@
 ## General 
-- [ ] connect
+- [ ] connect wallet 
   - [x] account of choice
   - [x] persist on refresh 
   - [x] with Massa Station
   - [ ] with Bearby
-- [x] disconnect
+- [x] disconnect wallet 
+- [x] toast notifications
   
 ## Create
 - [ ] deploy an ERC20
