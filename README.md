@@ -1,6 +1,9 @@
 ## General 
-- [ ] connect Bearby
-- [x] connect MassaStation
+- [ ] connect
+  - [x] account of choice
+  - [x] with Massa Station
+  - [ ] with Bearby
+- [x] disconnect
   
 ## Create
 - [ ] deploy an ERC20
@@ -8,7 +11,12 @@
 
 ## Explorer (token)
 - [x] view its datastore (balance, allowance)
-- [x] interact with it (transfer, approve, mint, burn)
+- [ ] interact with it
+  - [x] transfer
+  - [x] revoke
+  - [ ] approve
+  - [ ] mint?
+  - [ ] burn?
 
 ## Multisig
 - [ ] create a multisig wallet
@@ -18,5 +26,6 @@
 - [ ] view wallet's datastore (balance, owners, threshold)
 
 ## Staking
-- [ ] deposit/withdraw
+- [x] approve/deposit
+- [x] withdraw
 - [ ] view pending rewards
