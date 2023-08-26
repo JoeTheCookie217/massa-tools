@@ -7,7 +7,7 @@
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
 	import { client } from '../../utils/client';
 
-	const stakingAddress = 'AS12148EJam1pa9F9FtfvbWVyLaGtxf9Zocer2HvEDJxuPGumUQAT';
+	const stakingAddress = 'AS12JQvjYoVUpdh3eJLBU8jSVdqxNYDkFD9oQpcrj8pThgryiRdT7';
 	const depositToken = new Token(
 		ChainId.BUILDNET,
 		'AS1Tzj3E735idxk4j7LxdiYwkvfJv4ZJ7Lqc14ryrEB5BLJfCPKX',
@@ -15,7 +15,7 @@
 	); // vault WMAS-USDC
 	const rewardToken = new Token(
 		ChainId.BUILDNET,
-		'AS1SdRxUBZyUaAGdQ4RJsb8KFDSujtuLoC12s3agwFW575d8Pf9o',
+		'AS1TVPQb8SWscuLjhhPwCtqAwD7BjnD2pPSju9aQug2a2Cxmrjq5',
 		6
 	);
 	let depositAmount: number;
@@ -25,7 +25,6 @@
 		if (client) massaClient = client;
 	});
 	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address();
-	// $: depositBalance = fetchTokenBalance(depositToken, connectedAddress);
 
 	let depositBalance = 0n;
 	let stakedBalance = 0n;
