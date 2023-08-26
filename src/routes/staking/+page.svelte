@@ -19,6 +19,7 @@
 		6
 	);
 	let depositAmount: number;
+	let withdrawAmount: number;
 
 	let massaClient: IClient;
 	clientStore.subscribe((client) => {
@@ -33,30 +34,30 @@
 	let totalStaked = 0n;
 
 	$: {
-		fetchBalances();
-		fetchStakingInfo();
+		fetchBalances(connectedAddress);
+		fetchStakingInfo(connectedAddress);
 	}
 
-	const fetchBalances = () => {
-		if (!connectedAddress) return;
+	const fetchBalances = (address: string | undefined) => {
+		if (!address) return;
 
-		fetchTokenBalance(depositToken.address, connectedAddress).then((balance) => {
+		fetchTokenBalance(depositToken.address, address).then((balance) => {
 			depositBalance = balance;
 		});
-		fetchTokenBalance(rewardToken.address, connectedAddress).then((balance) => {
+		fetchTokenBalance(rewardToken.address, address).then((balance) => {
 			rewardBalance = balance;
 		});
 	};
 
-	const fetchStakingInfo = () => {
-		if (!connectedAddress) return;
+	const fetchStakingInfo = (address: string | undefined) => {
+		if (!address) return;
 
 		client
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
 				targetFunction: 'getUserStakedAmount',
-				parameter: new Args().addString(connectedAddress),
+				parameter: new Args().addString(address),
 				maxGas: 100_000_000n
 			})
 			.then((result) => {
@@ -67,7 +68,7 @@
 			.readSmartContract({
 				targetAddress: stakingAddress,
 				targetFunction: 'getPendingRewards',
-				parameter: new Args().addString(connectedAddress),
+				parameter: new Args().addString(address),
 				maxGas: 100_000_000n
 			})
 			.then((result) => {
@@ -78,7 +79,7 @@
 			.readSmartContract({
 				targetAddress: stakingAddress,
 				targetFunction: 'getTotalStakedAmount',
-				parameter: new Args().addString(connectedAddress),
+				parameter: [],
 				maxGas: 100_000_000n
 			})
 			.then((result) => {
@@ -111,12 +112,35 @@
 	const withdraw = () => {
 		if (!massaClient) return;
 
+		const amount = parseUnits(withdrawAmount.toString(), depositToken.decimals);
 		massaClient
 			.smartContracts()
 			.callSmartContract({
 				targetAddress: stakingAddress,
 				functionName: 'withdraw',
-				parameter: [],
+				parameter: new Args().addU64(amount),
+				coins: 0n,
+				maxGas: 100_000_000n,
+				fee: 0n
+			})
+			.then((txId) => {
+				console.log(txId);
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	};
+
+	const approveDeposit = () => {
+		if (!massaClient) return;
+
+		const amount = parseUnits(depositAmount.toString(), depositToken.decimals);
+		massaClient
+			.smartContracts()
+			.callSmartContract({
+				targetAddress: depositToken.address,
+				functionName: 'increaseAllowance',
+				parameter: new Args().addString(stakingAddress).addU64(amount),
 				coins: 0n,
 				maxGas: 100_000_000n,
 				fee: 0n
@@ -132,9 +156,15 @@
 
 {#if connectedAddress}
 	<div class="">
-		<input type="number" bind:value={depositAmount} />
-		<Button onClick={deposit} text="Deposit" />
-		<Button onClick={withdraw} text="Withdraw" />
+		<div>
+			<input type="number" bind:value={depositAmount} />
+			<Button onClick={approveDeposit} text="Approve" />
+			<Button onClick={deposit} text="Deposit" />
+		</div>
+		<div>
+			<input type="number" bind:value={withdrawAmount} />
+			<Button onClick={withdraw} text="Withdraw" />
+		</div>
 
 		<div class="flex flex-col">
 			<div>
