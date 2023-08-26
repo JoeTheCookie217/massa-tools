@@ -5,20 +5,45 @@
 	import type { MyPageLoad } from './+page';
 	import { clientStore } from '../../store/account';
 	import { Args, type IClient } from '@massalabs/massa-web3';
+	import { fetchTokenAllowances, fetchTokenBalance } from '../../services/datastore';
+	import type { Allowance } from '../../utils/types';
+
+	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
 	export let data: MyPageLoad;
 	const { properties, balances } = data;
+	const tokenAddress = properties.address;
 
 	let massaClient: IClient | null = null;
 	clientStore.subscribe((client) => {
 		massaClient = client;
 	});
+	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address();
 
+	let userBalance: bigint;
 	let transferReceiver: string;
 	let transferAmount: number;
-	$: disabledTransfer = !transferReceiver || transferAmount == 0 || !massaClient;
+	$: disabledTransfer =
+		!massaClient || !transferReceiver || !transferAmount || transferAmount > userBalance;
 
-	const token = new Token(ChainId.BUILDNET, properties.address, properties.decimals);
+	let allowances: Allowance[] = [];
+	$: {
+		console.log(connectedAddress);
+		fetch();
+	}
+
+	const fetch = () => {
+		if (!connectedAddress) return;
+
+		fetchTokenAllowances(tokenAddress, connectedAddress).then((res) => {
+			allowances = res;
+		});
+		fetchTokenBalance(tokenAddress, connectedAddress).then((balance) => {
+			userBalance = balance;
+		});
+	};
+
+	const token = new Token(ChainId.BUILDNET, tokenAddress, properties.decimals);
 
 	const transfer = async () => {
 		if (!massaClient) return;
@@ -29,7 +54,7 @@
 		const txId = await massaClient
 			.smartContracts()
 			.callSmartContract({
-				targetAddress: properties.address,
+				targetAddress: tokenAddress,
 				functionName: 'transfer',
 				parameter: new Args()
 					.addString(transferReceiver)
@@ -38,10 +63,33 @@
 				maxGas: 100_000_000n,
 				fee: 0n
 			})
+			.then((txId) => {
+				console.log(txId);
+			})
 			.catch((e) => {
 				console.log(e);
 			});
-		console.log(txId);
+	};
+
+	const revokeAllowance = async (spender: string, amount: bigint) => {
+		if (!massaClient) return;
+
+		const txId = await massaClient
+			.smartContracts()
+			.callSmartContract({
+				targetAddress: tokenAddress,
+				functionName: 'decreaseAllowance',
+				parameter: new Args().addString(spender).addU256(amount),
+				coins: 0n,
+				maxGas: 100_000_000n,
+				fee: 0n
+			})
+			.then((txId) => {
+				console.log(txId);
+			})
+			.catch((e) => {
+				console.log(e);
+			});
 	};
 </script>
 
@@ -73,11 +121,26 @@
 	<h2 class="text-2xl">Actions</h2>
 	{#if massaClient}
 		<div class="flex flex-col gap-2">
-			<div>
-				<input type="text" bind:value={transferReceiver} placeholder="Receiver address" />
-				<input type="number" bind:value={transferAmount} placeholder="Amount" />
-				<Button onClick={transfer} disabled={disabledTransfer} text="Transfer" />
-			</div>
+			{#if userBalance > 0n}
+				<div>
+					<h3 class="text-lg">Transfer</h3>
+					<input type="text" bind:value={transferReceiver} placeholder="Receiver address" />
+					<input type="number" bind:value={transferAmount} placeholder="Amount" />
+					<Button onClick={transfer} disabled={disabledTransfer} text="Transfer" />
+				</div>
+			{/if}
+			{#if allowances.length > 0}
+				<h3 class="text-lg">Allowances</h3>
+				{#each allowances as { spender, amount }}
+					{@const allowance = new TokenAmount(token, amount)}
+					{#if allowance.raw !== 0n && spender && spender !== connectedAddress}
+						<p>
+							{printAddress(spender)}: {allowance.toSignificant()}
+							<Button onClick={() => revokeAllowance(spender, amount)} text="Revoke" />
+						</p>
+					{/if}
+				{/each}
+			{/if}
 		</div>
 	{:else}
 		<p>Connect wallet to perform actions</p>
