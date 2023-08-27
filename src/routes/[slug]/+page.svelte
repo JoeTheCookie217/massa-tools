@@ -7,7 +7,12 @@
 	import type { Client } from '@massalabs/massa-web3';
 	import { fetchTokenAllowances, fetchTokenBalance } from '../../services/datastore';
 	import type { Allowance } from '../../utils/types';
-	import { buildDecreaseAllowance, buildTransfer } from '../../services/serialize';
+	import {
+		buildBurn,
+		buildDecreaseAllowance,
+		buildMint,
+		buildTransfer
+	} from '../../services/serialize';
 	import { sendTx } from '../../hooks/sendTx';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
@@ -20,13 +25,21 @@
 	clientStore.subscribe((client) => {
 		massaClient = client;
 	});
-	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address();
+	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address() || undefined;
 
 	let userBalance: bigint;
+
 	let transferReceiver: string;
 	let transferAmount: number;
 	$: disabledTransfer =
 		!massaClient || !transferReceiver || !transferAmount || transferAmount > userBalance;
+
+	let burnAmount: number;
+	$: disabledBurn = !massaClient || !burnAmount || burnAmount > userBalance;
+
+	let mintReceiver: string;
+	let mintAmount: number;
+	$: disabledMint = !massaClient || !mintReceiver || !mintAmount;
 
 	let allowances: Allowance[] = [];
 	$: {
@@ -47,7 +60,11 @@
 
 	const token = new Token(ChainId.BUILDNET, tokenAddress, properties.decimals);
 
-	const { send } = sendTx();
+	const { send, subscribe } = sendTx();
+	subscribe((state) => {
+		console.log(state);
+	});
+
 	const transfer = async () => {
 		const amount = BigInt(transferAmount * 10 ** properties.decimals);
 		const transferData = buildTransfer(amount, tokenAddress, transferReceiver);
@@ -56,6 +73,16 @@
 	const revokeAllowance = async (spender: string, amount: bigint) => {
 		const revokeData = buildDecreaseAllowance(amount, tokenAddress, spender);
 		send(revokeData);
+	};
+	const mint = async () => {
+		const amount = BigInt(mintAmount * 10 ** properties.decimals);
+		const mintData = buildMint(amount, tokenAddress, mintReceiver);
+		send(mintData);
+	};
+	const burn = async () => {
+		const amount = BigInt(burnAmount * 10 ** properties.decimals);
+		const burnData = buildBurn(amount, tokenAddress);
+		send(burnData);
 	};
 </script>
 
@@ -79,11 +106,9 @@
 			{@const balance = new TokenAmount(token, value)}
 			{@const share = balance.multiply(100n).divide(new TokenAmount(token, properties.totalSupply))}
 
-			{#if balance.raw !== 0n}
-				<p>
-					{printAddress(address)}: {balance.toSignificant()} ({share.toSignificant(2)}%)
-				</p>
-			{/if}
+			<p>
+				{printAddress(address)}: {balance.toSignificant()} ({share.toSignificant(3)}%)
+			</p>
 		{/each}
 	{/if}
 	<h2 class="text-2xl">Actions</h2>
@@ -95,6 +120,21 @@
 					<input type="text" bind:value={transferReceiver} placeholder="Receiver address" />
 					<input type="number" bind:value={transferAmount} placeholder="Amount" />
 					<Button onClick={transfer} disabled={disabledTransfer} text="Transfer" />
+				</div>
+				{#if properties.burnable}
+					<div>
+						<h3 class="text-lg">Burn</h3>
+						<input type="number" bind:value={burnAmount} placeholder="Amount" />
+						<Button onClick={burn} disabled={disabledBurn} text="Burn" />
+					</div>
+				{/if}
+			{/if}
+			{#if connectedAddress === properties.owner && properties.mintable}
+				<div>
+					<h3 class="text-lg">Mint</h3>
+					<input type="text" bind:value={mintReceiver} placeholder="Receiver address" />
+					<input type="number" bind:value={mintAmount} placeholder="Amount" />
+					<Button onClick={mint} disabled={disabledMint} text="Mint" />
 				</div>
 			{/if}
 			{#if allowances.length > 0}

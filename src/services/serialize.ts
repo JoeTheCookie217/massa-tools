@@ -31,6 +31,28 @@ export const buildIncreaseAllowance = (
 	};
 };
 
+export const buildMint = (
+	amount: bigint,
+	tokenAddress: string,
+	recipientAddress: string
+): ICallData => {
+	return {
+		...baseCallData,
+		targetAddress: tokenAddress,
+		functionName: 'mint',
+		parameter: new Args().addString(recipientAddress).addU64(amount)
+	};
+};
+
+export const buildBurn = (amount: bigint, tokenAddress: string): ICallData => {
+	return {
+		...baseCallData,
+		targetAddress: tokenAddress,
+		functionName: 'burn',
+		parameter: new Args().addU64(amount)
+	};
+};
+
 export const buildDecreaseAllowance = (
 	amount: bigint,
 	tokenAddress: string,

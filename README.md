@@ -8,7 +8,7 @@
 - [x] toast notifications
   
 ## Create
-- [ ] deploy an ERC20
+- [x] deploy an ERC20
 - [ ] deploy an ERC721
 
 ## Explorer (token)
@@ -17,8 +17,8 @@
   - [x] transfer
   - [x] revoke
   - [ ] approve
-  - [ ] mint?
-  - [ ] burn?
+  - [x] mint
+  - [x] burn
 
 ## Multisig
 - [ ] create a multisig wallet

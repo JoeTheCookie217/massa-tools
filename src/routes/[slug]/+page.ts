@@ -48,9 +48,12 @@ export async function load({ params }): Promise<MyPageLoad> {
 				const res = r[i].final_value;
 				if (res) {
 					if (key.startsWith('BALANCE')) {
+						const balance = bytesToNumber(res);
+						if (balance === 0n) continue;
+
 						balances.push({
 							address: key.slice(7),
-							value: bytesToNumber(res)
+							value: balance
 						});
 						continue;
 					}
@@ -103,7 +106,6 @@ const functionExists = async (address: string, functionName: string) => {
 		})
 		.then(() => true)
 		.catch((err) => {
-			console.log(err, typeof err);
 			if (JSON.stringify(err).includes('Missing export')) return false;
 			return true;
 		});
