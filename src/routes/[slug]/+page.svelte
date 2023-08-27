@@ -4,7 +4,7 @@
 	import { printAddress } from '../../utils/methods';
 	import type { MyPageLoad } from './+page';
 	import { clientStore } from '../../store/account';
-	import type { IClient } from '@massalabs/massa-web3';
+	import type { Client } from '@massalabs/massa-web3';
 	import { fetchTokenAllowances, fetchTokenBalance } from '../../services/datastore';
 	import type { Allowance } from '../../utils/types';
 	import { buildDecreaseAllowance, buildTransfer } from '../../services/serialize';
@@ -16,7 +16,7 @@
 	const { properties, balances } = data;
 	const tokenAddress = properties.address;
 
-	let massaClient: IClient | null = null;
+	let massaClient: Client | null = null;
 	clientStore.subscribe((client) => {
 		massaClient = client;
 	});

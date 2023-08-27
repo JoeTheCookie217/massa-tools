@@ -1,11 +1,5 @@
 <script lang="ts">
-	import {
-		Args,
-		bytesToU64,
-		strToBytes,
-		type IClient,
-		type ICallData
-	} from '@massalabs/massa-web3';
+	import { Args, bytesToU64, strToBytes, type Client, type ICallData } from '@massalabs/massa-web3';
 	import { clientStore } from '../../store/account';
 	import Button from '../../components/button.svelte';
 	import { fetchTokenBalance } from '../../services/datastore';
@@ -24,21 +18,23 @@
 	} from '../../services/serialize';
 	dayjs.extend(relativeTime);
 
-	const stakingAddress = 'AS177fsNiteqhKQ2nKhjQvKvZrZ9WXBAp27rGfx2AabwpRf7FfAJ';
+	const stakingAddress = 'AS122MZkHytLQnBA6qExyfpYoRzy1No64j9oDqUHhmas3uBfhV38A';
 	const depositToken = new Token(
 		ChainId.BUILDNET,
 		'AS1Tzj3E735idxk4j7LxdiYwkvfJv4ZJ7Lqc14ryrEB5BLJfCPKX',
-		9
-	); // vault WMAS-USDC
+		9,
+		'WMAS-USDC APT'
+	);
 	const rewardToken = new Token(
 		ChainId.BUILDNET,
-		'AS1DPfKnRKCH1aMreX1wagxxeMiV8UeWAWvQqgM4GyuA3gAMi55y',
-		6
+		'AS1uoB1HuRXZwvtE7xrW2ZBFbGrnaFEq2BynV1XPAV2bdM52dp87',
+		6,
+		'reDUSA'
 	);
 	let depositAmount: number = 0;
 	let withdrawAmount: number = 0;
 
-	let massaClient: IClient | null = null;
+	let massaClient: Client | null = null;
 	clientStore.subscribe((client) => {
 		if (client) massaClient = client;
 	});
@@ -140,18 +136,21 @@
 			});
 	};
 
-	const { send } = sendTx();
+	const { send, subscribe } = sendTx();
+	subscribe((x) => {
+		console.log(x);
+	});
 
-	const depositData: ICallData = buildDeposit(depositAmount, depositToken, stakingAddress);
+	$: depositData = buildDeposit(depositAmount, depositToken, stakingAddress);
 	const deposit = () => send(depositData);
 
-	const withdrawData: ICallData = buildWithdraw(withdrawAmount, depositToken, stakingAddress);
+	$: withdrawData = buildWithdraw(withdrawAmount, depositToken, stakingAddress);
 	const withdraw = () => send(withdrawData);
 
-	const harvestData = buildHarvest(stakingAddress);
+	$: harvestData = buildHarvest(stakingAddress);
 	const harvest = () => send(harvestData);
 
-	const approveData = buildIncreaseAllowance(
+	$: approveData = buildIncreaseAllowance(
 		parseUnits(depositAmount.toString(), depositToken.decimals),
 		depositToken.address,
 		stakingAddress
@@ -177,24 +176,28 @@
 				<span>Deposit Token Balance:</span>
 				<span>
 					{new TokenAmount(depositToken, depositBalance).toSignificant()}
+					{depositToken.symbol}
 				</span>
 			</div>
 			<div>
 				<span>Staked Balance:</span>
 				<span>
 					{new TokenAmount(depositToken, stakedBalance).toSignificant()}
+					{depositToken.symbol}
 				</span>
 			</div>
 			<div>
 				<span>Total staked:</span>
 				<span>
 					{new TokenAmount(depositToken, totalStaked).toSignificant()}
+					{depositToken.symbol}
 				</span>
 			</div>
 			<div>
 				<span>Pending Rewards:</span>
 				<span>
 					{new TokenAmount(rewardToken, pendingBalance).toSignificant()}
+					{rewardToken.symbol}
 				</span>
 				<span>(last update: {lastUpdate ? dayjs(lastUpdate).fromNow() : 'never'})</span>
 			</div>

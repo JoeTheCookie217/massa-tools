@@ -71,7 +71,7 @@
 					<Button text="Disconnect" onClick={disconnect} />
 				</div>
 			</div>
-		{:else if !accounts}
+		{:else if !accounts || accounts.length === 0}
 			<div class="flex flex-col gap-4 grow py-6">
 				<Button
 					class="grow"

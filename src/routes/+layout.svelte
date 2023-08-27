@@ -49,6 +49,7 @@
 
 	const disconnect = () => {
 		accountStore.set(null);
+		accounts = [];
 	};
 
 	const closeModal = () => {

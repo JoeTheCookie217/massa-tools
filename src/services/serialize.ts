@@ -82,3 +82,28 @@ export const buildHarvest = (stakingAddress: string): ICallData => {
 		parameter: new Args()
 	};
 };
+
+// DEPLOY
+
+export const buildDeployToken = (
+	name: string,
+	symbol: string,
+	decimals: number,
+	supply: bigint,
+	mintable: boolean,
+	burnable: boolean
+): ICallData => {
+	const deployerAddress = '';
+	return {
+		...baseCallData,
+		targetAddress: deployerAddress,
+		functionName: 'deploy',
+		parameter: new Args()
+			.addString(name)
+			.addString(symbol)
+			.addU8(decimals)
+			.addU64(supply)
+			.addBool(mintable)
+			.addBool(burnable)
+	};
+};

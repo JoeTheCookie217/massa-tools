@@ -1,4 +1,4 @@
-import type { ICallData, IClient } from '@massalabs/massa-web3';
+import type { ICallData, Client } from '@massalabs/massa-web3';
 import { writable } from 'svelte/store';
 import { clientStore } from '../store/account';
 import { toast } from '@zerodevx/svelte-toast';
@@ -15,12 +15,12 @@ const defaultState: TState = {
 };
 
 export function sendTx() {
-	let massaClient: IClient | null = null;
+	let massaClient: Client | null = null;
 	clientStore.subscribe((client) => {
 		if (client) massaClient = client;
 	});
 
-	const { subscribe, set, update } = writable(defaultState);
+	const { subscribe, set } = writable(defaultState);
 
 	const send = async (callData: ICallData) => {
 		set({ pending: true, error: null, txId: null });
@@ -38,7 +38,17 @@ export function sendTx() {
 			});
 			return txId;
 		} catch (error: any) {
-			set({ pending: false, error: error.message, txId: null });
+			const errorSplit = error.message.split('error: ');
+			const errorMsg = errorSplit[errorSplit.length - 1].split(' at')[0];
+			set({ pending: false, error: errorMsg, txId: null });
+
+			toast.push(errorMsg, {
+				theme: {
+					'--toastColor': 'mintcream',
+					'--toastBackground': 'rgb(180, 80, 75)',
+					'--toastBarBackground': '#FF4136'
+				}
+			});
 			throw error;
 		}
 	};
