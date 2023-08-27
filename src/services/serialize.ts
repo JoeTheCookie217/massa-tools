@@ -1,5 +1,5 @@
 import { Token, parseUnits } from '@dusalabs/sdk';
-import { Args, type ICallData } from '@massalabs/massa-web3';
+import { Args, MassaUnits, type ICallData } from '@massalabs/massa-web3';
 
 const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
 	coins: 0n,
@@ -93,7 +93,7 @@ export const buildDeployToken = (
 	mintable: boolean,
 	burnable: boolean
 ): ICallData => {
-	const deployerAddress = '';
+	const deployerAddress = 'AS12evPxJYGrKxymqjG1nXUHW6Vxwy95Sm2uTn9rY5UvwJ6hAoM4i';
 	return {
 		...baseCallData,
 		targetAddress: deployerAddress,
@@ -104,6 +104,7 @@ export const buildDeployToken = (
 			.addU8(decimals)
 			.addU64(supply)
 			.addBool(mintable)
-			.addBool(burnable)
+			.addBool(burnable),
+		coins: 35n * MassaUnits.oneMassa
 	};
 };

@@ -70,6 +70,8 @@
 		</div>
 		<div>Owner: {printAddress(properties.owner)}</div>
 		<div>Holders: {balances.length}</div>
+		<div>Mintable: {properties.mintable}</div>
+		<div>Burnable: {properties.burnable}</div>
 	</div>
 	{#if balances.length > 0}
 		<h2 class="text-2xl">Balances</h2>

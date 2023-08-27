@@ -14,6 +14,8 @@ type Properties = {
 	symbol: string;
 	totalSupply: bigint;
 	owner: string;
+	mintable: boolean;
+	burnable: boolean;
 };
 
 export type MyPageLoad = {
@@ -78,6 +80,9 @@ export async function load({ params }): Promise<MyPageLoad> {
 		});
 
 	if (Object.keys(properties).length === 0) throw error(404, 'ERC20 not found');
+
+	await functionExists(address, 'mint').then((res) => (properties.mintable = res));
+	await functionExists(address, 'burn').then((res) => (properties.burnable = res));
 	balances = balances.sort((a, b) => Number(b.value - a.value));
 	properties.address = address;
 
@@ -86,3 +91,20 @@ export async function load({ params }): Promise<MyPageLoad> {
 		properties
 	};
 }
+
+const functionExists = async (address: string, functionName: string) => {
+	return client
+		.smartContracts()
+		.readSmartContract({
+			maxGas: 100_000_000n,
+			parameter: [],
+			targetAddress: address,
+			targetFunction: functionName
+		})
+		.then(() => true)
+		.catch((err) => {
+			console.log(err, typeof err);
+			if (JSON.stringify(err).includes('Missing export')) return false;
+			return true;
+		});
+};
