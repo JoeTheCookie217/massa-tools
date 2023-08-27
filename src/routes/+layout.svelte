@@ -31,6 +31,7 @@
 	const connect = async (wallet: IProvider | undefined) => {
 		if (!wallet) return;
 
+		localStorage.setItem('wallet', wallet.name());
 		const _accounts = await wallet.accounts();
 		if (!_accounts?.length) return;
 
@@ -50,6 +51,8 @@
 	const disconnect = () => {
 		accountStore.set(null);
 		accounts = [];
+		localStorage.removeItem('wallet');
+		localStorage.removeItem('accountIndex');
 	};
 
 	const closeModal = () => {
@@ -63,7 +66,11 @@
 		stationWallet = _stationWallet;
 		const _bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
 		bearbyWallet = _bearbyWallet;
-		const acc = await connect(stationWallet || bearbyWallet);
+		const walletKey = localStorage.getItem('wallet');
+		const wallet = providers.find((provider) => provider.name() === walletKey);
+		if (!walletKey || !wallet) return;
+
+		const acc = await connect(wallet);
 		const accountIndex = Number(localStorage.getItem('accountIndex')) ?? '0';
 		acc?.length && select(acc[accountIndex], accountIndex);
 	});
