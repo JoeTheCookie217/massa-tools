@@ -6,7 +6,7 @@
   - [ ] with Bearby
 - [x] disconnect wallet 
 - [x] display toast notifications
-- [ ] select network
+- [x] select network
   
 ## Create
 - [x] deploy an ERC20

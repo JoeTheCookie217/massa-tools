@@ -3,9 +3,7 @@
 	import { clientStore } from '../../store/account';
 	import Button from '../../components/button.svelte';
 	import { fetchTokenBalance } from '../../services/datastore';
-	import { onMount } from 'svelte';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
-	import { client } from '../../utils/client';
 
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
@@ -16,7 +14,11 @@
 		buildIncreaseAllowance,
 		buildWithdraw
 	} from '../../services/serialize';
+	import { get } from 'svelte/store';
+	import networkStore from '../../store/network';
 	dayjs.extend(relativeTime);
+
+	const client = get(networkStore);
 
 	const stakingAddress = 'AS122MZkHytLQnBA6qExyfpYoRzy1No64j9oDqUHhmas3uBfhV38A';
 	const depositToken = new Token(

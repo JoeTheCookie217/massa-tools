@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import { printAddress } from '../utils/methods';
+	import { chainIdToProviders, printAddress, providerToChainId } from '../utils/methods';
 	import { onMount } from 'svelte';
 	import Modal from '../components/modal.svelte';
 	import { accountStore, clientStore } from '../store/account';
@@ -13,8 +13,14 @@
 	import { ClientFactory } from '@massalabs/massa-web3';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
+	import { ChainId } from '@dusalabs/sdk';
+	import networkStore from '../store/network';
 
 	const options: SvelteToastOptions = {};
+
+	const chains: ChainId[] = Object.values(ChainId).filter(
+		(v) => typeof v === 'number'
+	) as ChainId[];
 
 	let showModal = false;
 	let connectedAddress: string | undefined;
@@ -27,6 +33,19 @@
 	let selectedWallet: IProvider;
 	let stationWallet: IProvider | undefined;
 	let bearbyWallet: IProvider | undefined;
+
+	let selectedNetwork: ChainId;
+	networkStore.subscribe((network) => {
+		selectedNetwork = providerToChainId(network.getPublicProviders()[0]);
+	});
+	const changeChain = (chain: ChainId) =>
+		networkStore.update((network) => {
+			const newProviders = chainIdToProviders(chain);
+			localStorage.setItem('defaultPublicApi', newProviders[0].url);
+			console.log(localStorage.getItem('defaultPublicApi'), newProviders[0].url);
+			network.setCustomProviders(newProviders);
+			return network;
+		});
 
 	const connect = async (wallet: IProvider | undefined) => {
 		if (!wallet) return;
@@ -42,6 +61,12 @@
 
 	const select = async (selectedAccount: IAccount, index: number) => {
 		accountStore.set(selectedAccount);
+
+		selectedWallet.getNodesUrls().then((res) => {
+			console.log(res);
+		});
+
+		// @ts-ignore
 		const client = await ClientFactory.fromWalletProvider(selectedWallet, selectedAccount);
 		clientStore.set(client);
 		localStorage.setItem('accountIndex', index.toString());
@@ -87,6 +112,16 @@
 			<a href="/multisig">Multisig</a>
 			<a href="/staking">Staking</a>
 
+			<div class="flex flex-col gap-1">
+				{#each chains as chain}
+					<button
+						on:click={() => changeChain(chain)}
+						class={`${selectedNetwork === chain && 'text-purple-300'} hover:text-purple-200`}
+					>
+						{ChainId[chain].toLowerCase()}
+					</button>
+				{/each}
+			</div>
 			<Button
 				onClick={() => (showModal = true)}
 				text={connectedAddress ? printAddress(connectedAddress) : 'Connect Wallet'}
