@@ -42,7 +42,6 @@
 		networkStore.update((network) => {
 			const newProviders = chainIdToProviders(chain);
 			localStorage.setItem('defaultPublicApi', newProviders[0].url);
-			console.log(localStorage.getItem('defaultPublicApi'), newProviders[0].url);
 			network.setCustomProviders(newProviders);
 			return network;
 		});
