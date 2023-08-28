@@ -14,6 +14,8 @@
 		buildTransfer
 	} from '../../services/serialize';
 	import { sendTx } from '../../hooks/sendTx';
+	import { onMount } from 'svelte';
+	import { addRecentAddress } from '../../utils/localStorage';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -84,6 +86,15 @@
 		const burnData = buildBurn(amount, tokenAddress);
 		send(burnData);
 	};
+
+	onMount(() => {
+		addRecentAddress({
+			address: tokenAddress,
+			chainId: ChainId.BUILDNET,
+			name: properties.name,
+			symbol: properties.symbol
+		});
+	});
 </script>
 
 <div class="flex flex-col gap-4">

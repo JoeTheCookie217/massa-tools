@@ -5,7 +5,8 @@
   - [x] with Massa Station
   - [ ] with Bearby
 - [x] disconnect wallet 
-- [x] toast notifications
+- [x] display toast notifications
+- [ ] select network
   
 ## Create
 - [x] deploy an ERC20
@@ -13,12 +14,12 @@
 
 ## Explorer (token)
 - [x] view its datastore (balance, allowance)
-- [ ] interact with it
+- [x] interact with it
   - [x] transfer
   - [x] revoke
-  - [ ] approve
   - [x] mint
   - [x] burn
+- [x] save recently viewed history
 
 ## Multisig
 - [ ] create a multisig wallet

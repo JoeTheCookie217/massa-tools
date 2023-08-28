@@ -1,22 +1,9 @@
 import { error } from '@sveltejs/kit';
 import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
-import { client } from '../../utils/client';
 import { bytesToNumber } from '../../utils/methods';
-
-type BalanceEntry = {
-	address: string;
-	value: bigint;
-};
-type Properties = {
-	address: string;
-	decimals: number;
-	name: string;
-	symbol: string;
-	totalSupply: bigint;
-	owner: string;
-	mintable: boolean;
-	burnable: boolean;
-};
+import networkStore from '../../store/network';
+import { get } from 'svelte/store';
+import type { BalanceEntry, Properties } from '../../utils/types';
 
 export type MyPageLoad = {
 	balances: BalanceEntry[];
@@ -24,16 +11,22 @@ export type MyPageLoad = {
 };
 
 const erc20Keys = ['DECIMALS', 'SYMBOL', 'NAME', 'TOTAL_SUPPLY', 'OWNER'];
+const client = get(networkStore);
 
 export async function load({ params }): Promise<MyPageLoad> {
 	const address = params.slug;
 
+	const notFoundError = error(404, 'Address not found');
 	const keys = await client
 		.publicApi()
 		.getAddresses([address])
 		.then(async (res) => {
-			if (!res[0]) throw new Error('No such address');
+			if (!res[0]) throw notFoundError;
 			return res[0].candidate_datastore_keys.map((key) => String.fromCharCode(...key));
+		})
+		.catch((err) => {
+			console.error(err);
+			throw notFoundError;
 		});
 
 	let balances: BalanceEntry[] = [];
@@ -80,6 +73,10 @@ export async function load({ params }): Promise<MyPageLoad> {
 					}
 				}
 			}
+		})
+		.catch((err) => {
+			console.error(err);
+			throw error(404, 'Datastore invalid');
 		});
 
 	if (Object.keys(properties).length === 0) throw error(404, 'ERC20 not found');
