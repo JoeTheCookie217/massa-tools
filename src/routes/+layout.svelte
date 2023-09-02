@@ -102,15 +102,14 @@
 
 <main class="h-screen flex flex-col">
 	<header class="flex justify-around items-center p-2">
-		<h1>
-			<a class="text-2xl" href="/">Massa Tools</a>
-		</h1>
 		<nav class="flex items-center gap-4">
+			<a href="/">0xtools</a>
 			<a href="/explorer">Explorer</a>
 			<a href="/create">Create</a>
 			<a href="/multisig">Multisig</a>
 			<a href="/staking">Staking</a>
-
+		</nav>
+		<div class="flex items-center">
 			<div class="flex flex-col gap-1">
 				{#each chains as chain}
 					<button
@@ -125,7 +124,8 @@
 				onClick={() => (showModal = true)}
 				text={connectedAddress ? printAddress(connectedAddress) : 'Connect Wallet'}
 			/>
-		</nav>
+			<span>Dark mode</span>
+		</div>
 	</header>
 
 	<section class="grow grid place-items-center">
