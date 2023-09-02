@@ -15,6 +15,7 @@
 	import Button from '$lib/components/button.svelte';
 	import networkStore from '$lib/store/network';
 	import '../app.css';
+	import LightSwitch from '$lib/components/light-switch/light-switch.svelte';
 
 	const options: SvelteToastOptions = {};
 
@@ -124,7 +125,7 @@
 				onClick={() => (showModal = true)}
 				text={connectedAddress ? printAddress(connectedAddress) : 'Connect Wallet'}
 			/>
-			<span>Dark mode</span>
+			<LightSwitch />
 		</div>
 	</header>
 

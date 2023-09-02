@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Button from './button.svelte';
-	import { printAddress, printMasBalance } from '$utils/methods';
+	import { printAddress, printMasBalance } from '$lib/utils/methods';
 	import type { IAccount, IProvider } from '@massalabs/wallet-provider';
 
 	// PROPS
