@@ -1,10 +1,5 @@
 <script lang="ts">
-	import '../app.css';
-	import { chainIdToProviders, printAddress, providerToChainId } from '../utils/methods';
 	import { onMount } from 'svelte';
-	import Modal from '../components/modal.svelte';
-	import { accountStore, clientStore } from '../store/account';
-	import Button from '../components/button.svelte';
 	import {
 		providers as getProviders,
 		type IAccount,
@@ -14,7 +9,12 @@
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
 	import { ChainId } from '@dusalabs/sdk';
-	import networkStore from '../store/network';
+	import { chainIdToProviders, printAddress, providerToChainId } from '$lib/utils/methods';
+	import Modal from '$lib/components/modal.svelte';
+	import { accountStore, clientStore } from '$lib/store/account';
+	import Button from '$lib/components/button.svelte';
+	import networkStore from '$lib/store/network';
+	import '../app.css';
 
 	const options: SvelteToastOptions = {};
 

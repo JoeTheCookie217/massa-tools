@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Button from '../../components/button.svelte';
-	import { clearRecentAddresses, getRecentAddresses } from '../../utils/localStorage';
+	import Button from '$lib/components/button.svelte';
+	import { clearRecentAddresses, getRecentAddresses } from '$lib/utils/localStorage';
 
 	let address: string;
 

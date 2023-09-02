@@ -1,9 +1,9 @@
 import { error } from '@sveltejs/kit';
 import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
-import { bytesToNumber } from '../../utils/methods';
-import networkStore from '../../store/network';
+import { bytesToNumber } from '$lib/utils/methods';
+import networkStore from '$lib/store/network';
 import { get } from 'svelte/store';
-import type { BalanceEntry, Properties } from '../../utils/types';
+import type { BalanceEntry, Properties } from '$lib/utils/types';
 
 export type MyPageLoad = {
 	balances: BalanceEntry[];

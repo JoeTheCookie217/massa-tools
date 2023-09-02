@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
-	import Button from '../../components/button.svelte';
-	import { printAddress } from '../../utils/methods';
+	import Button from '$lib/components/button.svelte';
+	import { printAddress } from '$lib/utils/methods';
 	import type { MyPageLoad } from './+page';
-	import { clientStore } from '../../store/account';
+	import { clientStore } from '$lib/store/account';
 	import type { Client } from '@massalabs/massa-web3';
-	import { fetchTokenAllowances, fetchTokenBalance } from '../../services/datastore';
-	import type { Allowance } from '../../utils/types';
+	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
+	import type { Allowance } from '$lib/utils/types';
 	import {
 		buildBurn,
 		buildDecreaseAllowance,
 		buildMint,
 		buildTransfer
-	} from '../../services/serialize';
-	import { sendTx } from '../../hooks/sendTx';
+	} from '$lib/services/serialize';
+	import { sendTx } from '$lib/hooks/sendTx';
 	import { onMount } from 'svelte';
-	import { addRecentAddress } from '../../utils/localStorage';
+	import { addRecentAddress } from '$lib/utils/localStorage';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 

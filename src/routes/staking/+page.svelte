@@ -1,21 +1,21 @@
 <script lang="ts">
 	import { Args, bytesToU64, strToBytes, type Client, type ICallData } from '@massalabs/massa-web3';
-	import { clientStore } from '../../store/account';
-	import Button from '../../components/button.svelte';
-	import { fetchTokenBalance } from '../../services/datastore';
+	import { clientStore } from '$lib/store/account';
+	import Button from '$lib/components/button.svelte';
+	import { fetchTokenBalance } from '$lib/services/datastore';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
 
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
-	import { sendTx } from '../../hooks/sendTx';
+	import { sendTx } from '$lib/hooks/sendTx';
 	import {
 		buildDeposit,
 		buildHarvest,
 		buildIncreaseAllowance,
 		buildWithdraw
-	} from '../../services/serialize';
+	} from '$lib/services/serialize';
 	import { get } from 'svelte/store';
-	import networkStore from '../../store/network';
+	import networkStore from '$lib/store/network';
 	dayjs.extend(relativeTime);
 
 	const client = get(networkStore);

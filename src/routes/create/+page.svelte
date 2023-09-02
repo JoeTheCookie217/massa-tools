@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Client } from '@massalabs/massa-web3';
-	import Button from '../../components/button.svelte';
-	import { sendTx } from '../../hooks/sendTx';
-	import { buildDeployToken } from '../../services/serialize';
-	import { clientStore } from '../../store/account';
+	import Button from '$lib/components/button.svelte';
+	import { sendTx } from '$lib/hooks/sendTx';
+	import { buildDeployToken } from '$lib/services/serialize';
+	import { clientStore } from '$lib/store/account';
 
 	let client: Client | null;
 	clientStore.subscribe(async (newClient) => {

@@ -1,7 +1,7 @@
 import { Args, bytesToU64, strToBytes } from '@massalabs/massa-web3';
-import type { Allowance } from '../utils/types';
+import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
-import networkStore from '../store/network';
+import networkStore from '$lib/store/network';
 
 const maxGas = 100_000_000n;
 const baseClient = get(networkStore);
