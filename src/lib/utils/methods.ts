@@ -1,6 +1,8 @@
 import { ChainId } from '@dusalabs/sdk';
 import { bytesToU256, bytesToU64, ProviderType, type IProvider } from '@massalabs/massa-web3';
 
+export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
+
 export const printAddress = (address: string): string =>
 	address.slice(0, 6) + '...' + address.slice(-4);
 

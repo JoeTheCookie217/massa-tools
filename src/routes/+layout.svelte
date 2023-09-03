@@ -8,20 +8,17 @@
 	import { ClientFactory } from '@massalabs/massa-web3';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
-	import { ChainId } from '@dusalabs/sdk';
-	import { chainIdToProviders, printAddress, providerToChainId } from '$lib/utils/methods';
-	import Modal from '$lib/components/modal.svelte';
+	import { printAddress } from '$lib/utils/methods';
+	import Modal from '$lib/components/connect-modal.svelte';
 	import { accountStore, clientStore } from '$lib/store/account';
 	import Button from '$lib/components/button.svelte';
-	import networkStore from '$lib/store/network';
-	import '../app.css';
 	import LightSwitch from '$lib/components/light-switch/light-switch.svelte';
+	import { cn } from '$lib/utils';
+	import { page } from '$app/stores';
+	import '../app.css';
+	import ChainSelect from '$lib/components/chain-select.svelte';
 
 	const options: SvelteToastOptions = {};
-
-	const chains: ChainId[] = Object.values(ChainId).filter(
-		(v) => typeof v === 'number'
-	) as ChainId[];
 
 	let showModal = false;
 	let connectedAddress: string | undefined;
@@ -34,18 +31,6 @@
 	let selectedWallet: IProvider;
 	let stationWallet: IProvider | undefined;
 	let bearbyWallet: IProvider | undefined;
-
-	let selectedNetwork: ChainId;
-	networkStore.subscribe((network) => {
-		selectedNetwork = providerToChainId(network.getPublicProviders()[0]);
-	});
-	const changeChain = (chain: ChainId) =>
-		networkStore.update((network) => {
-			const newProviders = chainIdToProviders(chain);
-			localStorage.setItem('defaultPublicApi', newProviders[0].url);
-			network.setCustomProviders(newProviders);
-			return network;
-		});
 
 	const connect = async (wallet: IProvider | undefined) => {
 		if (!wallet) return;
@@ -99,32 +84,29 @@
 		const accountIndex = Number(localStorage.getItem('accountIndex')) ?? '0';
 		acc?.length && select(acc[accountIndex], accountIndex);
 	});
+	$: url = $page.url.pathname;
 </script>
 
 <main class="h-screen flex flex-col">
 	<header class="flex justify-around items-center p-2">
 		<nav class="flex items-center gap-4">
-			<a href="/">0xtools</a>
-			<a href="/explorer">Explorer</a>
-			<a href="/create">Create</a>
-			<a href="/multisig">Multisig</a>
-			<a href="/staking">Staking</a>
+			<a class="font-medium" href="/">0xtools</a>
+			{#each ['explorer', 'create', 'multisig', 'staking'] as link}
+				<a
+					href="/{link.toLowerCase()}"
+					class={cn(
+						'text-sm font-medium hover:text-primary transition-colors capitalize',
+						!url.includes(link) && ' text-muted-foreground'
+					)}>{link}</a
+				>
+			{/each}
 		</nav>
 		<div class="flex items-center">
-			<div class="flex flex-col gap-1">
-				{#each chains as chain}
-					<button
-						on:click={() => changeChain(chain)}
-						class={`${selectedNetwork === chain && 'text-purple-300'} hover:text-purple-200`}
-					>
-						{ChainId[chain].toLowerCase()}
-					</button>
-				{/each}
-			</div>
 			<Button
 				onClick={() => (showModal = true)}
 				text={connectedAddress ? printAddress(connectedAddress) : 'Connect Wallet'}
 			/>
+			<ChainSelect />
 			<LightSwitch />
 		</div>
 	</header>
