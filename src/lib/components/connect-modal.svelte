@@ -1,25 +1,25 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import Button from './button.svelte';
 	import { printAddress, printMasBalance } from '$lib/utils/methods';
 	import type { IAccount, IProvider } from '@massalabs/wallet-provider';
+	import { providers as getProviders } from '@massalabs/wallet-provider';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Button, buttonVariants } from './ui/button';
+	import { cn } from '$lib/utils';
+	import { CrossIcon } from 'lucide-svelte';
+	import { accountStore, clientStore } from '$lib/store/account';
 
-	// PROPS
-	export let connectedAddress: string | undefined;
-	export let balance: string | undefined;
-	export let closeModal: () => void;
-	export let connect: (wallet: IProvider | undefined) => void;
-	export let disconnect: () => void;
-	export let select: (selectedAccount: IAccount, index: number) => {};
-	export let accounts: IAccount[];
-	export let stationWallet: IProvider | undefined;
-	export let bearbyWallet: IProvider | undefined;
+	let accounts: IAccount[];
+	let selectedWallet: IProvider;
+	let stationWallet: IProvider | undefined;
+	let bearbyWallet: IProvider | undefined;
 
-	const onKeyDown = (e: KeyboardEvent) => {
-		if (e.key === 'Escape') {
-			closeModal();
-		}
-	};
+	let connectedAddress: string | undefined;
+	let balance: string | undefined;
+	accountStore.subscribe(async (account) => {
+		connectedAddress = account?.address();
+		balance = await account?.balance().then((res) => res.finalBalance);
+	});
 
 	let copied = false;
 	const copy = () => {
@@ -30,35 +30,87 @@
 		}, 1000);
 	};
 
-	onMount(() => {
-		window.addEventListener('keydown', onKeyDown);
+	const connect = async (wallet: IProvider | undefined) => {
+		if (!wallet) return;
 
-		return () => {
-			window.removeEventListener('keydown', onKeyDown);
-		};
+		localStorage.setItem('wallet', wallet.name());
+		const _accounts = await wallet.accounts();
+		if (!_accounts?.length) return;
+
+		selectedWallet = wallet;
+		accounts = _accounts;
+		return accounts;
+	};
+
+	const select = async (selectedAccount: IAccount, index: number) => {
+		accountStore.set(selectedAccount);
+
+		selectedWallet.getNodesUrls().then((res) => {
+			console.log(res);
+		});
+
+		// @ts-ignore
+		const client = await ClientFactory.fromWalletProvider(selectedWallet, selectedAccount);
+		clientStore.set(client);
+		localStorage.setItem('accountIndex', index.toString());
+	};
+
+	const disconnect = () => {
+		accountStore.set(null);
+		accounts = [];
+		localStorage.removeItem('wallet');
+		localStorage.removeItem('accountIndex');
+	};
+
+	onMount(async () => {
+		const providers = await getProviders();
+		const _stationWallet = providers.find((provider) => provider.name() === 'MASSASTATION');
+		stationWallet = _stationWallet;
+		const _bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
+		bearbyWallet = _bearbyWallet;
+		const walletKey = localStorage.getItem('wallet');
+		const wallet = providers.find((provider) => provider.name() === walletKey);
+		if (!walletKey || !wallet) return;
+
+		const acc = await connect(wallet);
+		const accountIndex = Number(localStorage.getItem('accountIndex')) ?? '0';
+		acc?.length && select(acc[accountIndex], accountIndex);
 	});
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div
-	class="absolute h-full w-full bg-black bg-opacity-90 z-50 grid place-items-center"
-	on:click={(e) => e.currentTarget === e.target && closeModal()}
->
-	<div class="flex flex-col h-80 w-80 p-4 bg-gray-700 rounded-md">
-		<div class="flex justify-between items-center p-2">
+<AlertDialog.Root>
+	<AlertDialog.Trigger>
+		<Button variant="outline">
 			{#if !connectedAddress}
-				<span>Connect Wallet</span>
+				Connect Wallet
 			{:else}
-				<span>Connected</span>
+				{printAddress(connectedAddress)}
 			{/if}
-			<button
-				on:click={(e) => {
-					e.stopPropagation();
-					closeModal();
-				}}>X</button
-			>
-		</div>
-		{#if connectedAddress}
+		</Button>
+	</AlertDialog.Trigger>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>
+				{#if !connectedAddress}
+					Connect Wallet
+				{:else}
+					{printAddress(connectedAddress)}
+				{/if}
+			</AlertDialog.Title>
+			<AlertDialog.Description>
+				This action cannot be undone. This will permanently delete your account and remove your data
+				from our servers.
+			</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<Button variant="outline">Click</Button>
+			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Action on:click={() => console.log('action')}>Continue</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
+
+<!-- {#if connectedAddress}
 			<div class="">
 				<div>
 					<span>{printAddress(connectedAddress)}</span>
@@ -74,13 +126,11 @@
 		{:else if !accounts || accounts.length === 0}
 			<div class="flex flex-col gap-4 grow py-6">
 				<Button
-					class="grow"
 					disabled={stationWallet === undefined}
 					text="Massa Station"
 					onClick={() => connect(stationWallet)}
 				/>
 				<Button
-					class="grow"
 					disabled={bearbyWallet === undefined}
 					text="Bearby"
 					onClick={() => connect(bearbyWallet)}
@@ -98,6 +148,4 @@
 					<Button text="Connect" onClick={() => select(account, index)} />
 				</div>
 			{/each}
-		{/if}
-	</div>
-</div>
+		{/if} -->
