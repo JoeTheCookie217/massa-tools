@@ -90,7 +90,7 @@
 <main class="h-screen flex flex-col">
 	<header class="flex justify-around items-center p-2">
 		<nav class="flex items-center gap-4">
-			<a class="font-medium" href="/">0xtools</a>
+			<a class="font-medium" href="/">massa-tools</a>
 			{#each ['explorer', 'create', 'multisig', 'staking'] as link}
 				<a
 					href="/{link.toLowerCase()}"

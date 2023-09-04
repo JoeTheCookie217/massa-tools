@@ -4,6 +4,7 @@ import { bytesToNumber } from '$lib/utils/methods';
 import networkStore from '$lib/store/network';
 import { get } from 'svelte/store';
 import type { BalanceEntry, Properties } from '$lib/utils/types';
+import { getDatastore } from '$lib/services/datastore.js';
 
 export type MyPageLoad = {
 	balances: BalanceEntry[];
@@ -17,17 +18,10 @@ export async function load({ params }): Promise<MyPageLoad> {
 	const address = params.slug;
 
 	const notFoundError = error(404, 'Address not found');
-	const keys = await client
-		.publicApi()
-		.getAddresses([address])
-		.then(async (res) => {
-			if (!res[0]) throw notFoundError;
-			return res[0].candidate_datastore_keys.map((key) => String.fromCharCode(...key));
-		})
-		.catch((err) => {
-			console.error(err);
-			throw notFoundError;
-		});
+	const keys = await getDatastore(address).catch((err) => {
+		console.error(err);
+		throw notFoundError;
+	});
 
 	let balances: BalanceEntry[] = [];
 	let properties: Properties = {} as Properties;

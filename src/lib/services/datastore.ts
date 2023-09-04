@@ -18,15 +18,22 @@ export const fetchTokenBalance = (address: string, account: string): Promise<big
 		.then((e) => bytesToU64(e.returnValue))
 		.catch(() => 0n);
 
+export const getDatastore = (address: string) =>
+	baseClient
+		.publicApi()
+		.getAddresses([address])
+		.then((r) =>
+			r[0].final_datastore_keys
+				.map((v) => String.fromCharCode(...v))
+				.sort((a, b) => a.localeCompare(b))
+		);
+
 export const fetchTokenAllowances = async (
 	address: string,
 	owner: string
 ): Promise<Allowance[]> => {
-	const keys = await baseClient
-		.publicApi()
-		.getAddresses([address])
-		.then((res) => {
-			const entries = res[0].final_datastore_keys.map((v) => String.fromCharCode(...v));
+	const keys = await getDatastore(address)
+		.then((entries) => {
 			const filteredEntries = entries.filter((e) => e.startsWith(owner));
 			return filteredEntries;
 		})
