@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@dusalabs/sdk':
     specifier: ^0.2.13
@@ -12,8 +8,8 @@ dependencies:
     specifier: 1.24.2
     version: 1.24.2(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
   '@massalabs/wallet-provider':
-    specifier: 1.3.2
-    version: 1.3.2(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
+    specifier: 1.3.4
+    version: 1.3.4(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
   '@zerodevx/svelte-toast':
     specifier: ^0.9.5
     version: 0.9.5(svelte@4.2.0)
@@ -1097,7 +1093,7 @@ packages:
   /@massalabs/massa-web3@1.24.2(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4):
     resolution: {integrity: sha512-gCorj6mWevOTVshPVSVh4Zpj/0OrP1wQY/btJDYjJMCqeCSrkTCff6I0wHX7RSw7GL4x2lJA5jyRPeuMYh/drQ==}
     dependencies:
-      '@massalabs/wallet-provider': 1.3.3(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
+      '@massalabs/wallet-provider': 1.3.4(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
       '@noble/ed25519': 1.7.3
       '@noble/hashes': 1.3.0
       '@types/ws': 8.5.4
@@ -1136,38 +1132,8 @@ packages:
       - webpack-dev-server
     dev: false
 
-  /@massalabs/wallet-provider@1.3.2(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4):
-    resolution: {integrity: sha512-aqQTueogva2viRDR5kEZU4ePmyix7F84Z0HvpwbXA7Rzx01aq5pnhMuMmBIdHyViN2B+zOQvtKYmepEv/NkvBg==}
-    dependencies:
-      '@hicaru/bearby.js': 0.4.8
-      '@massalabs/web3-utils': 1.4.1(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
-      axios: 0.26.1
-      bignumber.js: 9.1.1
-      bs58check: 3.0.1
-      buffer: 6.0.3
-      uid: 2.0.2
-      varint: 6.0.0
-    optionalDependencies:
-      bufferutil: 4.0.7
-      utf-8-validate: 6.0.3
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@jest/types'
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - '@webpack-cli/generators'
-      - babel-jest
-      - debug
-      - esbuild
-      - jest
-      - uglify-js
-      - webpack-bundle-analyzer
-      - webpack-dev-server
-    dev: false
-
-  /@massalabs/wallet-provider@1.3.3(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4):
-    resolution: {integrity: sha512-43yix68rJPrNBl8T8cnYFLhX0WI+jIKMLjC5Bp+PEyl0y1jQh4bUg7jY/vocFdlBkD5MaxUQ55rAoIlOLLmPAA==}
+  /@massalabs/wallet-provider@1.3.4(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4):
+    resolution: {integrity: sha512-1AvDZKr3UG7M3JdxA9PAzE3TP+m+r8H9a2fXTFFsKwiXv7YK1GrtDck3BH/OOKOcn5TLWQpSiTF7y94NdXs2jQ==}
     dependencies:
       '@hicaru/bearby.js': 0.4.8
       '@massalabs/web3-utils': 1.4.1(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
@@ -1864,12 +1830,12 @@ packages:
       acorn-walk: 8.2.0
     dev: false
 
-  /acorn-import-assertions@1.9.0(acorn@8.8.2):
+  /acorn-import-assertions@1.9.0(acorn@8.10.0):
     resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
     peerDependencies:
       acorn: ^8
     dependencies:
-      acorn: 8.8.2
+      acorn: 8.10.0
     dev: false
 
   /acorn-jsx@5.3.2(acorn@8.8.2):
@@ -4324,7 +4290,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.2.5
+      '@types/node': 20.5.8
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: false
@@ -4812,7 +4778,7 @@ packages:
     resolution: {integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==}
     dependencies:
       hosted-git-info: 2.8.9
-      resolve: 1.22.2
+      resolve: 1.22.4
       semver: 5.7.2
       validate-npm-package-license: 3.0.4
     dev: false
@@ -5346,7 +5312,7 @@ packages:
     resolution: {integrity: sha512-/vxpCXddiX8NGfGO/mTafwjq4aFa/71pvamip0++IQk3zG8cbCj0fifNPrjjF1XMXUne91jL9OoxmdykoEtifQ==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      resolve: 1.22.2
+      resolve: 1.22.4
     dev: false
 
   /regexp.prototype.flags@1.5.0:
@@ -6063,7 +6029,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.5
-      acorn: 8.8.2
+      acorn: 8.10.0
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: false
@@ -6182,7 +6148,7 @@ packages:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       jest: 29.6.4(@types/node@20.5.8)
-      jest-util: 29.6.2
+      jest-util: 29.6.3
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
@@ -6226,7 +6192,7 @@ packages:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 20.5.8
-      acorn: 8.8.2
+      acorn: 8.10.0
       acorn-walk: 8.2.0
       arg: 4.1.3
       create-require: 1.1.1
@@ -6607,8 +6573,8 @@ packages:
       '@webassemblyjs/ast': 1.11.6
       '@webassemblyjs/wasm-edit': 1.11.6
       '@webassemblyjs/wasm-parser': 1.11.6
-      acorn: 8.8.2
-      acorn-import-assertions: 1.9.0(acorn@8.8.2)
+      acorn: 8.10.0
+      acorn-import-assertions: 1.9.0(acorn@8.10.0)
       browserslist: 4.21.10
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.15.0
@@ -6800,3 +6766,7 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

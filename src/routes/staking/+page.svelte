@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Args, bytesToU64, strToBytes, type Client, type ICallData } from '@massalabs/massa-web3';
 	import { clientStore } from '$lib/store/account';
-	import Button from '$lib/components/button.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import { fetchTokenBalance } from '$lib/services/datastore';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
 
@@ -164,13 +164,13 @@
 	<div class="">
 		<div>
 			<input type="number" bind:value={depositAmount} />
-			<Button onClick={approve} text="Approve" />
-			<Button onClick={deposit} text="Deposit" />
+			<Button on:click={approve}>Approve</Button>
+			<Button on:click={deposit}>Deposit</Button>
 		</div>
 		<div>
 			<input type="number" bind:value={withdrawAmount} />
-			<Button onClick={withdraw} text="Withdraw" />
-			<Button onClick={harvest} text="Harvest" />
+			<Button on:click={withdraw}>Withdraw</Button>
+			<Button on:click={harvest}>Harvest</Button>
 		</div>
 
 		<div class="flex flex-col">

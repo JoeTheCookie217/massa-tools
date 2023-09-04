@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
-	import Button from '$lib/components/button.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import { printAddress } from '$lib/utils/methods';
 	import type { MyPageLoad } from './+page';
 	import { clientStore } from '$lib/store/account';
@@ -16,6 +16,8 @@
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { onMount } from 'svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
+	import Label from '$lib/components/ui/label/label.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -118,7 +120,9 @@
 			{@const share = balance.multiply(100n).divide(new TokenAmount(token, properties.totalSupply))}
 
 			<p>
-				{printAddress(address)}: {balance.toSignificant()} ({share.toSignificant(3)}%)
+				{printAddress(address)}: {Number(balance.toSignificant()).toLocaleString()} ({share.toSignificant(
+					3
+				)}%)
 			</p>
 		{/each}
 	{/if}
@@ -128,24 +132,39 @@
 			{#if userBalance > 0n}
 				<div>
 					<h3 class="text-lg">Transfer</h3>
-					<input type="text" bind:value={transferReceiver} placeholder="Receiver address" />
-					<input type="number" bind:value={transferAmount} placeholder="Amount" />
-					<Button onClick={transfer} disabled={disabledTransfer} text="Transfer" />
+					<div>
+						<Label for="address">Receiver address</Label>
+						<Input type="text" id="address" bind:value={transferReceiver} />
+					</div>
+					<div>
+						<Label for="amount">Amount</Label>
+						<Input type="number" id="amount" bind:value={transferAmount} />
+					</div>
+					<Button on:click={transfer} disabled={disabledTransfer}>Transfer</Button>
 				</div>
 				{#if properties.burnable}
 					<div>
 						<h3 class="text-lg">Burn</h3>
-						<input type="number" bind:value={burnAmount} placeholder="Amount" />
-						<Button onClick={burn} disabled={disabledBurn} text="Burn" />
+						<div>
+							<Label for="amount">Amount</Label>
+							<Input type="number" id="amount" bind:value={burnAmount} />
+						</div>
+						<Button on:click={burn} disabled={disabledBurn}>Burn</Button>
 					</div>
 				{/if}
 			{/if}
 			{#if connectedAddress === properties.owner && properties.mintable}
 				<div>
 					<h3 class="text-lg">Mint</h3>
-					<input type="text" bind:value={mintReceiver} placeholder="Receiver address" />
-					<input type="number" bind:value={mintAmount} placeholder="Amount" />
-					<Button onClick={mint} disabled={disabledMint} text="Mint" />
+					<div>
+						<Label for="address">Receiver address</Label>
+						<Input type="text" id="address" bind:value={mintReceiver} />
+					</div>
+					<div>
+						<Label for="amount">Amount</Label>
+						<Input type="number" id="amount" bind:value={mintAmount} />
+					</div>
+					<Button on:click={mint} disabled={disabledMint}>Mint</Button>
 				</div>
 			{/if}
 			{#if allowances.length > 0}
@@ -155,7 +174,7 @@
 					{#if allowance.raw !== 0n && spender && spender !== connectedAddress}
 						<p>
 							{printAddress(spender)}: {allowance.toSignificant()}
-							<Button onClick={() => revokeAllowance(spender, amount)} text="Revoke" />
+							<Button on:click={() => revokeAllowance(spender, amount)}>Revoke</Button>
 						</p>
 					{/if}
 				{/each}

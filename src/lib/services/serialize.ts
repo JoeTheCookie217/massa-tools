@@ -148,7 +148,7 @@ export const buildSubmit = (
 	to: string,
 	value: bigint,
 	data: Uint8Array
-) => {
+): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
@@ -157,7 +157,7 @@ export const buildSubmit = (
 	};
 };
 
-export const buildApprove = (multisigAddress: string, txId: number) => {
+export const buildApprove = (multisigAddress: string, txId: number): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
@@ -166,7 +166,7 @@ export const buildApprove = (multisigAddress: string, txId: number) => {
 	};
 };
 
-export const buildRevoke = (multisigAddress: string, txId: number) => {
+export const buildRevoke = (multisigAddress: string, txId: number): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
@@ -175,7 +175,7 @@ export const buildRevoke = (multisigAddress: string, txId: number) => {
 	};
 };
 
-export const buildExecute = (multisigAddress: string, txId: number) => {
+export const buildExecute = (multisigAddress: string, txId: number): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
