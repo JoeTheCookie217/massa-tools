@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
 import { bytesToNumber } from '$lib/utils/methods';
-import networkStore from '$lib/store/network';
+import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import type { BalanceEntry, Properties } from '$lib/utils/types';
 import { getDatastore } from '$lib/services/datastore.js';
@@ -12,7 +12,7 @@ export type MyPageLoad = {
 };
 
 const erc20Keys = ['DECIMALS', 'SYMBOL', 'NAME', 'TOTAL_SUPPLY', 'OWNER'];
-const client = get(networkStore);
+const client = get(clientStore);
 
 export async function load({ params }): Promise<MyPageLoad> {
 	const address = params.slug;

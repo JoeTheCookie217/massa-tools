@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Args, bytesToU64, strToBytes, type Client, type ICallData } from '@massalabs/massa-web3';
-	import { clientStore } from '$lib/store/account';
 	import { Button } from '$lib/components/ui/button';
 	import { fetchTokenBalance } from '$lib/services/datastore';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
@@ -15,10 +14,10 @@
 		buildWithdraw
 	} from '$lib/services/serialize';
 	import { get } from 'svelte/store';
-	import networkStore from '$lib/store/network';
+	import clientStore from '$lib/store/client';
 	dayjs.extend(relativeTime);
 
-	const client = get(networkStore);
+	const client = get(clientStore);
 
 	const stakingAddress = 'AS122MZkHytLQnBA6qExyfpYoRzy1No64j9oDqUHhmas3uBfhV38A';
 	const depositToken = new Token(

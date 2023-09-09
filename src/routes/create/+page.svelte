@@ -3,9 +3,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { buildDeployToken } from '$lib/services/serialize';
-	import { clientStore } from '$lib/store/account';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
+	import clientStore from '$lib/store/client';
 
 	let client: Client | null;
 	clientStore.subscribe(async (newClient) => {
@@ -18,7 +18,7 @@
 	let supply: number;
 	let mintable = false;
 	let burnable = false;
-	$: disabled = !name || !symbol || !decimals || !supply || !client;
+	$: disabled = !name || !symbol || !decimals || !supply;
 
 	const { send, subscribe } = sendTx();
 	subscribe((txState) => {

@@ -14,6 +14,6 @@ const client = new Client({
 	periodOffset: 0
 });
 
-const networkStore = writable<Client>(client);
+const clientStore = writable<Client>(client);
 
-export default networkStore;
+export default clientStore;

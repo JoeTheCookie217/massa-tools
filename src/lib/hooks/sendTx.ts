@@ -1,6 +1,6 @@
 import type { ICallData, Client } from '@massalabs/massa-web3';
 import { writable } from 'svelte/store';
-import { clientStore } from '$lib/store/account';
+import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
 
 type TState = {

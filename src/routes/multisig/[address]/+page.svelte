@@ -11,7 +11,6 @@
 		bytesToStr,
 		byteToBool
 	} from '@massalabs/massa-web3';
-	import { clientStore } from '$lib/store/account';
 	import { fetchTokenBalance, getDatastore } from '$lib/services/datastore';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
 
@@ -29,13 +28,13 @@
 		buildWithdraw
 	} from '$lib/services/serialize';
 	import { get } from 'svelte/store';
-	import networkStore from '$lib/store/network';
+	import clientStore from '$lib/store/client';
 
 	import { page } from '$app/stores';
 	import { error } from '@sveltejs/kit';
 	const { address: multisigAddress } = $page.params;
 
-	const client = get(networkStore);
+	const client = get(clientStore);
 
 	let massaClient: Client | null = null;
 	clientStore.subscribe((client) => {

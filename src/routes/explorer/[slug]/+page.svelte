@@ -3,7 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { printAddress } from '$lib/utils/methods';
 	import type { MyPageLoad } from './+page';
-	import { clientStore } from '$lib/store/account';
+	import clientStore from '$lib/store/client';
 	import type { Client } from '@massalabs/massa-web3';
 	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
 	import type { Allowance } from '$lib/utils/types';

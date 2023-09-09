@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select';
-	import networkStore from '$lib/store/network';
+	import clientStore from '$lib/store/client';
 	import { toTitle, providerToChainId, chainIdToProviders } from '$lib/utils/methods';
 	import { ChainId } from '@dusalabs/sdk';
 
@@ -8,35 +8,35 @@
 		(v) => typeof v === 'number'
 	) as ChainId[];
 	let selectedNetwork: ChainId;
-	networkStore.subscribe((network) => {
+	clientStore.subscribe((network) => {
 		selectedNetwork = providerToChainId(network.getPublicProviders()[0]);
 	});
+
 	const changeChain = (chain: ChainId) =>
-		networkStore.update((network) => {
+		clientStore.update((network) => {
 			const newProviders = chainIdToProviders(chain);
 			localStorage.setItem('defaultPublicApi', newProviders[0].url);
 			network.setCustomProviders(newProviders);
 			return network;
 		});
+
+	$: selected = { value: selectedNetwork, label: toTitle(ChainId[selectedNetwork].toLowerCase()) };
+	$: {
+		if (selected.value !== selectedNetwork) {
+			changeChain(selected.value);
+		}
+	}
 </script>
 
-<Select.Root onSelectedChange={(c) => changeChain(c)} selected={ChainId[selectedNetwork]}>
+<Select.Root bind:selected>
 	<Select.Trigger class="w-[180px]">
-		<Select.Value placeholder="Network" />
+		<Select.Value />
 	</Select.Trigger>
 	<Select.Content>
 		{#each chains as chain}
-			<Select.Item value={ChainId[chain]}>{toTitle(ChainId[chain].toLowerCase())}</Select.Item>
+			<Select.Item value={chain} label={toTitle(ChainId[chain].toLowerCase())}
+				>{toTitle(ChainId[chain].toLowerCase())}</Select.Item
+			>
 		{/each}
 	</Select.Content>
 </Select.Root>
-<!-- <div class="flex flex-col gap-1">
-    {#each chains as chain}
-        <button
-            on:click={() => changeChain(chain)}
-            class={`${selectedNetwork === chain && 'text-purple-300'} hover:text-purple-200`}
-        >
-            {ChainId[chain].toLowerCase()}
-        </button>
-    {/each}
-</div> -->

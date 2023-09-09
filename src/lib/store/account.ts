@@ -1,6 +1,5 @@
-import type { Client } from '@massalabs/massa-web3';
 import type { IAccount } from '@massalabs/wallet-provider';
 import { writable } from 'svelte/store';
 
-export const accountStore = writable<IAccount | null>(null);
-export const clientStore = writable<Client | null>(null);
+const accountStore = writable<IAccount | null>(null);
+export default accountStore;

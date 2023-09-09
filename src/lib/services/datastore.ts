@@ -1,10 +1,10 @@
 import { Args, bytesToU64, strToBytes } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
-import networkStore from '$lib/store/network';
+import clientStore from '$lib/store/client';
 
 const maxGas = 100_000_000n;
-const baseClient = get(networkStore);
+const baseClient = get(clientStore);
 
 export const fetchTokenBalance = (address: string, account: string): Promise<bigint> =>
 	baseClient
