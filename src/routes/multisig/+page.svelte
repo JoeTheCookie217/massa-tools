@@ -15,4 +15,6 @@
 		bind:value={address}
 	/>
 </div>
-<Button variant="link">Don't have a multisig wallet? Create one</Button>
+<a href="/multisig/create">
+	<Button variant="link">Don't have a multisig wallet? Create one</Button>
+</a>
