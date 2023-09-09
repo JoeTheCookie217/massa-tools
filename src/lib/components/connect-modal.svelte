@@ -3,12 +3,13 @@
 	import { printAddress, printMasBalance } from '$lib/utils/methods';
 	import type { IAccount, IProvider } from '@massalabs/wallet-provider';
 	import { providers as getProviders } from '@massalabs/wallet-provider';
-	import * as Dialog from '$lib/components/ui/alert-dialog';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button, buttonVariants } from './ui/button';
 	import { cn } from '$lib/utils';
 	import { CrossIcon } from 'lucide-svelte';
 	import accountStore from '$lib/store/account';
 	import clientStore from '$lib/store/client';
+	import { ClientFactory } from '@massalabs/massa-web3';
 
 	let accounts: IAccount[];
 	let selectedWallet: IProvider;
@@ -49,11 +50,11 @@
 			console.log(res);
 		});
 
-		// @ts-ignore
 		const client = await ClientFactory.fromWalletProvider(selectedWallet, selectedAccount);
 		clientStore.set(client);
 		localStorage.setItem('wallet', selectedWallet.name());
 		localStorage.setItem('accountIndex', index.toString());
+		open = false;
 	};
 
 	const disconnect = () => {
@@ -114,10 +115,11 @@
 		</Dialog.Header>
 		<div>
 			{#if connectedAddress}
-				<div class="flex flex-col justify-center items-center gap-4">
-					<span class="grid place-items-center h-16 w-16 text-4xl rounded-full bg-muted"
+				<div class="flex flex-col justify-center items-center">
+					<span class="grid place-items-center h-16 w-16 text-4xl rounded-full bg-muted mb-4"
 						>{emoji}</span
 					>
+					<span>{printAddress(connectedAddress)}</span>
 					<span>{balance && printMasBalance(balance)}</span>
 				</div>
 			{:else if !accounts?.length}
@@ -146,7 +148,7 @@
 		{#if connectedAddress}
 			<Dialog.Footer class="flex justify-center">
 				<Button on:click={copy}>
-					{copied ? 'Copied' : 'Copy'}
+					{copied ? 'Copied!' : 'Copy'}
 				</Button>
 				<Button on:click={disconnect}>Disconnect</Button>
 			</Dialog.Footer>

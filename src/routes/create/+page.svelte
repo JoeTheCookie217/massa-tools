@@ -1,16 +1,10 @@
 <script lang="ts">
-	import type { Client } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { buildDeployToken } from '$lib/services/serialize';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
-	import clientStore from '$lib/store/client';
-
-	let client: Client | null;
-	clientStore.subscribe(async (newClient) => {
-		client = newClient;
-	});
+	import { Checkbox } from '$lib/components/ui/checkbox';
 
 	let name: string;
 	let symbol: string;
@@ -26,8 +20,6 @@
 	});
 
 	async function deploy() {
-		if (!client) return;
-
 		const totalSupply = BigInt(supply) * BigInt(10 ** decimals);
 		const deployData = buildDeployToken(name, symbol, decimals, totalSupply, mintable, burnable);
 		send(deployData);
@@ -53,12 +45,22 @@
 			<Input type="number" id="supply" placeholder="1000000" bind:value={supply} />
 		</div>
 		<div>
-			<input type="checkbox" name="mintable" bind:checked={mintable} />
-			<label for="mintable">Mintable</label>
+			<Checkbox id="mintable" bind:checked={mintable} />
+			<Label
+				for="mintable"
+				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+			>
+				Mintable
+			</Label>
 		</div>
 		<div>
-			<input type="checkbox" name="burnable" bind:checked={burnable} />
-			<label for="burnable">Burnable</label>
+			<Checkbox id="burnable" bind:checked={burnable} />
+			<Label
+				for="burnable"
+				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+			>
+				Burnable
+			</Label>
 		</div>
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>

@@ -17,7 +17,7 @@
 	<header class="flex justify-around items-center p-2">
 		<nav class="flex items-center gap-4">
 			<a class="font-medium" href="/">massa-tools</a>
-			{#each ['explorer', 'create', 'multisig', 'staking'] as link}
+			{#each ['explorer', 'create', 'multisig' /* , 'staking' */] as link}
 				<a
 					href="/{link.toLowerCase()}"
 					class={cn(
@@ -39,7 +39,7 @@
 	</section>
 
 	<footer class="text-center p-2">
-		<p>
+		<p class="text-sm">
 			Made with ❤️ by
 			<a
 				class="hover:underline"

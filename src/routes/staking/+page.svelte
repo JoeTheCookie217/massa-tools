@@ -17,8 +17,6 @@
 	import clientStore from '$lib/store/client';
 	dayjs.extend(relativeTime);
 
-	const client = get(clientStore);
-
 	const stakingAddress = 'AS122MZkHytLQnBA6qExyfpYoRzy1No64j9oDqUHhmas3uBfhV38A';
 	const depositToken = new Token(
 		ChainId.BUILDNET,
@@ -35,7 +33,7 @@
 	let depositAmount: number = 0;
 	let withdrawAmount: number = 0;
 
-	let massaClient: Client | null = null;
+	let massaClient = get(clientStore);
 	clientStore.subscribe((client) => {
 		if (client) massaClient = client;
 	});
@@ -70,7 +68,7 @@
 	const fetchStakingInfo = (address: string | undefined) => {
 		if (!address) return;
 
-		client
+		massaClient
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
@@ -81,7 +79,7 @@
 			.then((result) => {
 				stakedBalance = bytesToU64(result.returnValue);
 			});
-		client
+		massaClient
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
@@ -92,7 +90,7 @@
 			.then((result) => {
 				pendingBalance = bytesToU64(result.returnValue);
 			});
-		client
+		massaClient
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
@@ -103,7 +101,7 @@
 			.then((result) => {
 				totalStaked = bytesToU64(result.returnValue);
 			});
-		client
+		massaClient
 			.publicApi()
 			.getDatastoreEntries([
 				{
