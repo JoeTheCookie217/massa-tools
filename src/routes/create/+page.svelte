@@ -16,6 +16,12 @@
 	let mintable = false;
 	let burnable = false;
 	$: disabled = !name || !symbol || !decimals || !supply;
+
+	$: defaultName = name || 'MyToken';
+	$: defaultSymbol = symbol || 'MYT';
+	$: defaultDecimals = decimals || 18;
+	$: defaultSupply = supply || 1000000;
+
 	$: code = `export * from '@massalabs/sc-standards/assembly/contracts/FT/token';${
 		mintable
 			? `
@@ -30,10 +36,10 @@ export * from '@massalabs/sc-standards/assembly/contracts/FT/token-burn';`
 
 import * as FT from '@massalabs/sc-standards/assembly/contracts/FT/token';
 export function constructor(_: StaticArray<u8>): void {
-	const name = '${name}';
-	const symbol = '${symbol}';
-	const decimals = ${decimals};
-	const totalSupply = ${supply}n * 10n ** ${decimals}n;
+	const name = '${defaultName}';
+	const symbol = '${defaultSymbol}';
+	const decimals = ${defaultDecimals};
+	const totalSupply = ${defaultSupply}n * 10n ** ${defaultDecimals}n;
 
 	const args = new Args().add(name).add(symbol).add(decimals).add(totalSupply);
 	FT.constructor(args);
