@@ -18,6 +18,7 @@
 	import { addRecentAddress } from '$lib/utils/localStorage';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import * as Table from '$lib/components/ui/table';
 	import { get } from 'svelte/store';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
@@ -115,16 +116,36 @@
 	</div>
 	{#if balances.length > 0}
 		<h2 class="text-2xl">Balances</h2>
-		{#each balances as { address, value }}
-			{@const balance = new TokenAmount(token, value)}
-			{@const share = balance.multiply(100n).divide(new TokenAmount(token, properties.totalSupply))}
+		<Table.Root>
+			<Table.Header>
+				<Table.Row>
+					<Table.Head class="w-[100px]">Type</Table.Head>
+					<Table.Head>Address</Table.Head>
+					<Table.Head>Balance</Table.Head>
+					<Table.Head class="text-right">Share</Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each balances as { address, value }}
+					{@const balance = new TokenAmount(token, value)}
+					{@const share = Number(
+						balance
+							.multiply(100n)
+							.divide(new TokenAmount(token, properties.totalSupply))
+							.toSignificant(3)
+					)}
 
-			<p>
-				{printAddress(address)}: {Number(balance.toSignificant()).toLocaleString()} ({share.toSignificant(
-					3
-				)}%)
-			</p>
-		{/each}
+					<Table.Row>
+						<Table.Cell>{address.startsWith('AU1') ? 'EOA' : 'SC'}</Table.Cell>
+						<Table.Cell>{printAddress(address)}</Table.Cell>
+						<Table.Cell class="font-medium"
+							>{Number(balance.toSignificant()).toLocaleString()}</Table.Cell
+						>
+						<Table.Cell class="text-right">{share < 0.01 ? '<0.01' : share}%</Table.Cell>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
 	{/if}
 	<h2 class="text-2xl">Actions</h2>
 	{#if massaClient}
@@ -132,52 +153,93 @@
 			{#if userBalance > 0n}
 				<div>
 					<h3 class="text-lg">Transfer</h3>
-					<div>
-						<Label for="address">Receiver address</Label>
-						<Input type="text" id="address" bind:value={transferReceiver} />
+					<div class="flex items-center gap-2">
+						<div>
+							<!-- <Label for="transferReceiver">Receiver address</Label> -->
+							<Input
+								type="text"
+								placeholder="Receiver address"
+								id="transferReceiver"
+								bind:value={transferReceiver}
+							/>
+						</div>
+						<div>
+							<!-- <Label for="transferAmount">Amount</Label> -->
+							<Input
+								type="number"
+								placeholder="Amount"
+								id="transferAmount"
+								bind:value={transferAmount}
+							/>
+						</div>
+						<Button on:click={transfer} disabled={disabledTransfer}>Transfer</Button>
 					</div>
-					<div>
-						<Label for="amount">Amount</Label>
-						<Input type="number" id="amount" bind:value={transferAmount} />
-					</div>
-					<Button on:click={transfer} disabled={disabledTransfer}>Transfer</Button>
 				</div>
 				{#if properties.burnable}
 					<div>
 						<h3 class="text-lg">Burn</h3>
-						<div>
-							<Label for="amount">Amount</Label>
-							<Input type="number" id="amount" bind:value={burnAmount} />
+						<div class="flex items-center gap-2">
+							<div>
+								<!-- <Label for="burnAmount">Amount</Label> -->
+								<Input type="number" placeholder="Amount" id="burnAmount" bind:value={burnAmount} />
+							</div>
+							<Button on:click={burn} disabled={disabledBurn}>Burn</Button>
 						</div>
-						<Button on:click={burn} disabled={disabledBurn}>Burn</Button>
 					</div>
 				{/if}
 			{/if}
 			{#if connectedAddress === properties.owner && properties.mintable}
 				<div>
 					<h3 class="text-lg">Mint</h3>
-					<div>
-						<Label for="address">Receiver address</Label>
-						<Input type="text" id="address" bind:value={mintReceiver} />
+					<div class="flex items-center gap-2">
+						<div>
+							<!-- <Label for="mintReceiver">Receiver address</Label> -->
+							<Input
+								type="text"
+								placeholder="Receiver address"
+								id="mintReceiver"
+								bind:value={mintReceiver}
+							/>
+						</div>
+						<div>
+							<!-- <Label for="mintAmount">Amount</Label> -->
+							<Input type="number" placeholder="Amount" id="mintAmount" bind:value={mintAmount} />
+						</div>
+						<Button on:click={mint} disabled={disabledMint}>Mint</Button>
 					</div>
-					<div>
-						<Label for="amount">Amount</Label>
-						<Input type="number" id="amount" bind:value={mintAmount} />
-					</div>
-					<Button on:click={mint} disabled={disabledMint}>Mint</Button>
 				</div>
 			{/if}
 			{#if allowances.length > 0}
 				<h3 class="text-lg">Allowances</h3>
-				{#each allowances as { spender, amount }}
-					{@const allowance = new TokenAmount(token, amount)}
-					{#if allowance.raw !== 0n && spender && spender !== connectedAddress}
-						<p>
-							{printAddress(spender)}: {allowance.toSignificant()}
-							<Button on:click={() => revokeAllowance(spender, amount)}>Revoke</Button>
-						</p>
-					{/if}
-				{/each}
+				<Table.Root>
+					<Table.Header>
+						<Table.Row>
+							<Table.Head class="w-[100px]">Type</Table.Head>
+							<Table.Head>Address</Table.Head>
+							<Table.Head>Allowance</Table.Head>
+							<Table.Head class="text-right">Action</Table.Head>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body>
+						{#each allowances as { spender, amount }}
+							{@const allowance = new TokenAmount(token, amount)}
+							{#if allowance.raw !== 0n && spender && spender !== connectedAddress}
+								<Table.Row>
+									<Table.Cell>{spender.startsWith('AU1') ? 'EOA' : 'SC'}</Table.Cell>
+									<Table.Cell>{printAddress(spender)}</Table.Cell>
+									<Table.Cell class="font-medium"
+										>{Number(allowance.toSignificant()).toLocaleString()}</Table.Cell
+									>
+									<Table.Cell class="text-right">
+										<Button variant="ghost" on:click={() => revokeAllowance(spender, amount)}
+											>Revoke</Button
+										>
+									</Table.Cell>
+								</Table.Row>
+							{/if}
+						{/each}
+					</Table.Body>
+				</Table.Root>
 			{/if}
 		</div>
 	{:else}
