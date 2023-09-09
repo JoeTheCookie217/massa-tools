@@ -5,6 +5,9 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { Checkbox } from '$lib/components/ui/checkbox';
+	import Highlight from 'svelte-highlight';
+	import { typescript } from 'svelte-highlight/languages';
+	import styles from 'svelte-highlight/styles/dracula';
 
 	let name: string;
 	let symbol: string;
@@ -13,6 +16,31 @@
 	let mintable = false;
 	let burnable = false;
 	$: disabled = !name || !symbol || !decimals || !supply;
+	$: code = `export * from '@massalabs/sc-standards/assembly/contracts/FT/token';${
+		mintable
+			? `
+export * from '@massalabs/sc-standards/assembly/contracts/FT/token-mint';`
+			: ''
+	}${
+		burnable
+			? `
+export * from '@massalabs/sc-standards/assembly/contracts/FT/token-burn';`
+			: ''
+	}
+
+import * as FT from '@massalabs/sc-standards/assembly/contracts/FT/token';
+export function constructor(_: StaticArray<u8>): void {
+	const name = '${name}';
+	const symbol = '${symbol}';
+	const decimals = ${decimals};
+	const totalSupply = ${supply}n * 10n ** ${decimals}n;
+
+	const args = new Args().add(name).add(symbol).add(decimals).add(totalSupply);
+	FT.constructor(args);
+}
+	`;
+
+	const copy = () => navigator.clipboard.writeText(code);
 
 	const { send, subscribe } = sendTx();
 	subscribe((txState) => {
@@ -25,6 +53,11 @@
 		send(deployData);
 	}
 </script>
+
+<svelte:head>
+	<title>Create Token</title>
+	{@html styles}
+</svelte:head>
 
 <div class="flex">
 	<div class="grid grid-cols-2">
@@ -65,7 +98,7 @@
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>
 	<div>
-		<h2>Deploy Data</h2>
-		<pre>{JSON.stringify({ name, symbol, decimals, supply, mintable, burnable }, null, 2)}</pre>
+		<Button on:click={copy}>Copy to clipboard</Button>
+		<Highlight language={typescript} {code} />
 	</div>
 </div>
