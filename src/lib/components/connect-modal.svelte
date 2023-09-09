@@ -3,7 +3,7 @@
 	import { printAddress, printMasBalance } from '$lib/utils/methods';
 	import type { IAccount, IProvider } from '@massalabs/wallet-provider';
 	import { providers as getProviders } from '@massalabs/wallet-provider';
-	import * as Dialog from '$lib/components/ui/alert-dialog';
+	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button, buttonVariants } from './ui/button';
 	import { cn } from '$lib/utils';
 	import { CrossIcon } from 'lucide-svelte';
