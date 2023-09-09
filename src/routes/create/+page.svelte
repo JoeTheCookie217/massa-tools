@@ -1,16 +1,9 @@
 <script lang="ts">
-	import type { Client } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { buildDeployToken } from '$lib/services/serialize';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
-	import clientStore from '$lib/store/client';
-
-	let client: Client | null;
-	clientStore.subscribe(async (newClient) => {
-		client = newClient;
-	});
 
 	let name: string;
 	let symbol: string;
@@ -26,8 +19,6 @@
 	});
 
 	async function deploy() {
-		if (!client) return;
-
 		const totalSupply = BigInt(supply) * BigInt(10 ** decimals);
 		const deployData = buildDeployToken(name, symbol, decimals, totalSupply, mintable, burnable);
 		send(deployData);

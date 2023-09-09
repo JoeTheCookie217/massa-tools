@@ -33,28 +33,31 @@
 			>
 		</Button>
 	</div>
-</div>
-{#if history.length}
-	<div>
-		<div class="flex items-center gap-2">
-			<h2>Recent addresses</h2>
-			<Button on:click={handleClear}>Clear</Button>
-		</div>
-		{#each history as historyItem}
-			<div>
-				{#if historyItem.name}
-					<span>
-						{historyItem.name}
-					</span>
-				{/if}
-				{#if historyItem.symbol}
-					<span>
-						{historyItem.symbol}
-					</span>
-				{/if}
-
-				<a href="/{historyItem.address}">{historyItem.address}</a>
+	<a href="/create">
+		<Button variant="link">Want your own token? Create one</Button>
+	</a>
+	{#if history.length}
+		<div>
+			<div class="flex items-center gap-2">
+				<h2>Recent addresses</h2>
+				<Button on:click={handleClear}>Clear</Button>
 			</div>
-		{/each}
-	</div>
-{/if}
+			{#each history as historyItem}
+				<div>
+					{#if historyItem.name}
+						<span>
+							{historyItem.name}
+						</span>
+					{/if}
+					{#if historyItem.symbol}
+						<span>
+							{historyItem.symbol}
+						</span>
+					{/if}
+
+					<a href="/{historyItem.address}">{historyItem.address}</a>
+				</div>
+			{/each}
+		</div>
+	{/if}
+</div>

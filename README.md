@@ -26,7 +26,7 @@
 - [ ] submit actions (transfer, add/remove keys, change threshold)
 - [ ] confirm actions
 - [ ] delete actions
-- [ ] view wallet's datastore (balance, owners, threshold)
+- [x] view wallet's datastore (balance, owners, threshold)
 
 ## Staking
 - [x] approve/deposit

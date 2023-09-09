@@ -1,7 +1,7 @@
 import { Token, parseUnits } from '@dusalabs/sdk';
 import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
 
-const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
+export const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
 	coins: 0n,
 	maxGas: 100_000_000n,
 	fee: 0n
@@ -132,65 +132,12 @@ export const buildDeployToken = (
 };
 
 export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
-	const deployerAddress = '';
+	const deployerAddress = 'AS1c75ZWhD3RqzZsvoak2TPGB7idyCGm4mwTtdtdJqTsEm35bLtV';
 	return {
 		...baseCallData,
 		targetAddress: deployerAddress,
 		functionName: 'deploy',
 		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
 		coins: 35n * MassaUnits.oneMassa
-	};
-};
-
-// MULTISIG
-
-export const buildReceive = (multisigAddress: string, value: bigint): ICallData => {
-	return {
-		...baseCallData,
-		targetAddress: multisigAddress,
-		functionName: 'receive',
-		parameter: new Args(),
-		coins: value
-	};
-};
-
-export const buildSubmit = (
-	multisigAddress: string,
-	to: string,
-	value: bigint,
-	data: Uint8Array
-): ICallData => {
-	return {
-		...baseCallData,
-		targetAddress: multisigAddress,
-		functionName: 'submit',
-		parameter: new Args().addString(to).addU64(value).addUint8Array(data)
-	};
-};
-
-export const buildApprove = (multisigAddress: string, txId: number): ICallData => {
-	return {
-		...baseCallData,
-		targetAddress: multisigAddress,
-		functionName: 'approve',
-		parameter: new Args().addU64(BigInt(txId))
-	};
-};
-
-export const buildRevoke = (multisigAddress: string, txId: number): ICallData => {
-	return {
-		...baseCallData,
-		targetAddress: multisigAddress,
-		functionName: 'revoke',
-		parameter: new Args().addU64(BigInt(txId))
-	};
-};
-
-export const buildExecute = (multisigAddress: string, txId: number): ICallData => {
-	return {
-		...baseCallData,
-		targetAddress: multisigAddress,
-		functionName: 'execute',
-		parameter: new Args().addU64(BigInt(txId))
 	};
 };

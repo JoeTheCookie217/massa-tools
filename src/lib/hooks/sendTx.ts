@@ -1,5 +1,5 @@
 import type { ICallData, Client } from '@massalabs/massa-web3';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
 
@@ -15,7 +15,7 @@ const defaultState: TState = {
 };
 
 export function sendTx() {
-	let massaClient: Client | null = null;
+	let massaClient = get(clientStore);
 	clientStore.subscribe((client) => {
 		if (client) massaClient = client;
 	});
@@ -25,7 +25,8 @@ export function sendTx() {
 	const send = async (callData: ICallData) => {
 		set({ pending: true, error: null, txId: null });
 		try {
-			if (!massaClient) throw new Error('Massa client is not initialized');
+			if (!massaClient || !massaClient.wallet().getBaseAccount())
+				throw new Error('Massa client is not initialized');
 			const txId = await massaClient.smartContracts().callSmartContract(callData);
 			set({ pending: false, error: null, txId });
 

@@ -1,18 +1,11 @@
 <script lang="ts">
-	import type { Client } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { buildDeployMultisig } from '$lib/services/serialize';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
-	import clientStore from '$lib/store/client';
 
-	let client: Client | null;
-	clientStore.subscribe(async (newClient) => {
-		client = newClient;
-	});
-
-	let owners: string[];
+	let owners: string[] = [];
 	let ownersLength: number = 0;
 	let required: number;
 	$: disabled = !owners || !required;
@@ -22,21 +15,29 @@
 		console.log(txState);
 	});
 
-	async function deploy() {
-		if (!client) return;
+	const increment = () => {
+		ownersLength++;
+		owners = [...owners, ''];
+	};
+	const decrement = () => {
+		ownersLength--;
+		owners = owners.slice(0, ownersLength);
+	};
 
+	async function deploy() {
 		const deployData = buildDeployMultisig(owners, required);
 		send(deployData);
 	}
 </script>
 
 <div class="flex">
-	<div class="grid grid-cols-2">
+	<div class="">
 		<div>
 			<Label for="required">Required</Label>
 			<Input type="number" id="required" placeholder="2" bind:value={required} />
 		</div>
-		<Button bind:value={ownersLength}>+</Button>
+		<Button variant="ghost" on:click={increment}>+</Button>
+		<Button variant="ghost" on:click={decrement}>-</Button>
 		{#each Array(ownersLength) as _, i}
 			<div>
 				<Label for="owner">Owner {i + 1}</Label>

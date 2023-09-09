@@ -18,6 +18,7 @@
 	import { addRecentAddress } from '$lib/utils/localStorage';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import { get } from 'svelte/store';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -25,12 +26,13 @@
 	const { properties, balances } = data;
 	const tokenAddress = properties.address;
 
-	let massaClient: Client | null = null;
+	let massaClient = get(clientStore);
 	clientStore.subscribe((client) => {
 		massaClient = client;
 	});
 	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address() || undefined;
 
+	let allowances: Allowance[] = [];
 	let userBalance: bigint;
 
 	let transferReceiver: string;
@@ -45,13 +47,11 @@
 	let mintAmount: number;
 	$: disabledMint = !massaClient || !mintReceiver || !mintAmount;
 
-	let allowances: Allowance[] = [];
 	$: {
-		console.log(connectedAddress);
-		fetch();
+		fetch(connectedAddress);
 	}
 
-	const fetch = () => {
+	const fetch = (address: string | undefined) => {
 		if (!connectedAddress) return;
 
 		fetchTokenAllowances(tokenAddress, connectedAddress).then((res) => {
