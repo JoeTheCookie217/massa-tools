@@ -8,6 +8,7 @@
 - [x] display toast notifications
 - [x] select network
 - [x] light/dark mode
+- [ ] display tx status & fetch events (address created)
   
 ## Explorer (token)
 - [x] view its datastore (balance, allowance)

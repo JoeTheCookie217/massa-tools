@@ -5,9 +5,8 @@
 	import { providers as getProviders } from '@massalabs/wallet-provider';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from './ui/button';
-	import accountStore from '$lib/store/account';
 	import clientStore from '$lib/store/client';
-	import { ClientFactory } from '@massalabs/massa-web3';
+	import { ClientFactory, toMAS } from '@massalabs/massa-web3';
 	import useCopy from '$lib/hooks/useCopy';
 
 	let accounts: IAccount[];
@@ -15,10 +14,15 @@
 	let stationWallet: IProvider | undefined;
 	let bearbyWallet: IProvider | undefined;
 
-	$: connectedAddress = $accountStore?.address() || '';
+	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() || '';
 	let balance: string | undefined;
 	$: {
-		$accountStore?.balance().then((res) => res.finalBalance);
+		$clientStore
+			.wallet()
+			.getAccountBalance(connectedAddress)
+			.then((res) => {
+				if (res) balance = toMAS(res.final).toFixed(2);
+			});
 	}
 
 	const { copy, copied } = useCopy();
@@ -35,8 +39,6 @@
 	};
 
 	const select = async (selectedAccount: IAccount, index: number) => {
-		accountStore.set(selectedAccount);
-
 		selectedWallet.getNodesUrls().then((res) => {
 			console.log(res);
 		});
@@ -49,7 +51,6 @@
 	};
 
 	const disconnect = () => {
-		accountStore.set(null);
 		accounts = [];
 		localStorage.removeItem('wallet');
 		localStorage.removeItem('accountIndex');
