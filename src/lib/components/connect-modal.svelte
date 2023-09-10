@@ -21,7 +21,7 @@
 		$accountStore?.balance().then((res) => res.finalBalance);
 	}
 
-	const { copy, copied } = useCopy(connectedAddress);
+	const { copy, copied } = useCopy();
 
 	const connect = async (wallet: IProvider | undefined) => {
 		if (!wallet) return;
@@ -138,8 +138,8 @@
 		</div>
 		{#if connectedAddress}
 			<Dialog.Footer class="flex justify-center">
-				<Button on:click={copy}>
-					{copied ? 'Copied!' : 'Copy'}
+				<Button on:click={() => copy(connectedAddress)}>
+					{$copied ? 'Copied!' : 'Copy'}
 				</Button>
 				<Button on:click={disconnect}>Disconnect</Button>
 			</Dialog.Footer>

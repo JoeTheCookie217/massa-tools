@@ -19,6 +19,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Table from '$lib/components/ui/table';
 	import ConnectModal from '$lib/components/connect-modal.svelte';
+	import CopyButton from '$lib/components/copy-button.svelte';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -101,7 +102,7 @@
 			({properties.decimals}
 			decimals)
 		</div>
-		<div>Owner: {printAddress(properties.owner)}</div>
+		<div>Owner: {printAddress(properties.owner, 8)}</div>
 		<div>Holders: {balances.length}</div>
 		<div>Mintable: {properties.mintable}</div>
 		<div>Burnable: {properties.burnable}</div>
@@ -129,7 +130,12 @@
 
 					<Table.Row>
 						<Table.Cell>{address.startsWith('AU1') ? 'EOA' : 'SC'}</Table.Cell>
-						<Table.Cell>{printAddress(address)}</Table.Cell>
+						<Table.Cell class="flex items-center gap-2">
+							<span>
+								{printAddress(address, 8)}
+							</span>
+							<CopyButton copyText={address} />
+						</Table.Cell>
 						<Table.Cell class="font-medium"
 							>{Number(balance.toSignificant()).toLocaleString()}</Table.Cell
 						>
@@ -218,7 +224,12 @@
 							{#if allowance.raw !== 0n && spender && spender !== connectedAddress}
 								<Table.Row>
 									<Table.Cell>{spender.startsWith('AU1') ? 'EOA' : 'SC'}</Table.Cell>
-									<Table.Cell>{printAddress(spender)}</Table.Cell>
+									<Table.Cell class="flex items-center gap-2">
+										<span>
+											{printAddress(spender, 8)}
+										</span>
+										<CopyButton copyText={spender} /></Table.Cell
+									>
 									<Table.Cell class="font-medium"
 										>{Number(allowance.toSignificant()).toLocaleString()}</Table.Cell
 									>

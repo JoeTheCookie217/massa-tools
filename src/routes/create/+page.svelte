@@ -49,7 +49,7 @@ export function constructor(_: StaticArray<u8>): void {
 }
 	`;
 
-	const { copy, copied } = useCopy(name);
+	const { copy, copied } = useCopy();
 
 	const { send } = sendTx();
 
@@ -104,8 +104,8 @@ export function constructor(_: StaticArray<u8>): void {
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>
 	<div>
-		<Button on:click={copy}>
-			{copied ? 'Copied!' : 'Copy to clipboard'}
+		<Button on:click={() => copy(code)}>
+			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
 		<Highlight language={typescript} {code} />
 	</div>

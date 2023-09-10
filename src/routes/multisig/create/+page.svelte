@@ -47,7 +47,8 @@ export function constructor(_: StaticArray<u8>): void {
 }
 	`;
 
-	const { copy, copied } = useCopy(code);
+	const { copy: _copy, copied } = useCopy();
+	const copy = () => _copy(code);
 </script>
 
 <svelte:head>
@@ -73,7 +74,7 @@ export function constructor(_: StaticArray<u8>): void {
 	</div>
 	<div>
 		<Button on:click={copy}>
-			{copied ? 'Copied!' : 'Copy to clipboard'}
+			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
 		<Highlight language={typescript} {code} />
 	</div>

@@ -3,8 +3,8 @@ import { bytesToU256, bytesToU64, ProviderType, type IProvider } from '@massalab
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const printAddress = (address: string): string =>
-	address.slice(0, 6) + '...' + address.slice(-4);
+export const printAddress = (address: string, chars = 6): string =>
+	address.slice(0, chars) + '...' + address.slice(-(chars - 2));
 
 export const printMasBalance = (balance: string): string => Number(balance).toFixed(2) + ' MAS';
 

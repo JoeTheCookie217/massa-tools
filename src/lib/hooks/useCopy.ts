@@ -1,12 +1,13 @@
-const useCopy = (text: string, delay = 500) => {
-	let copied = false;
-	console.log('useCopy', text);
+import { writable } from 'svelte/store';
 
-	const copy = () => {
-		console.log('copy');
-		navigator.clipboard.writeText(text);
-		copied = true;
-		setTimeout(() => (copied = false), delay);
+const useCopy = (delay = 1000) => {
+	const copied = writable(false);
+
+	const copy = async (text: string) => {
+		await navigator.clipboard.writeText(text);
+		copied.set(true);
+
+		setTimeout(() => copied.set(false), delay);
 	};
 
 	return {
