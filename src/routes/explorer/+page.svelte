@@ -2,7 +2,12 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { clearRecentAddresses, getRecentAddresses } from '$lib/utils/localStorage';
+	import {
+		clearRecentAddresses,
+		getRecentAddresses,
+		removeRecentAddress,
+		type Address
+	} from '$lib/utils/localStorage';
 
 	let address: string;
 
@@ -11,6 +16,11 @@
 	const handleClear = () => {
 		clearRecentAddresses();
 		history = [];
+	};
+
+	const handleRemove = (item: Address) => {
+		removeRecentAddress(item);
+		history = getRecentAddresses();
 	};
 </script>
 
@@ -40,7 +50,7 @@
 		<div>
 			<div class="flex items-center gap-2">
 				<h2>Recent addresses</h2>
-				<Button on:click={handleClear}>Clear</Button>
+				<Button variant="link" on:click={handleClear}>Clear</Button>
 			</div>
 			{#each history as historyItem}
 				<div>
@@ -55,7 +65,8 @@
 						</span>
 					{/if}
 
-					<a href="/{historyItem.address}">{historyItem.address}</a>
+					<a href="/explorer/{historyItem.address}">{historyItem.address}</a>
+					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
 				</div>
 			{/each}
 		</div>

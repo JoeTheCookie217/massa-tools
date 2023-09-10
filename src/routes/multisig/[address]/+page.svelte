@@ -29,6 +29,7 @@
 	import { printMasBalance } from '$lib/utils/methods';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { addRecentMultisig } from '$lib/utils/localStorage';
 	const { address: multisigAddress } = $page.params;
 
 	const client = get(clientStore);
@@ -108,6 +109,10 @@
 		const receiveData = buildReceive(multisigAddress, value);
 		send(receiveData);
 	};
+
+	onMount(() => {
+		addRecentMultisig(multisigAddress);
+	});
 </script>
 
 {#await fetchMultisigInfo(multisigAddress)}

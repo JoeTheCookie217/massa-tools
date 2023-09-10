@@ -54,7 +54,7 @@
 				>
 			{/each}
 		</nav>
-		<div class="flex items-center">
+		<div class="flex items-center gap-2">
 			<ConnectModal />
 			<ChainSelect />
 			<LightSwitch />

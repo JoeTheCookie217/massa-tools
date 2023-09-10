@@ -2,14 +2,23 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { clearRecentAddresses, getRecentAddresses } from '$lib/utils/localStorage';
+	import {
+		clearRecentMultisigs,
+		getRecentMultisigs,
+		removeRecentMultisig
+	} from '$lib/utils/localStorage';
 
 	let address: string;
+	let history = getRecentMultisigs();
 
-	let history = getRecentAddresses();
 	const handleClear = () => {
-		clearRecentAddresses();
+		clearRecentMultisigs();
 		history = [];
+	};
+
+	const handleRemove = (item: string) => {
+		removeRecentMultisig(item);
+		history = getRecentMultisigs();
 	};
 </script>
 
@@ -40,22 +49,12 @@
 		<div>
 			<div class="flex items-center gap-2">
 				<h2>Recent addresses</h2>
-				<Button on:click={handleClear}>Clear</Button>
+				<Button variant="link" on:click={handleClear}>Clear</Button>
 			</div>
 			{#each history as historyItem}
 				<div>
-					{#if historyItem.name}
-						<span>
-							{historyItem.name}
-						</span>
-					{/if}
-					{#if historyItem.symbol}
-						<span>
-							{historyItem.symbol}
-						</span>
-					{/if}
-
-					<a href="/{historyItem.address}">{historyItem.address}</a>
+					<a href="/multisig/{historyItem}">{historyItem}</a>
+					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
 				</div>
 			{/each}
 		</div>

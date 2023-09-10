@@ -2,7 +2,7 @@ import type { ChainId } from '@dusalabs/sdk';
 
 const KEY = 'recent-addresses';
 
-type Address = {
+export type Address = {
 	address: string;
 	chainId: ChainId;
 	name?: string;
