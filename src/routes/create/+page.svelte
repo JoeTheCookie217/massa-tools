@@ -10,7 +10,7 @@
 	import styles from 'svelte-highlight/styles/dracula';
 	import useCopy from '$lib/hooks/useCopy';
 
-	let name: string = '';
+	let name: string;
 	let symbol: string;
 	let decimals: number;
 	let supply: number;
@@ -18,10 +18,10 @@
 	let burnable = false;
 	$: disabled = !name || !symbol || !decimals || !supply;
 
-	$: defaultName = name || 'MyToken';
-	$: defaultSymbol = symbol || 'MYT';
-	$: defaultDecimals = decimals || 18;
-	$: defaultSupply = supply || 1000000;
+	const defaultName = 'MyToken';
+	const defaultSymbol = 'MYT';
+	const defaultDecimals = 9;
+	const defaultSupply = 1234;
 
 	$: code = `export * from '@massalabs/sc-standards/assembly/contracts/FT/token';${
 		mintable
@@ -39,12 +39,9 @@ import { Args } from '@massalabs/as-types';
 import * as FT from '@massalabs/sc-standards/assembly/contracts/FT/token';
 
 export function constructor(_: StaticArray<u8>): void {
-	const name = '${defaultName}';
-	const symbol = '${defaultSymbol}';
-	const decimals = ${defaultDecimals};
-	const totalSupply = ${defaultSupply}n * 10n ** ${defaultDecimals}n;
-
-	const args = new Args().add(name).add(symbol).add(decimals).add(totalSupply);
+	const args = new Args().add('${name || defaultName}').add('${symbol || defaultSymbol}').add(${
+		decimals || defaultDecimals
+	}).add(${supply || defaultSupply} * 10 ** ${decimals || defaultDecimals});
 	FT.constructor(args.serialize());
 }
 	`;
@@ -69,19 +66,24 @@ export function constructor(_: StaticArray<u8>): void {
 	<div class="grid grid-cols-2">
 		<div>
 			<Label for="name">Name</Label>
-			<Input type="text" id="name" placeholder="My Token" bind:value={name} />
+			<Input type="text" id="name" placeholder={defaultName} bind:value={name} />
 		</div>
 		<div>
 			<Label for="symbol">Symbol</Label>
-			<Input type="text" id="symbol" placeholder="MYT" bind:value={symbol} />
+			<Input type="text" id="symbol" placeholder={defaultSymbol} bind:value={symbol} />
 		</div>
 		<div>
 			<Label for="decimals">Decimals</Label>
-			<Input type="number" id="decimals" placeholder="18" bind:value={decimals} />
+			<Input
+				type="number"
+				id="decimals"
+				placeholder={defaultDecimals.toString()}
+				bind:value={decimals}
+			/>
 		</div>
 		<div>
 			<Label for="supply">Supply</Label>
-			<Input type="number" id="supply" placeholder="1000000" bind:value={supply} />
+			<Input type="number" id="supply" placeholder={defaultSupply.toString()} bind:value={supply} />
 		</div>
 		<div>
 			<Checkbox id="mintable" bind:checked={mintable} />
