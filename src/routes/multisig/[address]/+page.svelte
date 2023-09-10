@@ -1,19 +1,7 @@
 <script lang="ts">
-	import {
-		Args,
-		bytesToU64,
-		strToBytes,
-		type Client,
-		type ICallData,
-		bytesToArray,
-		ArrayTypes,
-		bytesToI32,
-		bytesToStr,
-		byteToBool
-	} from '@massalabs/massa-web3';
+	import { strToBytes, byteToBool, bytesToI32 } from '@massalabs/massa-web3';
 	import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 	import { parseEther } from '@dusalabs/sdk';
-
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
 	dayjs.extend(relativeTime);
@@ -21,45 +9,37 @@
 	import { Input } from '$lib/components/ui/input';
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { buildReceive, buildSubmit } from './methods';
-	import { get } from 'svelte/store';
 	import clientStore from '$lib/store/client';
-
 	import { page } from '$app/stores';
 	import { error } from '@sveltejs/kit';
 	import { printMasBalance } from '$lib/utils/methods';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { addRecentMultisig } from '$lib/utils/localStorage';
+
+	type MultisigInfo = {
+		balance: bigint;
+		required: number;
+		owners: string[];
+	};
+
 	const { address: multisigAddress } = $page.params;
 
-	const client = get(clientStore);
-
-	let massaClient = get(clientStore);
-	clientStore.subscribe((client) => (massaClient = client));
-	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address();
-
-	let owners: string[];
-	let required: number;
-	let balance = 0n;
+	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 
 	let submitTo: string;
 	let submitValue: number;
-
 	let receiveValue: number;
 
-	onMount(() => {
-		fetchMasBalance(multisigAddress).then((b) => (balance = b));
-	});
-
-	const fetchMultisigInfo = async (address: string | undefined) => {
-		if (!address) return;
+	const fetchMultisigInfo = async (address: string): Promise<MultisigInfo> => {
+		const balance = await fetchMasBalance(multisigAddress);
 
 		const OWNER_PREFIX = 'is_owner::';
 		const ownerKeys = await getDatastore(address).then((entries) => {
 			return entries.filter((entry) => entry.startsWith(OWNER_PREFIX));
 		});
 
-		client
+		const { required, owners } = await $clientStore
 			.publicApi()
 			.getDatastoreEntries([
 				{
@@ -72,8 +52,9 @@
 				}))
 			])
 			.then((result) => {
-				const requiredRed = result[0].final_value;
-				if (requiredRed) required = bytesToI32(requiredRed);
+				const requiredRes = result[0].final_value;
+				if (!requiredRes) throw error(404, 'Multisig invalid');
+				const required = bytesToI32(requiredRes);
 
 				const ownersRes = result.slice(1);
 				const newOwners = [];
@@ -86,17 +67,18 @@
 						}
 					}
 				}
-				owners = newOwners;
+				const owners = newOwners;
+
+				return { required, owners };
 			})
 			.catch(() => {
 				throw error(404, 'Multisig not found');
 			});
+
+		return { balance, required, owners };
 	};
 
-	const { send, subscribe } = sendTx();
-	subscribe((x) => {
-		console.log(x);
-	});
+	const { send } = sendTx();
 
 	const submit = () => {
 		const value = parseEther(submitValue.toString());
@@ -117,13 +99,13 @@
 
 {#await fetchMultisigInfo(multisigAddress)}
 	<p>loading...</p>
-{:then}
+{:then { balance, required, owners }}
 	{#if connectedAddress}
 		{#if owners.includes(connectedAddress)}
 			<div>
 				<div class="">
 					<Label for="recipient">Recipient</Label>
-					<Input type="text" id="recipient" placeholder="user or smart contract address" />
+					<Input type="text" id="recipient" placeholder="0x..." bind:value={submitTo} />
 				</div>
 				<div class="">
 					<Label for="submitValue">Value (MAS)</Label>

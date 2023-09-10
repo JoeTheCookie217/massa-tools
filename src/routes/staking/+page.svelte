@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { Args, bytesToU64, strToBytes, type Client, type ICallData } from '@massalabs/massa-web3';
+	import { Args, bytesToU64, strToBytes } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { fetchTokenBalance } from '$lib/services/datastore';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
-
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
 	import { sendTx } from '$lib/hooks/sendTx';
@@ -13,7 +12,6 @@
 		buildIncreaseAllowance,
 		buildWithdraw
 	} from '$lib/services/serialize';
-	import { get } from 'svelte/store';
 	import clientStore from '$lib/store/client';
 	dayjs.extend(relativeTime);
 
@@ -33,11 +31,7 @@
 	let depositAmount: number = 0;
 	let withdrawAmount: number = 0;
 
-	let massaClient = get(clientStore);
-	clientStore.subscribe((client) => {
-		if (client) massaClient = client;
-	});
-	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address();
+	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 
 	let depositBalance = 0n;
 	let stakedBalance = 0n;
@@ -68,7 +62,7 @@
 	const fetchStakingInfo = (address: string | undefined) => {
 		if (!address) return;
 
-		massaClient
+		$clientStore
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
@@ -79,7 +73,7 @@
 			.then((result) => {
 				stakedBalance = bytesToU64(result.returnValue);
 			});
-		massaClient
+		$clientStore
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
@@ -90,7 +84,7 @@
 			.then((result) => {
 				pendingBalance = bytesToU64(result.returnValue);
 			});
-		massaClient
+		$clientStore
 			.smartContracts()
 			.readSmartContract({
 				targetAddress: stakingAddress,
@@ -101,7 +95,7 @@
 			.then((result) => {
 				totalStaked = bytesToU64(result.returnValue);
 			});
-		massaClient
+		$clientStore
 			.publicApi()
 			.getDatastoreEntries([
 				{
@@ -135,26 +129,29 @@
 			});
 	};
 
-	const { send, subscribe } = sendTx();
-	subscribe((x) => {
-		console.log(x);
-	});
+	const { send } = sendTx();
 
-	$: depositData = buildDeposit(depositAmount, depositToken, stakingAddress);
-	const deposit = () => send(depositData);
+	const deposit = () => {
+		const amount = parseUnits(depositAmount.toString(), depositToken.decimals);
+		const depositData = buildDeposit(amount, stakingAddress);
+		send(depositData);
+	};
 
-	$: withdrawData = buildWithdraw(withdrawAmount, depositToken, stakingAddress);
-	const withdraw = () => send(withdrawData);
+	const withdraw = () => {
+		const withdrawData = buildWithdraw(withdrawAmount, depositToken, stakingAddress);
+		send(withdrawData);
+	};
 
-	$: harvestData = buildHarvest(stakingAddress);
-	const harvest = () => send(harvestData);
+	const approve = () => {
+		const amount = parseUnits(depositAmount.toString(), depositToken.decimals);
+		const approveData = buildIncreaseAllowance(amount, depositToken.address, stakingAddress);
+		send(approveData);
+	};
 
-	$: approveData = buildIncreaseAllowance(
-		parseUnits(depositAmount.toString(), depositToken.decimals),
-		depositToken.address,
-		stakingAddress
-	);
-	const approve = () => send(approveData);
+	const harvest = () => {
+		const harvestData = buildHarvest(stakingAddress);
+		send(harvestData);
+	};
 </script>
 
 {#if connectedAddress}

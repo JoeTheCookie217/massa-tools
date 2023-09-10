@@ -8,8 +8,9 @@
 	import Highlight from 'svelte-highlight';
 	import { typescript } from 'svelte-highlight/languages';
 	import styles from 'svelte-highlight/styles/dracula';
+	import useCopy from '$lib/hooks/useCopy';
 
-	let name: string;
+	let name: string = '';
 	let symbol: string;
 	let decimals: number;
 	let supply: number;
@@ -48,12 +49,9 @@ export function constructor(_: StaticArray<u8>): void {
 }
 	`;
 
-	const copy = () => navigator.clipboard.writeText(code);
+	const { copy, copied } = useCopy(name);
 
-	const { send, subscribe } = sendTx();
-	subscribe((txState) => {
-		console.log(txState);
-	});
+	const { send } = sendTx();
 
 	async function deploy() {
 		const totalSupply = BigInt(supply) * BigInt(10 ** decimals);
@@ -106,7 +104,9 @@ export function constructor(_: StaticArray<u8>): void {
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>
 	<div>
-		<Button on:click={copy}>Copy to clipboard</Button>
+		<Button on:click={copy}>
+			{copied ? 'Copied!' : 'Copy to clipboard'}
+		</Button>
 		<Highlight language={typescript} {code} />
 	</div>
 </div>

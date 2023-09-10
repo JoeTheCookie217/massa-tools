@@ -68,17 +68,12 @@ export const buildDecreaseAllowance = (
 
 // STAKING
 
-export const buildDeposit = (
-	depositAmount: number,
-	depositToken: Token,
-	stakingAddress: string
-): ICallData => {
-	const amount = parseUnits(depositAmount.toString(), depositToken.decimals);
+export const buildDeposit = (depositAmount: bigint, stakingAddress: string): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: stakingAddress,
 		functionName: 'deposit',
-		parameter: new Args().addU64(amount)
+		parameter: new Args().addU64(depositAmount)
 	};
 };
 

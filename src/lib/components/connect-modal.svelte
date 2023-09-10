@@ -4,33 +4,24 @@
 	import type { IAccount, IProvider } from '@massalabs/wallet-provider';
 	import { providers as getProviders } from '@massalabs/wallet-provider';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Button, buttonVariants } from './ui/button';
-	import { cn } from '$lib/utils';
-	import { CrossIcon } from 'lucide-svelte';
+	import { Button } from './ui/button';
 	import accountStore from '$lib/store/account';
 	import clientStore from '$lib/store/client';
 	import { ClientFactory } from '@massalabs/massa-web3';
+	import useCopy from '$lib/hooks/useCopy';
 
 	let accounts: IAccount[];
 	let selectedWallet: IProvider;
 	let stationWallet: IProvider | undefined;
 	let bearbyWallet: IProvider | undefined;
 
-	let connectedAddress: string | undefined;
+	$: connectedAddress = $accountStore?.address() || '';
 	let balance: string | undefined;
-	accountStore.subscribe(async (account) => {
-		connectedAddress = account?.address();
-		balance = await account?.balance().then((res) => res.finalBalance);
-	});
+	$: {
+		$accountStore?.balance().then((res) => res.finalBalance);
+	}
 
-	let copied = false;
-	const copy = () => {
-		copied = true;
-		connectedAddress && navigator.clipboard.writeText(connectedAddress);
-		setTimeout(() => {
-			copied = false;
-		}, 1000);
-	};
+	const { copy, copied } = useCopy(connectedAddress);
 
 	const connect = async (wallet: IProvider | undefined) => {
 		if (!wallet) return;

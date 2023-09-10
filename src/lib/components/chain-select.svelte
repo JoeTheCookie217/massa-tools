@@ -7,10 +7,7 @@
 	const chains: ChainId[] = Object.values(ChainId).filter(
 		(v) => typeof v === 'number'
 	) as ChainId[];
-	let selectedNetwork: ChainId;
-	clientStore.subscribe((network) => {
-		selectedNetwork = providerToChainId(network.getPublicProviders()[0]);
-	});
+	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	const changeChain = (chain: ChainId) =>
 		clientStore.update((network) => {

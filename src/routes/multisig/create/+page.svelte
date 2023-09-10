@@ -7,6 +7,7 @@
 	import Highlight from 'svelte-highlight';
 	import { typescript } from 'svelte-highlight/languages';
 	import styles from 'svelte-highlight/styles/dracula';
+	import useCopy from '$lib/hooks/useCopy';
 
 	let owners: string[] = [];
 	let ownersLength: number = 0;
@@ -16,10 +17,7 @@
 	$: defaultOwners = owners.length ? owners : ['0x...'];
 	$: defaultRequired = required || 2;
 
-	const { send, subscribe } = sendTx();
-	subscribe((txState) => {
-		console.log(txState);
-	});
+	const { send } = sendTx();
 
 	const increment = () => {
 		ownersLength++;
@@ -49,7 +47,7 @@ export function constructor(_: StaticArray<u8>): void {
 }
 	`;
 
-	const copy = () => navigator.clipboard.writeText(code);
+	const { copy, copied } = useCopy(code);
 </script>
 
 <svelte:head>
@@ -74,7 +72,9 @@ export function constructor(_: StaticArray<u8>): void {
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>
 	<div>
-		<Button on:click={copy}>Copy to clipboard</Button>
+		<Button on:click={copy}>
+			{copied ? 'Copied!' : 'Copy to clipboard'}
+		</Button>
 		<Highlight language={typescript} {code} />
 	</div>
 </div>

@@ -4,7 +4,6 @@
 	import { printAddress } from '$lib/utils/methods';
 	import type { MyPageLoad } from './+page';
 	import clientStore from '$lib/store/client';
-	import type { Client } from '@massalabs/massa-web3';
 	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
 	import type { Allowance } from '$lib/utils/types';
 	import {
@@ -16,10 +15,10 @@
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { onMount } from 'svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
-	import Label from '$lib/components/ui/label/label.svelte';
+	// import Label from '$lib/components/ui/label/label.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Table from '$lib/components/ui/table';
-	import { get } from 'svelte/store';
+	import ConnectModal from '$lib/components/connect-modal.svelte';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -27,11 +26,7 @@
 	const { properties, balances } = data;
 	const tokenAddress = properties.address;
 
-	let massaClient = get(clientStore);
-	clientStore.subscribe((client) => {
-		massaClient = client;
-	});
-	$: connectedAddress = massaClient?.wallet().getBaseAccount()?.address() || undefined;
+	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 
 	let allowances: Allowance[] = [];
 	let userBalance: bigint;
@@ -39,36 +34,33 @@
 	let transferReceiver: string;
 	let transferAmount: number;
 	$: disabledTransfer =
-		!massaClient || !transferReceiver || !transferAmount || transferAmount > userBalance;
+		!connectedAddress || !transferReceiver || !transferAmount || transferAmount > userBalance;
 
 	let burnAmount: number;
-	$: disabledBurn = !massaClient || !burnAmount || burnAmount > userBalance;
+	$: disabledBurn = !connectedAddress || !burnAmount || burnAmount > userBalance;
 
 	let mintReceiver: string;
 	let mintAmount: number;
-	$: disabledMint = !massaClient || !mintReceiver || !mintAmount;
+	$: disabledMint = !connectedAddress || !mintReceiver || !mintAmount;
 
 	$: {
 		fetch(connectedAddress);
 	}
 
 	const fetch = (address: string | undefined) => {
-		if (!connectedAddress) return;
+		if (!address) return;
 
-		fetchTokenAllowances(tokenAddress, connectedAddress).then((res) => {
+		fetchTokenAllowances(tokenAddress, address).then((res) => {
 			allowances = res;
 		});
-		fetchTokenBalance(tokenAddress, connectedAddress).then((balance) => {
+		fetchTokenBalance(tokenAddress, address).then((balance) => {
 			userBalance = balance;
 		});
 	};
 
 	const token = new Token(ChainId.BUILDNET, tokenAddress, properties.decimals);
 
-	const { send, subscribe } = sendTx();
-	subscribe((state) => {
-		console.log(state);
-	});
+	const { send } = sendTx();
 
 	const transfer = async () => {
 		const amount = BigInt(transferAmount * 10 ** properties.decimals);
@@ -132,7 +124,7 @@
 						balance
 							.multiply(100n)
 							.divide(new TokenAmount(token, properties.totalSupply))
-							.toSignificant(3)
+							.toSignificant(2)
 					)}
 
 					<Table.Row>
@@ -148,7 +140,7 @@
 		</Table.Root>
 	{/if}
 	<h2 class="text-2xl">Actions</h2>
-	{#if massaClient}
+	{#if connectedAddress}
 		<div class="flex flex-col gap-2">
 			{#if userBalance > 0n}
 				<div>
@@ -243,6 +235,6 @@
 			{/if}
 		</div>
 	{:else}
-		<p>Connect wallet to perform actions</p>
+		<ConnectModal />
 	{/if}
 </div>

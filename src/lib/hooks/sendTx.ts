@@ -54,6 +54,10 @@ export function sendTx() {
 		}
 	};
 
+	subscribe((state) => {
+		console.log(state);
+	});
+
 	return {
 		subscribe,
 		send
