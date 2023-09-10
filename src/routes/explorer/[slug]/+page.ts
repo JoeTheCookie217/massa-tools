@@ -97,7 +97,7 @@ const functionExists = async (address: string, functionName: string) => {
 		})
 		.then(() => true)
 		.catch((err) => {
-			if (JSON.stringify(err).includes('Missing export')) return false;
+			if (err.message.includes('Missing export')) return false;
 			return true;
 		});
 };
