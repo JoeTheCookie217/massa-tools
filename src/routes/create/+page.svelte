@@ -34,7 +34,9 @@ export * from '@massalabs/sc-standards/assembly/contracts/FT/token-burn';`
 			: ''
 	}
 
+import { Args } from '@massalabs/as-types';
 import * as FT from '@massalabs/sc-standards/assembly/contracts/FT/token';
+
 export function constructor(_: StaticArray<u8>): void {
 	const name = '${defaultName}';
 	const symbol = '${defaultSymbol}';
@@ -42,7 +44,7 @@ export function constructor(_: StaticArray<u8>): void {
 	const totalSupply = ${defaultSupply}n * 10n ** ${defaultDecimals}n;
 
 	const args = new Args().add(name).add(symbol).add(decimals).add(totalSupply);
-	FT.constructor(args);
+	FT.constructor(args.serialize());
 }
 	`;
 
@@ -65,7 +67,7 @@ export function constructor(_: StaticArray<u8>): void {
 	{@html styles}
 </svelte:head>
 
-<div class="flex">
+<div class="flex gap-4">
 	<div class="grid grid-cols-2">
 		<div>
 			<Label for="name">Name</Label>

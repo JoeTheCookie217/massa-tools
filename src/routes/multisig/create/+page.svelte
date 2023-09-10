@@ -37,13 +37,15 @@
 
 	$: code = `export * from '@dusalabs/periphery/assembly/contracts/multisig';
 
+import { Args } from '@massalabs/as-types';
 import * as MS from '@dusalabs/periphery/assembly/contracts/multisig';
+
 export function constructor(_: StaticArray<u8>): void {
 	const owners = ${JSON.stringify(defaultOwners)};
 	const required = ${defaultRequired};
 
 	const args = new Args().add(owners).add(required);
-	MS.constructor(args);
+	MS.constructor(args.serialize());
 }
 	`;
 
