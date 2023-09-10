@@ -7,6 +7,7 @@
 - [x] disconnect wallet 
 - [x] display toast notifications
 - [x] select network
+- [x] light/dark mode
   
 ## Explorer (token)
 - [x] view its datastore (balance, allowance)

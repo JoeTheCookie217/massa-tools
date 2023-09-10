@@ -9,6 +9,7 @@ Derived from SkeletonUI:  https://github.com/skeletonlabs/skeleton/blob/master/p
 	import {
 		getModeOsPrefers,
 		modeCurrent,
+		setInitialClassState,
 		setModeCurrent,
 		setModeUserPrefers
 	} from './light-switch';
@@ -35,10 +36,7 @@ Derived from SkeletonUI:  https://github.com/skeletonlabs/skeleton/blob/master/p
 
 	// Lifecycle
 	onMount(() => {
-		// Sync lightswitch with the theme
-		if (!('modeCurrent' in localStorage)) {
-			setModeCurrent(getModeOsPrefers());
-		}
+		setInitialClassState();
 	});
 </script>
 
