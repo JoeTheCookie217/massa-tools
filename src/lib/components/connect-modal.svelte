@@ -17,12 +17,13 @@
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() || '';
 	let balance: string | undefined;
 	$: {
-		$clientStore
-			.wallet()
-			.getAccountBalance(connectedAddress)
-			.then((res) => {
-				if (res) balance = toMAS(res.final).toFixed(2);
-			});
+		connectedAddress &&
+			$clientStore
+				.wallet()
+				.getAccountBalance(connectedAddress)
+				.then((res) => {
+					if (res) balance = toMAS(res.final).toFixed(2);
+				});
 	}
 
 	const { copy, copied } = useCopy();
