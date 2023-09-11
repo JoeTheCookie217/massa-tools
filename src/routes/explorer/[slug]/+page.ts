@@ -29,7 +29,7 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 	console.log(keys);
 
 	let balances: BalanceEntry[] = [];
-	let properties: Properties = { address } as Properties;
+	let properties: Properties = { address, holders: balanceKeys.length } as Properties;
 
 	await client
 		.publicApi()

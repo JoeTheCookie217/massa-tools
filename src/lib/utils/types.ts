@@ -15,6 +15,7 @@ export type Properties = {
 	symbol: string;
 	totalSupply: bigint;
 	owner: string;
+	holders: number;
 	mintable: boolean;
 	burnable: boolean;
 };

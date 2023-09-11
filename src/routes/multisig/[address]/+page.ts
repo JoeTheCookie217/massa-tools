@@ -10,6 +10,7 @@ import {
 } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
+import type { RouteParams } from './$types';
 
 const client = get(clientStore);
 
@@ -21,7 +22,7 @@ type MultisigInfo = {
 	transactions: Transaction[];
 };
 
-export async function load({ params }): Promise<MultisigInfo> {
+export async function load({ params }: { params: RouteParams }): Promise<MultisigInfo> {
 	const address = params.address;
 
 	const balance = await fetchMasBalance(address);

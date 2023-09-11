@@ -2,7 +2,6 @@
 	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
 	import { printAddress } from '$lib/utils/methods';
-	import type { MyPageLoad } from './+page';
 	import clientStore from '$lib/store/client';
 	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
 	import type { Allowance } from '$lib/utils/types';
@@ -24,7 +23,7 @@
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
-	export let data: MyPageLoad;
+	export let data;
 	const { properties, balances } = data;
 	const tokenAddress = properties.address;
 
@@ -104,7 +103,7 @@
 			decimals)
 		</div>
 		<div>Owner: {printAddress(properties.owner, 8)}</div>
-		<div>Holders: {balances.length}</div>
+		<div>Holders: {properties.holders}</div>
 		<div>Mintable: {properties.mintable}</div>
 		<div>Burnable: {properties.burnable}</div>
 	</div>
