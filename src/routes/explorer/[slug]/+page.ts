@@ -5,8 +5,9 @@ import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import type { BalanceEntry, Properties } from '$lib/utils/types';
 import { getDatastore } from '$lib/services/datastore.js';
+import type { RouteParams } from './$types';
 
-export type MyPageLoad = {
+type TokenInfo = {
 	balances: BalanceEntry[];
 	properties: Properties;
 };
@@ -14,17 +15,21 @@ export type MyPageLoad = {
 const erc20Keys = ['DECIMALS', 'SYMBOL', 'NAME', 'TOTAL_SUPPLY', 'OWNER'];
 const client = get(clientStore);
 
-export async function load({ params }): Promise<MyPageLoad> {
+export async function load({ params }: { params: RouteParams }): Promise<TokenInfo> {
 	const address = params.slug;
 
 	const notFoundError = error(404, 'Address not found');
-	const keys = await getDatastore(address).catch((err) => {
-		console.error(err);
-		throw notFoundError;
-	});
+	const balanceKeys = await getDatastore(address)
+		.then((res) => res.filter((entry) => entry.startsWith('BALANCE')))
+		.catch((err) => {
+			console.error(err);
+			throw notFoundError;
+		});
+	const keys = [...new Set([...erc20Keys, ...balanceKeys.slice(0, 100)])];
+	console.log(keys);
 
 	let balances: BalanceEntry[] = [];
-	let properties: Properties = {} as Properties;
+	let properties: Properties = { address } as Properties;
 
 	await client
 		.publicApi()
@@ -70,7 +75,7 @@ export async function load({ params }): Promise<MyPageLoad> {
 		})
 		.catch((err) => {
 			console.error(err);
-			throw error(404, 'Datastore invalid');
+			throw error(404, 'Token invalid');
 		});
 
 	if (Object.keys(properties).length === 0) throw error(404, 'ERC20 not found');
@@ -78,7 +83,6 @@ export async function load({ params }): Promise<MyPageLoad> {
 	await functionExists(address, 'mint').then((res) => (properties.mintable = res));
 	await functionExists(address, 'burn').then((res) => (properties.burnable = res));
 	balances = balances.sort((a, b) => Number(b.value - a.value));
-	properties.address = address;
 
 	return {
 		balances,
