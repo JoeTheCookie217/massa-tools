@@ -1,5 +1,12 @@
 import { Token, parseUnits } from '@dusalabs/sdk';
-import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
+import {
+	Args,
+	MassaUnits,
+	type ICallData,
+	ArrayTypes,
+	type ISerializable,
+	type IDeserializedResult
+} from '@massalabs/massa-web3';
 
 export const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
 	coins: 0n,
@@ -136,3 +143,35 @@ export const buildDeployMultisig = (owners: string[], required: number): ICallDa
 		coins: 35n * MassaUnits.oneMassa
 	};
 };
+
+// SERIALIZABLE
+
+export class Transaction implements ISerializable<Transaction> {
+	constructor(
+		public to: string = '',
+		public value: bigint = 0n,
+		public data: Uint8Array = new Uint8Array(0),
+		public executed: boolean = false
+	) {}
+
+	serialize(): Uint8Array {
+		const args = new Args()
+			.addString(this.to)
+			.addU64(this.value)
+			.addUint8Array(this.data)
+			.addBool(this.executed);
+		return Uint8Array.from(args.serialize());
+	}
+
+	deserialize(data: Uint8Array, offset: number): IDeserializedResult<Transaction> {
+		const args = new Args(data, offset);
+		this.to = args.nextString();
+		this.value = args.nextU64();
+		this.data = args.nextUint8Array();
+		this.executed = args.nextBool();
+		return {
+			instance: this,
+			offset: args.getOffset()
+		};
+	}
+}

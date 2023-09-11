@@ -2,6 +2,7 @@ import { Args, bytesToU64, strToBytes } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
+import { parseEther } from '@dusalabs/sdk';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -10,8 +11,11 @@ export const fetchMasBalance = (account: string): Promise<bigint> =>
 	baseClient
 		.publicApi()
 		.getAddresses([account])
-		.then((e) => BigInt(e[0].final_balance))
-		.catch(() => 0n);
+		.then((e) => parseEther(e[0].final_balance))
+		.catch((err) => {
+			console.log(err.message);
+			return 0n;
+		});
 
 export const fetchTokenBalance = (address: string, account: string): Promise<bigint> =>
 	baseClient

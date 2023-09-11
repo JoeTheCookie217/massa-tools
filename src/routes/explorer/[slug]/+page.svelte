@@ -19,8 +19,8 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Table from '$lib/components/ui/table';
 	import ConnectModal from '$lib/components/connect-modal.svelte';
-	import CopyButton from '$lib/components/copy-button.svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip';
+	import AddressCell from '$lib/components/address-cell.svelte';
+	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 
 	const MAX_ALLOWANCE = 2n ** 64n - 1n;
 
@@ -133,39 +133,14 @@
 
 					<Table.Row>
 						<Table.Cell>{i + 1}</Table.Cell>
-						<Table.Cell class="flex items-center gap-2">
-							<Tooltip.Root openDelay={50}>
-								<Tooltip.Trigger>
-									<span>
-										{printAddress(address, 8)}
-									</span>
-								</Tooltip.Trigger>
-								<Tooltip.Content>
-									<span class="text-xs">
-										{address}
-									</span>
-								</Tooltip.Content>
-							</Tooltip.Root>
-							<CopyButton copyText={address} />
-						</Table.Cell>
+						<AddressCell {address} />
 						<Table.Cell class="font-medium"
 							>{Number(balance.toSignificant()).toLocaleString()}</Table.Cell
 						>
 						<Table.Cell>{share < 0.01 ? '<0.01' : share}%</Table.Cell>
 						<Table.Cell class="font-medium">$???</Table.Cell>
 						<Table.Cell class="text-right">
-							<Tooltip.Root openDelay={50}>
-								<Tooltip.Trigger>
-									<span>
-										{address.startsWith('AU1') ? 'EOA' : 'SC'}
-									</span>
-								</Tooltip.Trigger>
-								<Tooltip.Content>
-									<span class="text-xs">
-										{address.startsWith('AU1') ? 'Externally Owned Account' : 'Smart Contract'}
-									</span>
-								</Tooltip.Content>
-							</Tooltip.Root>
+							<AccountTypeCell {address} />
 						</Table.Cell>
 					</Table.Row>
 				{/each}
@@ -252,39 +227,12 @@
 							{#if allowance.raw !== 0n && spender && spender !== connectedAddress}
 								<Table.Row>
 									<Table.Cell>{i + 1}</Table.Cell>
-									<Table.Cell class="flex items-center gap-2">
-										<Tooltip.Root openDelay={50}>
-											<Tooltip.Trigger>
-												<span>
-													{printAddress(spender, 8)}
-												</span>
-											</Tooltip.Trigger>
-											<Tooltip.Content>
-												<span class="text-xs">
-													{spender}
-												</span>
-											</Tooltip.Content>
-										</Tooltip.Root>
-										<CopyButton copyText={spender} />
-									</Table.Cell>
+									<AddressCell address={spender} />
 									<Table.Cell class="font-medium"
 										>{Number(allowance.toSignificant()).toLocaleString()}</Table.Cell
 									>
 									<Table.Cell>
-										<Tooltip.Root openDelay={50}>
-											<Tooltip.Trigger>
-												<span>
-													{spender.startsWith('AU1') ? 'EOA' : 'SC'}
-												</span>
-											</Tooltip.Trigger>
-											<Tooltip.Content>
-												<span class="text-xs">
-													{spender.startsWith('AU1')
-														? 'Externally Owned Account'
-														: 'Smart Contract'}
-												</span>
-											</Tooltip.Content>
-										</Tooltip.Root>
+										<AccountTypeCell address={spender} />
 									</Table.Cell>
 									<Table.Cell class="text-center">
 										<Button variant="ghost" on:click={() => revokeAllowance(spender, amount)}
