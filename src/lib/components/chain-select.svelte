@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Select from '$lib/components/ui/select';
-	import clientStore from '$lib/store/client';
+	import clientStore, { PROVIDER_URL_KEY } from '$lib/store/client';
 	import { toTitle, providerToChainId, chainIdToProviders } from '$lib/utils/methods';
 	import { ChainId } from '@dusalabs/sdk';
 
@@ -12,7 +12,7 @@
 	const changeChain = (chain: ChainId) =>
 		clientStore.update((network) => {
 			const newProviders = chainIdToProviders(chain);
-			localStorage.setItem('defaultPublicApi', newProviders[0].url);
+			localStorage.setItem(PROVIDER_URL_KEY, newProviders[0].url);
 			network.setCustomProviders(newProviders);
 			return network;
 		});

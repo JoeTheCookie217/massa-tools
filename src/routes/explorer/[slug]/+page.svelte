@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
-	import { printAddress } from '$lib/utils/methods';
+	import { printAddress, providerToChainId } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
 	import type { Allowance } from '$lib/utils/types';
@@ -59,7 +59,8 @@
 		});
 	};
 
-	const token = new Token(ChainId.BUILDNET, tokenAddress, properties.decimals);
+	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
+	const token = new Token(selectedNetwork, tokenAddress, properties.decimals);
 
 	const { send } = sendTx();
 
@@ -86,7 +87,7 @@
 	onMount(() => {
 		addRecentAddress({
 			address: tokenAddress,
-			chainId: ChainId.BUILDNET,
+			chainId: selectedNetwork,
 			name: properties.name,
 			symbol: properties.symbol
 		});

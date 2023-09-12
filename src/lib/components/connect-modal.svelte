@@ -5,7 +5,7 @@
 	import { providers as getProviders } from '@massalabs/wallet-provider';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from './ui/button';
-	import clientStore from '$lib/store/client';
+	import clientStore, { baseClient } from '$lib/store/client';
 	import { ClientFactory, toMAS } from '@massalabs/massa-web3';
 	import useCopy from '$lib/hooks/useCopy';
 
@@ -52,6 +52,7 @@
 	};
 
 	const disconnect = () => {
+		clientStore.set(baseClient);
 		accounts = [];
 		localStorage.removeItem('wallet');
 		localStorage.removeItem('accountIndex');
