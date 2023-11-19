@@ -1,8 +1,8 @@
-import { Args, bytesToU64, strToBytes } from '@massalabs/massa-web3';
+import { Args, bytesToU256, strToBytes } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
-import { parseEther } from '@dusalabs/sdk';
+import { IERC20, parseEther } from '@dusalabs/sdk';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -18,16 +18,7 @@ export const fetchMasBalance = (account: string): Promise<bigint> =>
 		});
 
 export const fetchTokenBalance = (address: string, account: string): Promise<bigint> =>
-	baseClient
-		.smartContracts()
-		.readSmartContract({
-			targetAddress: address,
-			targetFunction: 'balanceOf',
-			parameter: new Args().addString(account).serialize(),
-			maxGas
-		})
-		.then((e) => bytesToU64(e.returnValue))
-		.catch(() => 0n);
+	new IERC20(address, baseClient).balanceOf(account);
 
 export const getDatastore = (address: string) =>
 	baseClient
@@ -56,7 +47,7 @@ export const fetchTokenAllowances = async (
 		.getDatastoreEntries(keys.map((k) => ({ address, key: strToBytes(k) })))
 		.then((res) => {
 			return res.map((r, i) => {
-				const amount = r.final_value ? bytesToU64(r.final_value) : 0n;
+				const amount = r.final_value ? bytesToU256(r.final_value) : 0n;
 				const spender = keys[i].slice(owner.length);
 				return {
 					owner,

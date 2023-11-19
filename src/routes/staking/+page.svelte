@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Args, bytesToU64, strToBytes } from '@massalabs/massa-web3';
+	import { Args, bytesToU256, bytesToU64, strToBytes } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { fetchTokenBalance } from '$lib/services/datastore';
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
@@ -71,7 +71,7 @@
 				maxGas: 100_000_000n
 			})
 			.then((result) => {
-				stakedBalance = bytesToU64(result.returnValue);
+				stakedBalance = bytesToU256(result.returnValue);
 			});
 		$clientStore
 			.smartContracts()
@@ -82,7 +82,7 @@
 				maxGas: 100_000_000n
 			})
 			.then((result) => {
-				pendingBalance = bytesToU64(result.returnValue);
+				pendingBalance = bytesToU256(result.returnValue);
 			});
 		$clientStore
 			.smartContracts()
@@ -93,7 +93,7 @@
 				maxGas: 100_000_000n
 			})
 			.then((result) => {
-				totalStaked = bytesToU64(result.returnValue);
+				totalStaked = bytesToU256(result.returnValue);
 			});
 		$clientStore
 			.publicApi()
@@ -119,7 +119,7 @@
 
 				const res1 = result[1].final_value;
 				if (res1) {
-					rewardPerToken = Number(bytesToU64(res1));
+					rewardPerToken = Number(bytesToU256(res1));
 				}
 
 				const res2 = result[2].final_value;

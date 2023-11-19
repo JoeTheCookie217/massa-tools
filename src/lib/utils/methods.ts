@@ -14,7 +14,7 @@ export const printAddress = (address: string, chars = 6): string =>
 
 export const printMasBalance = (balance: string): string => Number(balance).toFixed(2) + ' MAS';
 
-export const bytesToNumber = (bytes: Uint8Array): bigint => {
+export const bytesToBigInt = (bytes: Uint8Array): bigint => {
 	try {
 		return bytesToU256(bytes);
 	} catch (e) {

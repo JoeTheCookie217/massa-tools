@@ -1,17 +1,26 @@
-import type { ICallData, Client } from '@massalabs/massa-web3';
+import {
+	type ICallData,
+	type Client,
+	type IEvent,
+	withTimeoutRejection
+} from '@massalabs/massa-web3';
 import { get, writable } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
+import { pollAsyncEvents } from '$lib/services/events';
+import { EventDecoder } from '@dusalabs/sdk';
 
 type TState = {
 	txId: string | null;
 	pending: boolean;
 	error: string | null;
+	events: IEvent[];
 };
 const defaultState: TState = {
 	txId: null,
 	pending: false,
-	error: null
+	error: null,
+	events: []
 };
 
 export function sendTx() {
@@ -20,15 +29,15 @@ export function sendTx() {
 		if (client) massaClient = client;
 	});
 
-	const { subscribe, set } = writable(defaultState);
+	const { subscribe, set, update } = writable(defaultState);
 
 	const send = async (callData: ICallData) => {
-		set({ pending: true, error: null, txId: null });
+		update((state) => ({ ...state, pending: true }));
 		try {
 			if (!massaClient || !massaClient.wallet().getBaseAccount())
 				throw new Error('Massa client is not initialized');
 			const txId = await massaClient.smartContracts().callSmartContract(callData);
-			set({ pending: false, error: null, txId });
+			update((state) => ({ ...state, txId }));
 
 			toast.push('Tx submitted!', {
 				theme: {
@@ -37,11 +46,18 @@ export function sendTx() {
 					'--toastBarBackground': '#2F855A'
 				}
 			});
-			return txId;
+
+			const { isError, eventPoller, events } = await withTimeoutRejection(
+				pollAsyncEvents(massaClient, txId),
+				90_000
+			);
+			eventPoller.stopPolling();
+
+			const eventsMsg = events.map((event) => event.data);
+			console.log('eventMsg', eventsMsg);
 		} catch (error: any) {
-			const errorSplit = error.message.split('error: ');
-			const errorMsg = errorSplit[errorSplit.length - 1].split(' at')[0];
-			set({ pending: false, error: errorMsg, txId: null });
+			const errorMsg = EventDecoder.decodeError(error.message);
+			update((state) => ({ ...state, error: errorMsg }));
 
 			toast.push(errorMsg, {
 				theme: {
