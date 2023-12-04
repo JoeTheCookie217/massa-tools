@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
-	import { printAddress, providerToChainId } from '$lib/utils/methods';
+	import { printAddress, printTokenAmount, providerToChainId } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
 	import type { Allowance } from '$lib/utils/types';
@@ -101,7 +101,12 @@
 			({properties.decimals}
 			decimals)
 		</div>
-		<div>Owner: {printAddress(properties.owner, 8)}</div>
+		<div>
+			<span>Owner:</span>
+			<a href={`${properties.owner}`}>
+				{printAddress(properties.owner, 8)}
+			</a>
+		</div>
 		<div>Holders: {properties.holders}</div>
 		<div>Mintable: {properties.mintable}</div>
 		<div>Burnable: {properties.burnable}</div>
@@ -132,9 +137,7 @@
 					<Table.Row>
 						<Table.Cell>{i + 1}</Table.Cell>
 						<AddressCell {address} />
-						<Table.Cell class="font-medium"
-							>{Number(balance.toSignificant()).toLocaleString()}</Table.Cell
-						>
+						<Table.Cell class="font-medium">{printTokenAmount(balance)}</Table.Cell>
 						<Table.Cell>{share < 0.01 ? '<0.01' : share}%</Table.Cell>
 						<Table.Cell class="font-medium">$???</Table.Cell>
 						<Table.Cell class="text-right">
