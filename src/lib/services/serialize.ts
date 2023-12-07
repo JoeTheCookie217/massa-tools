@@ -21,7 +21,7 @@ export const buildTransfer = (amount: bigint, tokenAddress: string, to: string):
 		...baseCallData,
 		targetAddress: tokenAddress,
 		functionName: 'transfer',
-		parameter: new Args().addString(to).addU64(amount)
+		parameter: new Args().addString(to).addU256(amount)
 	};
 };
 
@@ -34,7 +34,7 @@ export const buildIncreaseAllowance = (
 		...baseCallData,
 		targetAddress: tokenAddress,
 		functionName: 'increaseAllowance',
-		parameter: new Args().addString(spenderAddress).addU64(amount)
+		parameter: new Args().addString(spenderAddress).addU256(amount)
 	};
 };
 
@@ -47,7 +47,7 @@ export const buildMint = (
 		...baseCallData,
 		targetAddress: tokenAddress,
 		functionName: 'mint',
-		parameter: new Args().addString(recipientAddress).addU64(amount)
+		parameter: new Args().addString(recipientAddress).addU256(amount)
 	};
 };
 
@@ -56,7 +56,7 @@ export const buildBurn = (amount: bigint, tokenAddress: string): ICallData => {
 		...baseCallData,
 		targetAddress: tokenAddress,
 		functionName: 'burn',
-		parameter: new Args().addU64(amount)
+		parameter: new Args().addU256(amount)
 	};
 };
 
@@ -69,7 +69,7 @@ export const buildDecreaseAllowance = (
 		...baseCallData,
 		targetAddress: tokenAddress,
 		functionName: 'decreaseAllowance',
-		parameter: new Args().addString(spenderAddress).addU64(amount)
+		parameter: new Args().addString(spenderAddress).addU256(amount)
 	};
 };
 
@@ -80,7 +80,7 @@ export const buildDeposit = (depositAmount: bigint, stakingAddress: string): ICa
 		...baseCallData,
 		targetAddress: stakingAddress,
 		functionName: 'deposit',
-		parameter: new Args().addU64(depositAmount)
+		parameter: new Args().addU256(depositAmount)
 	};
 };
 
@@ -94,7 +94,7 @@ export const buildWithdraw = (
 		...baseCallData,
 		targetAddress: stakingAddress,
 		functionName: 'withdraw',
-		parameter: new Args().addU64(amount)
+		parameter: new Args().addU256(amount)
 	};
 };
 
@@ -126,7 +126,7 @@ export const buildDeployToken = (
 			.addString(name)
 			.addString(symbol)
 			.addU8(decimals)
-			.addU64(supply)
+			.addU256(supply)
 			.addBool(mintable)
 			.addBool(burnable),
 		coins: 35n * MassaUnits.oneMassa

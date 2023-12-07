@@ -1,4 +1,4 @@
-import { ChainId } from '@dusalabs/sdk';
+import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
 import {
 	bytesToU256,
 	bytesToU64,
@@ -9,12 +9,18 @@ import {
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const printAddress = (address: string, chars = 6): string =>
-	address.slice(0, chars) + '...' + address.slice(-(chars - 2));
+export const isEOA = (address: string): boolean => address.startsWith('AU1');
+export const isSC = (address: string): boolean => address.startsWith('AS1');
+export const isAddress = (address: string): boolean =>
+	(isEOA(address) || isSC(address)) && (address.length >= 50 || address.length <= 56);
 
 export const printMasBalance = (balance: string): string => Number(balance).toFixed(2) + ' MAS';
+export const printAddress = (address: string, chars = 6): string =>
+	address.slice(0, chars) + '...' + address.slice(-(chars - 2));
+export const printTokenAmount = (amount: TokenAmount): string =>
+	Number(amount.toSignificant()).toLocaleString();
 
-export const bytesToNumber = (bytes: Uint8Array): bigint => {
+export const bytesToBigInt = (bytes: Uint8Array): bigint => {
 	try {
 		return bytesToU256(bytes);
 	} catch (e) {

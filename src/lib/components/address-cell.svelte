@@ -10,9 +10,9 @@
 <Table.Cell class="flex items-center gap-2">
 	<Tooltip.Root openDelay={50}>
 		<Tooltip.Trigger>
-			<span>
+			<a href={`/explorer/${address}`}>
 				{printAddress(address, 8)}
-			</span>
+			</a>
 		</Tooltip.Trigger>
 		<Tooltip.Content>
 			<span class="text-xs">

@@ -1,9 +1,13 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@dusalabs/sdk':
-    specifier: ^0.2.13
-    version: 0.2.13(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
+    specifier: ^0.3.18
+    version: 0.3.18(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
   '@massalabs/massa-web3':
     specifier: 1.24.2
     version: 1.24.2(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
@@ -449,8 +453,8 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: false
 
-  /@dusalabs/sdk@0.2.13(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4):
-    resolution: {integrity: sha512-9duCwACoS4faqQURfJvIyJmi/55EiEq8K2UJOAQyPDE0FBDRc4EbBAs/M6Juq7ePqcgYp4itcXRwblZ4c1cUAg==}
+  /@dusalabs/sdk@0.3.18(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4):
+    resolution: {integrity: sha512-vz31BHvT9pm759H3SePv16pWeCU1ueWAJvGec1pRoHLo5UIplfid5xQ+cUP3p94hzzaKSydEfn165hhgXhHKgw==}
     engines: {node: '>=10'}
     dependencies:
       '@massalabs/massa-web3': 1.24.2(@babel/core@7.22.11)(@types/node@20.5.8)(jest@29.6.4)
@@ -6783,7 +6787,3 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
