@@ -21,7 +21,9 @@
 	let showPersistentMap = false;
 	$: displayedEntries = showPersistentMap
 		? entries
-		: entries.filter(({ key }) => !key.includes('::'));
+		: entries.filter(
+				({ key }) => !key.includes('::') && !key.includes('ALLOWANCE') && !key.includes('BALANCE')
+		  );
 
 	onMount(() => {
 		addRecentAddress({
