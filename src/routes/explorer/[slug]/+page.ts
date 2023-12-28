@@ -7,7 +7,7 @@ import type { RouteParams } from './$types';
 
 type Entry = {
 	key: string;
-	value: Uint8Array | null;
+	value: Uint8Array;
 };
 
 type AddressInfo = {
@@ -33,7 +33,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 			res
 				.filter((entry) => entry.final_value)
 				.map((entry, i) => ({
-					value: entry.final_value,
+					value: entry.final_value as Uint8Array,
 					key: keys[i]
 				}))
 		)
