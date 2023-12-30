@@ -11,6 +11,7 @@
 	import { Args, byteToU8, bytesToStr, bytesToU256 } from '@massalabs/massa-web3';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
+	import DecodeSelect from '$lib/components/decode-select.svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 
@@ -52,7 +53,7 @@
 				<Table.Row>
 					<Table.Head>Key</Table.Head>
 					<Table.Head>Value</Table.Head>
-					<Table.Head class="w-[50px] text-right">Type</Table.Head>
+					<Table.Head>Decode</Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
