@@ -19,3 +19,6 @@ export type Properties = {
 	mintable: boolean;
 	burnable: boolean;
 };
+
+export const ERC20_KEYS = ['SYMBOL', 'NAME', 'OWNER', 'TOTAL_SUPPLY', 'DECIMALS'] as const;
+export type ERC20_KEY = (typeof ERC20_KEYS)[number];

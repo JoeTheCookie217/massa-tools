@@ -3,7 +3,7 @@ import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
 import { bytesToBigInt } from '$lib/utils/methods';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
-import type { BalanceEntry, Properties } from '$lib/utils/types';
+import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
 import { getDatastore } from '$lib/services/datastore.js';
 import type { RouteParams } from './$types';
 
@@ -12,7 +12,6 @@ type TokenInfo = {
 	properties: Properties;
 };
 
-const erc20Keys = ['DECIMALS', 'SYMBOL', 'NAME', 'TOTAL_SUPPLY', 'OWNER'];
 const client = get(clientStore);
 
 export async function load({ params }: { params: RouteParams }): Promise<TokenInfo> {
@@ -23,9 +22,9 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 		.then((res) => res.filter((entry) => entry.startsWith('BALANCE')))
 		.catch((err) => {
 			console.error(err);
-			throw notFoundError;
+			return [];
 		});
-	const keys = [...new Set([...erc20Keys, ...balanceKeys.slice(0, 100)])];
+	const keys = [...new Set([...ERC20_KEYS, ...balanceKeys.slice(0, 100)])];
 	console.log(keys);
 
 	const r = await client
@@ -44,12 +43,16 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 		}))
 		.sort((a, b) => Number(b.value - a.value));
 
-	const erc20entries = r.filter((entry, i) => erc20Keys.includes(keys[i]) && entry.final_value);
-	const symbolEntry = erc20entries.find((entry) => keys[r.indexOf(entry)] === 'SYMBOL');
-	const nameEntry = erc20entries.find((entry) => keys[r.indexOf(entry)] === 'NAME');
-	const ownerEntry = erc20entries.find((entry) => keys[r.indexOf(entry)] === 'OWNER');
-	const totalSupplyEntry = erc20entries.find((entry) => keys[r.indexOf(entry)] === 'TOTAL_SUPPLY');
-	const decimalsEntry = erc20entries.find((entry) => keys[r.indexOf(entry)] === 'DECIMALS');
+	const erc20entries = r.filter(
+		(entry, i) => ERC20_KEYS.includes(keys[i] as ERC20_KEY) && entry.final_value
+	);
+
+	const find = (key: ERC20_KEY) => erc20entries.find((entry) => keys[r.indexOf(entry)] === key);
+	const symbolEntry = find('SYMBOL');
+	const nameEntry = find('NAME');
+	const ownerEntry = find('OWNER');
+	const totalSupplyEntry = find('TOTAL_SUPPLY');
+	const decimalsEntry = find('DECIMALS');
 
 	if (!symbolEntry || !nameEntry || !ownerEntry || !totalSupplyEntry || !decimalsEntry)
 		throw error(404, 'ERC20 not found');

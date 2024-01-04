@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { isAddress, printAddress, providerToChainId } from '$lib/utils/methods';
+	import { getAddressLabel, isAddress, printAddress, providerToChainId } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 
 	import { onMount } from 'svelte';
@@ -14,9 +14,10 @@
 	import DecodeSelect from '$lib/components/decode-select.svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
+	import CopyButton from '$lib/components/copy-button.svelte';
 
 	export let data;
-	const { entries, address } = data;
+	const { entries, address, isVerified, isToken } = data;
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
@@ -37,8 +38,29 @@
 </script>
 
 <div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-2">
+			<h2 class="text-2xl">Information</h2>
+			<div class="flex">
+				<span>
+					{printAddress(address)}
+				</span>
+				<CopyButton copyText={address} />
+			</div>
+			{#if isVerified}
+				<div class="text-sm text-green-500">Verified</div>
+				<div class="text-sm">{getAddressLabel(address)}</div>
+			{/if}
+			{#if isToken}
+				<a href={`/token/${address}`}>
+					<div class="text-sm underline">Token page</div>
+				</a>
+			{/if}
+		</div>
+	</div>
+
 	{#if displayedEntries.length > 0}
-		<h2 class="text-2xl">Entries</h2>
+		<h2 class="text-2xl">Datastore</h2>
 		<div>
 			<Checkbox id="mintable" bind:checked={showPersistentMap} />
 			<Label

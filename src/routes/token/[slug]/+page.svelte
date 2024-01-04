@@ -20,6 +20,7 @@
 	import ConnectModal from '$lib/components/connect-modal.svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
+	import CopyButton from '$lib/components/copy-button.svelte';
 
 	export let data;
 	const { properties, balances } = data;
@@ -94,10 +95,16 @@
 
 <div class="flex flex-col gap-4">
 	<h1 class="text-4xl">{properties.name} ({properties.symbol})</h1>
+	<div class="flex">
+		<h2 class="text-xl">
+			{printAddress(properties.address)}
+		</h2>
+		<CopyButton copyText={properties.address} />
+	</div>
 	<h2 class="text-2xl">Properties</h2>
 	<div class="grid grid-cols-3 gap-4">
 		<div>
-			Total supply: {new TokenAmount(token, properties.totalSupply).toSignificant()}
+			Total supply: {printTokenAmount(new TokenAmount(token, properties.totalSupply))}
 			({properties.decimals}
 			decimals)
 		</div>
@@ -116,11 +123,11 @@
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>
-					<Table.Head class="w-[50px]">Rank</Table.Head>
+					<Table.Head class="w-[50px]">#</Table.Head>
 					<Table.Head>Address</Table.Head>
 					<Table.Head>Balance</Table.Head>
 					<Table.Head>Share</Table.Head>
-					<Table.Head>Value</Table.Head>
+					<!-- <Table.Head>Value</Table.Head> -->
 					<Table.Head class="w-[50px] text-right">Type</Table.Head>
 				</Table.Row>
 			</Table.Header>
@@ -139,7 +146,7 @@
 						<AddressCell {address} />
 						<Table.Cell class="font-medium">{printTokenAmount(balance)}</Table.Cell>
 						<Table.Cell>{share < 0.01 ? '<0.01' : share}%</Table.Cell>
-						<Table.Cell class="font-medium">$???</Table.Cell>
+						<!-- <Table.Cell class="font-medium">$???</Table.Cell> -->
 						<Table.Cell class="text-right">
 							<AccountTypeCell {address} />
 						</Table.Cell>
@@ -215,7 +222,7 @@
 				<Table.Root>
 					<Table.Header>
 						<Table.Row>
-							<Table.Head>Rank</Table.Head>
+							<Table.Head>#</Table.Head>
 							<Table.Head>Address</Table.Head>
 							<Table.Head>Allowance</Table.Head>
 							<Table.Head class="w-[50px]">Type</Table.Head>
