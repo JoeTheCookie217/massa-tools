@@ -61,7 +61,8 @@ export const getAddressLabel = (address: string): string => {
 const contains = (map: { [chainId in ChainId]: string }, address: string): boolean =>
 	Object.values(map).some((z) => z === address);
 
-export const printMasBalance = (balance: string): string => Number(balance).toFixed(2) + ' MAS';
+export const printMasBalance = (balance: string): string =>
+	Number(balance).toLocaleString() + ' MAS';
 export const printAddress = (address: string, chars = 6): string =>
 	address.slice(0, chars) + '...' + address.slice(-(chars - 2));
 export const printTokenAmount = (amount: TokenAmount): string =>

@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { getAddressLabel, isAddress, printAddress, providerToChainId } from '$lib/utils/methods';
+	import {
+		getAddressLabel,
+		isAddress,
+		printAddress,
+		printMasBalance,
+		providerToChainId
+	} from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 
 	import { onMount } from 'svelte';
@@ -8,7 +14,7 @@
 	// import Label from '$lib/components/ui/label/label.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Table from '$lib/components/ui/table';
-	import { Args, byteToU8, bytesToStr, bytesToU256 } from '@massalabs/massa-web3';
+	import { Args, byteToU8, bytesToStr, bytesToU256, toMAS } from '@massalabs/massa-web3';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
 	import DecodeSelect from '$lib/components/decode-select.svelte';
@@ -17,7 +23,7 @@
 	import CopyButton from '$lib/components/copy-button.svelte';
 
 	export let data;
-	const { entries, address, isVerified, isToken } = data;
+	const { entries, address, isVerified, isToken, balance } = data;
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
@@ -41,11 +47,12 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex flex-col gap-2">
 			<h2 class="text-2xl">Information</h2>
-			<div class="flex">
+			<div class="flex items-center gap-2">
 				<span>
 					{printAddress(address)}
 				</span>
 				<CopyButton copyText={address} />
+				<span>{printMasBalance(toMAS(balance).toFixed(2))}</span>
 			</div>
 			{#if isVerified}
 				<div class="text-sm text-green-500">Verified</div>

@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { byteToU8, bytesToStr, strToBytes, type IDatastoreEntry } from '@massalabs/massa-web3';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
-import { getDatastore } from '$lib/services/datastore.js';
+import { fetchMasBalance, getDatastore } from '$lib/services/datastore.js';
 import type { RouteParams } from './$types';
 import { isVerified } from '$lib/utils/methods';
 import { ERC20_KEYS } from '$lib/utils/types';
@@ -17,6 +17,7 @@ type AddressInfo = {
 	entries: Entry[];
 	isVerified: boolean;
 	isToken: boolean;
+	balance: bigint;
 };
 
 const client = get(clientStore);
@@ -50,6 +51,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 		address,
 		entries,
 		isVerified: isVerified(address),
-		isToken: ERC20_KEYS.every((key) => entries.some((entry) => entry.key === key))
+		isToken: ERC20_KEYS.every((key) => entries.some((entry) => entry.key === key)),
+		balance: await fetchMasBalance(address)
 	};
 }
