@@ -150,6 +150,7 @@ export const buildDeployMultisig = (owners: string[], required: number): ICallDa
 export class Transaction implements ISerializable<Transaction> {
 	constructor(
 		public to: string = '',
+		public method: string = '',
 		public value: bigint = 0n,
 		public data: Uint8Array = new Uint8Array(0),
 		public executed: boolean = false
@@ -158,6 +159,7 @@ export class Transaction implements ISerializable<Transaction> {
 	serialize(): Uint8Array {
 		const args = new Args()
 			.addString(this.to)
+			.addString(this.method)
 			.addU64(this.value)
 			.addUint8Array(this.data)
 			.addBool(this.executed);
@@ -167,6 +169,7 @@ export class Transaction implements ISerializable<Transaction> {
 	deserialize(data: Uint8Array, offset: number): IDeserializedResult<Transaction> {
 		const args = new Args(data, offset);
 		this.to = args.nextString();
+		this.method = args.nextString();
 		this.value = args.nextU64();
 		this.data = args.nextUint8Array();
 		this.executed = args.nextBool();

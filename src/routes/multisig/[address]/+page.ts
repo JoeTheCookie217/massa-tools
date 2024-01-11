@@ -12,14 +12,24 @@ import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
 
+const toDatastoreInput = (address: string, keys: string[]) =>
+	keys.map((key) => ({ address, key: strToBytes(key) }));
+
 const client = get(clientStore);
+
+type Approval = {
+	address: string;
+	support: boolean;
+};
+
+type FullTransaction = { tx: Transaction; approvals: Approval[] };
 
 type MultisigInfo = {
 	address: string;
 	balance: bigint;
 	required: number;
 	owners: string[];
-	transactions: Transaction[];
+	transactions: FullTransaction[];
 };
 
 export async function load({ params }: { params: RouteParams }): Promise<MultisigInfo> {
@@ -32,6 +42,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const TX_PREFIX = 'transactions::';
 	const ownerKeys = datastore.filter((entry) => entry.startsWith(OWNER_PREFIX));
 	const txKeys = datastore.filter((entry) => entry.startsWith(TX_PREFIX));
+	const approvalsKeys = datastore.filter((entry) => entry.startsWith('approved::'));
 
 	const { required, owners, transactions } = await client
 		.publicApi()
@@ -40,14 +51,9 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 				address,
 				key: strToBytes('required')
 			},
-			...ownerKeys.map((key) => ({
-				address,
-				key: strToBytes(key)
-			})),
-			...txKeys.map((key) => ({
-				address,
-				key: strToBytes(key)
-			}))
+			...toDatastoreInput(address, ownerKeys),
+			...toDatastoreInput(address, txKeys),
+			...toDatastoreInput(address, approvalsKeys)
 		])
 		.then((result) => {
 			const requiredRes = result[0].final_value;
@@ -67,14 +73,24 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			}
 
 			const txRes = result.slice(ownerKeys.length + 1);
-			const transactions: Transaction[] = [];
+			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
 				const res = txRes[i].final_value;
 				if (res) {
 					const tx = new Transaction().deserialize(res, 0);
-					transactions.push(tx.instance);
+					transactions.push({ tx: tx.instance, approvals: [] });
 				}
 			}
+
+			// const approvalsRes = result.slice(ownerKeys.length + 1);
+			// const approvals: Approval[] = [];
+			// for (let i = 0; i < approvalsRes.length; i++) {
+			// 	const res = approvalsRes[i].final_value;
+			// 	if (res) {
+			// 		const approval: Approval = {address}
+			// 		approvals.push(approval);
+			// 	}
+			// }
 
 			return { required, owners, transactions: transactions };
 		})
@@ -94,7 +110,6 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	// 		console.log(res);
 	// 		return bytesToSerializableObjectArray(res.returnValue, Transaction);
 	// 	});
-	console.log(transactions);
 
 	return { balance, required, owners, address, transactions };
 }

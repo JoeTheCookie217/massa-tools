@@ -15,6 +15,7 @@ export const buildReceive = (multisigAddress: string, value: bigint): ICallData 
 export const buildSubmit = (
 	multisigAddress: string,
 	to: string,
+	method: string,
 	value: bigint,
 	data: Uint8Array
 ): ICallData => {
@@ -22,7 +23,7 @@ export const buildSubmit = (
 		...baseCallData,
 		targetAddress: multisigAddress,
 		functionName: 'submit',
-		parameter: new Args().addString(to).addU64(value).addUint8Array(data)
+		parameter: new Args().addString(to).addString(method).addU64(value).addUint8Array(data)
 	};
 };
 
