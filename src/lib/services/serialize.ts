@@ -134,12 +134,13 @@ export const buildDeployToken = (
 };
 
 export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
-	const deployerAddress = 'AS1c75ZWhD3RqzZsvoak2TPGB7idyCGm4mwTtdtdJqTsEm35bLtV';
+	const deployerAddress = 'AS1JpoKqTqKNdDezoEGE9YsC3xW2nJidqwcJPipUaNCiBpu5PdBK';
 	return {
 		...baseCallData,
 		targetAddress: deployerAddress,
 		functionName: 'deploy',
 		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
+		maxGas: 1_000_000_000n,
 		coins: 35n * MassaUnits.oneMassa
 	};
 };

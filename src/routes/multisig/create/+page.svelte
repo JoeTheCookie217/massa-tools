@@ -8,13 +8,20 @@
 	import { typescript } from 'svelte-highlight/languages';
 	import styles from 'svelte-highlight/styles/dracula';
 	import useCopy from '$lib/hooks/useCopy';
+	import { isAddress } from '$lib/utils/methods';
 
 	let owners: string[] = [];
 	let ownersLength: number = 0;
 	let required: number;
-	$: disabled = !owners || !required;
+	$: disabled =
+		!owners ||
+		!required ||
+		required > owners.length ||
+		required < 1 ||
+		owners.some((owner) => !isAddress(owner)) ||
+		owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0; // contains duplicates
 
-	$: defaultOwners = owners.length ? owners : ['0x...'];
+	$: defaultOwners = owners;
 	$: defaultRequired = required || 2;
 
 	const { send } = sendTx();
@@ -39,7 +46,7 @@ import { Args } from '@massalabs/as-types';
 import * as MS from '@dusalabs/periphery/assembly/contracts/multisig';
 
 export function constructor(_: StaticArray<u8>): void {
-	const owners = ${JSON.stringify(defaultOwners)};
+	const owners = ${JSON.stringify(defaultOwners, undefined, 4)};
 	const required = ${defaultRequired};
 
 	const args = new Args().add(owners).add(required);
@@ -47,8 +54,7 @@ export function constructor(_: StaticArray<u8>): void {
 }
 	`;
 
-	const { copy: _copy, copied } = useCopy();
-	const copy = () => _copy(code);
+	const { copy, copied } = useCopy();
 </script>
 
 <svelte:head>
@@ -73,7 +79,7 @@ export function constructor(_: StaticArray<u8>): void {
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>
 	<div>
-		<Button on:click={copy}>
+		<Button on:click={() => copy(code)}>
 			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
 		<Highlight language={typescript} {code} />

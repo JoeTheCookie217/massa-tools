@@ -39,12 +39,13 @@ export function sendTx() {
 			const txId = await massaClient.smartContracts().callSmartContract(callData);
 			update((state) => ({ ...state, txId }));
 
-			toast.push('Tx submitted!', {
+			const submitToast = toast.push('Tx pending...', {
 				theme: {
 					'--toastColor': 'mintcream',
 					'--toastBackground': 'rgba(72,187,120,0.9)',
 					'--toastBarBackground': '#2F855A'
-				}
+				},
+				initial: 0
 			});
 
 			const { isError, eventPoller, events } = await withTimeoutRejection(
@@ -54,11 +55,21 @@ export function sendTx() {
 			eventPoller.stopPolling();
 
 			const eventsMsg = events.map((event) => event.data);
-			console.log('eventMsg', eventsMsg);
+			console.log(isError, eventsMsg);
+			if (isError) throw new Error(eventsMsg[eventsMsg.length - 1]);
+			toast.pop(submitToast);
+			toast.push('Tx confirmed!', {
+				theme: {
+					'--toastColor': 'mintcream',
+					'--toastBackground': 'rgba(72,187,120,0.9)',
+					'--toastBarBackground': '#2F855A'
+				}
+			});
 		} catch (error: any) {
 			const errorMsg = EventDecoder.decodeError(error.message);
 			update((state) => ({ ...state, error: errorMsg }));
 
+			toast.pop();
 			toast.push(errorMsg, {
 				theme: {
 					'--toastColor': 'mintcream',

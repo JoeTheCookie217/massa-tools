@@ -119,7 +119,7 @@
 			</div>
 			<div>
 				<span>Owners:</span>
-				<span>{owners.join()}</span>
+				<span>{JSON.stringify(owners, undefined, 4)}</span>
 			</div>
 		</div>
 	{:else}
