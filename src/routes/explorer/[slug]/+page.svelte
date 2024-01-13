@@ -111,6 +111,9 @@
 						{:catch err}
 							<Table.Cell>{value}</Table.Cell>
 						{/await}
+						<Table.Cell>
+							<DecodeSelect {value} />
+						</Table.Cell>
 					</Table.Row>
 				{/each}
 			</Table.Body>
