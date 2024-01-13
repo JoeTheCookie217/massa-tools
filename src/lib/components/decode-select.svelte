@@ -12,27 +12,26 @@
 	} from '@massalabs/massa-web3';
 
 	export let value: Uint8Array;
-	type X = { value: Function; label: string };
 
 	const methods: Function[] = [
-		bytesToU256,
+		// () => value,
 		bytesToStr,
 		byteToBool,
-		byteToU16,
 		byteToU8,
+		byteToU16,
 		bytesToU32,
 		bytesToU64,
-		bytesToU128
+		bytesToU128,
+		bytesToU256
 	];
-	$: selected = { value: (arr: Uint8Array): any => {}, label: getLabel(methods[0]) };
-
 	const getLabel = (method: Function) => method.name.split('To')[1];
+	const getMethod = (label: string) =>
+		methods.find((method) => getLabel(method) === label.replace(' ', ''));
 
+	$: selected = { value: methods[0], label: getLabel(methods[0]) };
 	$: {
-		console.log(selected.value.name);
-		if (selected.value.name) {
-			value = selected.value(value);
-		}
+		const fn = getMethod(selected.label);
+		if (fn) console.log(fn(value));
 	}
 </script>
 
@@ -42,7 +41,7 @@
 	</Select.Trigger>
 	<Select.Content>
 		{#each methods as method}
-			<Select.Item value={method} label={getLabel(method)}>{getLabel(method)}</Select.Item>
+			<Select.Item value={getLabel(method)}>{getLabel(method)}</Select.Item>
 		{/each}
 	</Select.Content>
 </Select.Root>
