@@ -87,30 +87,24 @@
 			</Table.Header>
 			<Table.Body>
 				{#each displayedEntries as { key, value }, i}
-					<!-- try using bytesToU256 and if error, use bytesToStr instead -->
 					<Table.Row>
 						<Table.Cell>{key}</Table.Cell>
-						{#await Promise.resolve(bytesToStr(value)) then strValue}
-							{#if key.startsWith('PAIR_INFORMATION')}
-								{@const params = decodePairInformation(value)}
-								<Table.Cell>
-									{JSON.stringify(params, undefined, 2)}
-								</Table.Cell>
-							{:else if key.startsWith('FEES_PARAMETERS')}
-								{@const params = decodeFeeParameters(value)}
-								<Table.Cell>
-									{JSON.stringify(params, undefined, 2)}
-								</Table.Cell>
-							{:else if key.startsWith('status')}
-								<Table.Cell>{byteToU8(value)}</Table.Cell>
-							{:else if isAddress(strValue)}
+						{#if key.startsWith('PAIR_INFORMATION')}
+							{@const params = decodePairInformation(value)}
+							<Table.Cell>
+								{JSON.stringify(params, undefined, 2)}
+							</Table.Cell>
+						{:else if key.startsWith('FEES_PARAMETERS')}
+							{@const params = decodeFeeParameters(value)}
+							<Table.Cell>
+								{JSON.stringify(params, undefined, 2)}
+							</Table.Cell>
+							<!-- {:else if isAddress(strValue)}
 								<AddressCell address={strValue} />
-							{:else}
-								<Table.Cell>{strValue}</Table.Cell>
-							{/if}
-						{:catch err}
+							-->
+						{:else}
 							<Table.Cell>{value}</Table.Cell>
-						{/await}
+						{/if}
 						<Table.Cell>
 							<DecodeSelect {value} />
 						</Table.Cell>

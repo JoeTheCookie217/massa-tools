@@ -12,6 +12,7 @@
 	} from '@massalabs/massa-web3';
 
 	export let value: Uint8Array;
+	let decodedValue: string | number | boolean | bigint | {} | undefined;
 
 	const methods: Function[] = [
 		// () => value,
@@ -31,7 +32,13 @@
 	$: selected = { value: methods[0], label: getLabel(methods[0]) };
 	$: {
 		const fn = getMethod(selected.label);
-		if (fn) console.log(fn(value));
+		if (fn && value instanceof Uint8Array)
+			try {
+				decodedValue = fn(value);
+			} catch (e) {
+				decodedValue = value;
+				console.log(e);
+			}
 	}
 </script>
 
@@ -45,3 +52,4 @@
 		{/each}
 	</Select.Content>
 </Select.Root>
+{decodedValue}
