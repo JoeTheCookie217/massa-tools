@@ -1,9 +1,4 @@
-import {
-	type ICallData,
-	type Client,
-	type IEvent,
-	withTimeoutRejection
-} from '@massalabs/massa-web3';
+import { type ICallData, type IEvent, withTimeoutRejection } from '@massalabs/massa-web3';
 import { get, writable } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
@@ -31,12 +26,13 @@ export function sendTx() {
 
 	const { subscribe, set, update } = writable(defaultState);
 
-	const send = async (callData: ICallData) => {
+	const send = async (data: ICallData) => {
 		update((state) => ({ ...state, pending: true }));
 		try {
 			if (!massaClient || !massaClient.wallet().getBaseAccount())
 				throw new Error('Massa client is not initialized');
-			const txId = await massaClient.smartContracts().callSmartContract(callData);
+
+			const txId = await massaClient.smartContracts().callSmartContract(data);
 			update((state) => ({ ...state, txId }));
 
 			const submitToast = toast.push('Tx pending...', {
@@ -50,7 +46,7 @@ export function sendTx() {
 
 			const { isError, eventPoller, events } = await withTimeoutRejection(
 				pollAsyncEvents(massaClient, txId),
-				90_000
+				45_000
 			);
 			eventPoller.stopPolling();
 
