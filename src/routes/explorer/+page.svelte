@@ -27,13 +27,7 @@
 <div>
 	<div class="flex items-end gap-2">
 		<div>
-			<Label for="address">ERC20 Token Address</Label>
-			<Input
-				type="text"
-				id="address"
-				placeholder="AS12a1HN9WreQYmxucyLGQ3TSm3s8QYdF72VHG3mJHPLJHakwscFT"
-				bind:value={address}
-			/>
+			<Input type="text" placeholder="Smart contract/user address" bind:value={address} />
 		</div>
 		<Button disabled={!address}>
 			<a
@@ -43,9 +37,6 @@
 			>
 		</Button>
 	</div>
-	<a href="/create">
-		<Button variant="link">Want your own token? Create one</Button>
-	</a>
 	{#if history.length}
 		<div>
 			<div class="flex items-center gap-2">

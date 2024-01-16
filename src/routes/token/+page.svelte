@@ -27,18 +27,12 @@
 <div>
 	<div class="flex items-end gap-2">
 		<div>
-			<Label for="address">ERC20 Token Address</Label>
-			<Input
-				type="text"
-				id="address"
-				placeholder="AS12a1HN9WreQYmxucyLGQ3TSm3s8QYdF72VHG3mJHPLJHakwscFT"
-				bind:value={address}
-			/>
+			<Input type="text" placeholder="ERC20 token address" bind:value={address} />
 		</div>
 		<Button disabled={!address}>
 			<a
 				href={`
-				/explorer/${address}
+				/token/${address}
 			`}>Search</a
 			>
 		</Button>
