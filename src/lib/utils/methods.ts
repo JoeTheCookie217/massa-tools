@@ -21,7 +21,8 @@ import {
 	ProviderType,
 	type IProvider,
 	DefaultProviderUrls,
-	strToBytes
+	strToBytes,
+	Args
 } from '@massalabs/massa-web3';
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
@@ -31,16 +32,9 @@ export const isSC = (address: string): boolean => address.startsWith('AS1');
 export const isAddress = (address: string): boolean =>
 	(isEOA(address) || isSC(address)) && (address.length >= 50 || address.length <= 56);
 
-export const dexAddresses: Array<{ [chainId in ChainId]: string }> = [
-	LB_QUOTER_ADDRESS,
-	LB_ROUTER_ADDRESS,
-	LB_FACTORY_ADDRESS,
-	DCA_MANAGER_ADDRESS,
-	LIMIT_ORDER_MANAGER_ADDRESS,
-	VAULT_MANAGER_ADDRESS,
-	MULTICALL_ADDRESS
-];
-
+// prettier-ignore
+export const dexAddresses: Array<{ [chainId in ChainId]: string }> = [ LB_QUOTER_ADDRESS, LB_ROUTER_ADDRESS, LB_FACTORY_ADDRESS, DCA_MANAGER_ADDRESS, LIMIT_ORDER_MANAGER_ADDRESS, VAULT_MANAGER_ADDRESS, MULTICALL_ADDRESS ];
+// prettier-ignore
 export const tokenAddresses: Array<{ [chainId in ChainId]: Token }> = [WETH, WMAS, USDC, USDT, WBTC];
 
 export const isVerified = (address: string) => isDusaContract(address) || isToken(address);
@@ -49,6 +43,7 @@ export const isDusaContract = (address: string) =>
 export const isToken = (address: string) =>
 	tokenAddresses.some((addr) => Object.values(addr).some((z) => z.address === address));
 export const getAddressLabel = (address: string): string => {
+	if (isToken(address)) return 'Whitelisted token';
 	if (contains(LB_QUOTER_ADDRESS, address)) return 'Quoter';
 	if (contains(LB_ROUTER_ADDRESS, address)) return 'Router';
 	if (contains(LB_FACTORY_ADDRESS, address)) return 'Factory';
@@ -56,7 +51,6 @@ export const getAddressLabel = (address: string): string => {
 	if (contains(LIMIT_ORDER_MANAGER_ADDRESS, address)) return 'Limit Order Manager';
 	if (contains(VAULT_MANAGER_ADDRESS, address)) return 'Vault Manager';
 	if (contains(MULTICALL_ADDRESS, address)) return 'Multicall';
-	else if (isToken(address)) return 'Whitelisted token';
 	throw new Error('Address not found');
 };
 
@@ -109,5 +103,19 @@ export const chainIdToProviders = (chainId: ChainId): IProvider[] => {
 	];
 };
 
+// DATASTORE
+
 export const toDatastoreInput = (address: string, keys: string[]) =>
-keys.map((key) => ({ address, key: strToBytes(key) }));
+	keys.map((key) => ({ address, key: strToBytes(key) }));
+
+export const parseBalance = (val: Uint8Array | null) => {
+	try {
+		return val ? new Args(val).nextU256() : 0n;
+	} catch (err) {
+		try {
+			return val ? bytesToU256(val) : 0n;
+		} catch (err) {
+			return 0n;
+		}
+	}
+};

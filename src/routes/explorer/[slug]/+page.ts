@@ -13,6 +13,7 @@ import { fetchMasBalance, getDatastore } from '$lib/services/datastore.js';
 import type { RouteParams } from './$types';
 import {
 	isVerified,
+	parseBalance,
 	providerToChainId,
 	toDatastoreInput,
 	tokenAddresses
@@ -35,18 +36,6 @@ type AddressInfo = {
 
 const client = get(clientStore);
 const selectedNetwork = providerToChainId(client.getPublicProviders()[0]);
-
-const parseBalance = (val: Uint8Array | null) => {
-	try {
-		return val ? new Args(val).nextU256() : 0n;
-	} catch (err) {
-		try {
-			return val ? bytesToU256(val) : 0n;
-		} catch (err) {
-			return 0n;
-		}
-	}
-};
 
 export async function load({ params }: { params: RouteParams }): Promise<AddressInfo> {
 	const address = params.slug;

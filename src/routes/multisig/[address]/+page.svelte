@@ -7,7 +7,12 @@
 	import { sendTx } from '$lib/hooks/sendTx';
 	import { buildApprove, buildExecute, buildReceive, buildSubmit } from './methods';
 	import clientStore from '$lib/store/client';
-	import { printAddress, printMasBalance } from '$lib/utils/methods';
+	import {
+		printAddress,
+		printMasBalance,
+		providerToChainId,
+		tokenAddresses
+	} from '$lib/utils/methods';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { addRecentMultisig } from '$lib/utils/localStorage';
@@ -16,13 +21,15 @@
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import CopyButton from '$lib/components/copy-button.svelte';
+	import { TokenAmount } from '@dusalabs/sdk';
 
 	export let data;
 
-	const { address: multisigAddress, balance, owners, required, transactions } = data;
+	const { address: multisigAddress, balance, owners, required, transactions, erc20Balances } = data;
 	const argsPlaceholder = '{"0": 45, "1": 19, "2": 0, "3": 21}';
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
+	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	let submitTo: string;
 	let submitMethod: string = '';
@@ -82,19 +89,27 @@
 						<span>{printAddress(multisigAddress)}</span>
 						<CopyButton copyText={multisigAddress} />
 					</div>
-					<span>Balance:</span>
-					<span>{printMasBalance(toMAS(balance).toFixed())}</span>
+					<span>Balance: {printMasBalance(toMAS(balance).toFixed())}</span>
+					<div class="flex flex-col gap-1">
+						{#each erc20Balances as b, i}
+							{@const token = tokenAddresses[i][selectedNetwork]}
+							{#if b > 0 && b < 2n ** 256n - 1n}
+								<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
+							{/if}
+						{/each}
+					</div>
 				</div>
 				<div class="flex items-center">
 					<div>
 						<span>Owners:</span>
 						<span>{owners.length}</span>
-						{#each owners as owner}
-							<div>
-								<span>{printAddress(owner)}</span>
-								<CopyButton copyText={owner} />
-							</div>
-						{/each}
+						<div class="flex flex-col gap-1">
+							{#each owners as owner}
+								<a href={`/explorer/${owner}`}>
+									{printAddress(owner)}
+								</a>
+							{/each}
+						</div>
 					</div>
 					<div>
 						<span>Required:</span>

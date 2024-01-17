@@ -5,9 +5,15 @@ import { strToBytes, bytesToI32, byteToBool } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
-import { toDatastoreInput } from '$lib/utils/methods';
+import {
+	parseBalance,
+	providerToChainId,
+	toDatastoreInput,
+	tokenAddresses
+} from '$lib/utils/methods';
 
 const client = get(clientStore);
+const selectedNetwork = providerToChainId(client.getPublicProviders()[0]);
 
 type Approval = {
 	address: string;
@@ -22,11 +28,11 @@ type MultisigInfo = {
 	required: number;
 	owners: string[];
 	transactions: FullTransaction[];
+	erc20Balances: bigint[];
 };
 
 export async function load({ params }: { params: RouteParams }): Promise<MultisigInfo> {
 	const address = params.address;
-
 	const balance = await fetchMasBalance(address);
 
 	const datastore = await getDatastore(address);
@@ -35,8 +41,12 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const ownerKeys = datastore.filter((entry) => entry.startsWith(OWNER_PREFIX));
 	const txKeys = datastore.filter((entry) => entry.startsWith(TX_PREFIX));
 	const approvalsKeys = datastore.filter((entry) => entry.startsWith('approved::'));
+	const erc20BalancesKeys = tokenAddresses.map((token) => ({
+		address: token[selectedNetwork].address,
+		key: strToBytes(`BALANCE${address}`)
+	}));
 
-	const { required, owners, transactions } = await client
+	const r = await client
 		.publicApi()
 		.getDatastoreEntries([
 			{
@@ -45,7 +55,8 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			},
 			...toDatastoreInput(address, ownerKeys),
 			...toDatastoreInput(address, txKeys),
-			...toDatastoreInput(address, approvalsKeys)
+			...toDatastoreInput(address, approvalsKeys),
+			...erc20BalancesKeys
 		])
 		.then((result) => {
 			const requiredRes = result[0].final_value;
@@ -64,7 +75,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 				}
 			}
 
-			const txRes = result.slice(ownerKeys.length + 1);
+			const txRes = result.slice(ownerKeys.length + 1, ownerKeys.length + 1 + txKeys.length);
 			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
 				const res = txRes[i].final_value;
@@ -88,7 +99,10 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			// 	}
 			// }
 
-			return { required, owners, transactions: transactions };
+			const resBalances = result.slice(-erc20BalancesKeys.length);
+			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
+
+			return { required, owners, transactions, erc20Balances };
 		})
 		.catch(() => {
 			throw error(404, 'Multisig not found');
@@ -107,5 +121,5 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	// 		return bytesToSerializableObjectArray(res.returnValue, Transaction);
 	// 	});
 
-	return { balance, required, owners, address, transactions };
+	return { ...r, address, balance };
 }
