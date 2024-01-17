@@ -67,11 +67,12 @@
 
 	<footer class="text-center p-2">
 		<p class="text-sm">
-			Made with ❤️ by
 			<a
 				class="hover:underline"
 				target="_blank"
-				href="https://github.com/JoeTheCookie217/massa-tools">JoeTheCookie217</a
+				href="https://github.com/JoeTheCookie217/massa-tools"
+			>
+				Made with ❤️ by JoeTheCookie217</a
 			>
 		</p>
 	</footer>

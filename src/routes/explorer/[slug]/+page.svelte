@@ -21,6 +21,7 @@
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
+	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
 	export let data;
 	const { entries, address, isVerified, isToken, balance } = data;
@@ -103,7 +104,9 @@
 								<AddressCell address={strValue} />
 							-->
 						{:else}
-							<Table.Cell>{value}</Table.Cell>
+							<Table.Cell>
+								<Textarea value={value.toString()} />
+							</Table.Cell>
 						{/if}
 						<Table.Cell>
 							<DecodeSelect {value} />

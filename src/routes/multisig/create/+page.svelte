@@ -40,17 +40,19 @@
 		send(deployData);
 	}
 
-	$: code = `export * from '@dusalabs/periphery/assembly/contracts/multisig';
+	const importPath = '@dusalabs/periphery/assembly/contracts/multisig';
+
+	$: code = `export * from '${importPath}';
 
 import { Args } from '@massalabs/as-types';
-import * as MS from '@dusalabs/periphery/assembly/contracts/multisig';
+import { constructor as _constructor } from '${importPath}';
 
 export function constructor(_: StaticArray<u8>): void {
 	const owners = ${JSON.stringify(defaultOwners, undefined, 4)};
 	const required = ${defaultRequired};
 
 	const args = new Args().add(owners).add(required);
-	MS.constructor(args.serialize());
+	_constructor(args.serialize());
 }
 	`;
 

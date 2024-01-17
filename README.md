@@ -24,7 +24,7 @@
 - [ ] deploy an ERC721
 
 ## Multisig
-- [ ] create a multisig wallet
+- [x] create a multisig wallet
 - [ ] submit actions (transfer, add/remove keys, change threshold)
 - [ ] confirm actions
 - [ ] delete actions

@@ -25,13 +25,7 @@
 <div>
 	<div class="flex items-end gap-2">
 		<div>
-			<Label for="address">Multisig Address</Label>
-			<Input
-				type="text"
-				id="address"
-				placeholder="AS12a1HN9WreQYmxucyLGQ3TSm3s8QYdF72VHG3mJHPLJHakwscFT"
-				bind:value={address}
-			/>
+			<Input type="text" placeholder="Multisig address" bind:value={address} />
 		</div>
 		<Button disabled={!address}>
 			<a

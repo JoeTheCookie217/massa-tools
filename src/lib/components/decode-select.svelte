@@ -8,22 +8,32 @@
 		byteToU8,
 		bytesToU32,
 		bytesToU64,
-		bytesToU128
+		bytesToU128,
+		bytesToArray,
+		ArrayTypes
 	} from '@massalabs/massa-web3';
 
 	export let value: Uint8Array;
 	let decodedValue: string | number | boolean | bigint | {} | undefined = undefined;
 
+	const bytesToStrArray = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.STRING);
+	const bytesToI64Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.I64);
+	const bytesToU64Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.U64);
+	const bytesToU256Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.U256);
+
 	const methods: Function[] = [
-		// () => value,
 		bytesToStr,
 		byteToBool,
 		byteToU8,
 		byteToU16,
 		bytesToU32,
 		bytesToU64,
-		bytesToU128,
-		bytesToU256
+		//bytesToU128,
+		bytesToU256,
+		bytesToStrArray,
+		bytesToI64Array,
+		bytesToU64Array,
+		bytesToU256Array
 	];
 	const getLabel = (method: Function) => method.name.split('To')[1];
 	const getMethod = (label: string) =>

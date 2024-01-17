@@ -23,26 +23,28 @@
 	const defaultDecimals = 9;
 	const defaultSupply = 1234;
 
-	$: code = `export * from '@massalabs/sc-standards/assembly/contracts/FT/token';${
+	const importPath = '@massalabs/sc-standards/assembly/contracts/FT';
+
+	$: code = `export * from '${importPath}/token';${
 		mintable
 			? `
-export * from '@massalabs/sc-standards/assembly/contracts/FT/token-mint';`
+export * from '${importPath}/token-mint';`
 			: ''
 	}${
 		burnable
 			? `
-export * from '@massalabs/sc-standards/assembly/contracts/FT/token-burn';`
+export * from '${importPath}/token-burn';`
 			: ''
 	}
 
 import { Args } from '@massalabs/as-types';
-import * as FT from '@massalabs/sc-standards/assembly/contracts/FT/token';
+import { constructor as _constructor } from '${importPath}/token';
 
 export function constructor(_: StaticArray<u8>): void {
 	const args = new Args().add('${name || defaultName}').add('${symbol || defaultSymbol}').add(${
 		decimals || defaultDecimals
 	}).add(${supply || defaultSupply} * 10 ** ${decimals || defaultDecimals});
-	FT.constructor(args.serialize());
+	_constructor(args.serialize());
 }
 	`;
 

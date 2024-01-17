@@ -14,21 +14,23 @@ interface IEventPollerResult {
 }
 
 const MASSA_EXEC_ERROR = 'massa_execution_error';
+const eventsFilter: Omit<IEventFilter, 'original_operation_id'> = {
+	start: null,
+	end: null,
+	original_caller_address: null,
+	emitter_address: null,
+	is_final: null
+};
 
 export const pollAsyncEvents = async (
 	web3Client: Client,
 	opId: string
 ): Promise<IEventPollerResult> => {
-	const eventsFilter: IEventFilter = {
-		start: null,
-		end: null,
-		original_caller_address: null,
-		original_operation_id: opId,
-		emitter_address: null,
-		is_final: null
-	};
-
-	const eventPoller = EventPoller.startEventsPolling(eventsFilter, 1000, web3Client);
+	const eventPoller = EventPoller.startEventsPolling(
+		{ ...eventsFilter, original_operation_id: opId },
+		1000,
+		web3Client
+	);
 
 	return new Promise((resolve, reject) => {
 		eventPoller.on(ON_MASSA_EVENT_DATA, (events: Array<IEvent>) => {
