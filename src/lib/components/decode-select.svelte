@@ -20,6 +20,7 @@
 	const bytesToI64Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.I64);
 	const bytesToU64Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.U64);
 	const bytesToU256Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.U256);
+	const bytesToSerializable = (arr: Uint8Array) => ({});
 
 	const methods: Function[] = [
 		bytesToStr,
@@ -33,9 +34,16 @@
 		bytesToStrArray,
 		bytesToI64Array,
 		bytesToU64Array,
-		bytesToU256Array
+		bytesToU256Array,
+		bytesToSerializable
 	];
-	const getLabel = (method: Function) => method.name.split('To')[1];
+	const getLabel = (method: Function) => {
+		try {
+			return method.name.split('To')[1];
+		} catch (error) {
+			return '';
+		}
+	};
 	const getMethod = (label: string) =>
 		methods.find((method) => getLabel(method) === label.replace(' ', ''));
 
