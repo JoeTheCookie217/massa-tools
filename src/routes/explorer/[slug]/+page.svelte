@@ -5,7 +5,8 @@
 		isAddress,
 		printAddress,
 		printMasBalance,
-		providerToChainId
+		providerToChainId,
+		tokenAddresses
 	} from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 
@@ -22,9 +23,10 @@
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+	import { TokenAmount } from '@dusalabs/sdk';
 
 	export let data;
-	const { entries, address, isVerified, isToken, balance } = data;
+	const { entries, address, isVerified, isToken, balance, erc20Balances } = data;
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
@@ -54,6 +56,12 @@
 				</span>
 				<CopyButton copyText={address} />
 				<span>{printMasBalance(toMAS(balance).toFixed(2))}</span>
+				{#each erc20Balances as b, i}
+					{@const token = tokenAddresses[i][selectedNetwork]}
+					{#if b > 0 && b < 2n ** 256n - 1n}
+						<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
+					{/if}
+				{/each}
 			</div>
 			{#if isVerified}
 				<div class="text-sm text-green-500">Verified</div>

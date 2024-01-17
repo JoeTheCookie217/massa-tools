@@ -20,7 +20,8 @@ import {
 	bytesToU64,
 	ProviderType,
 	type IProvider,
-	DefaultProviderUrls
+	DefaultProviderUrls,
+	strToBytes
 } from '@massalabs/massa-web3';
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
@@ -30,7 +31,7 @@ export const isSC = (address: string): boolean => address.startsWith('AS1');
 export const isAddress = (address: string): boolean =>
 	(isEOA(address) || isSC(address)) && (address.length >= 50 || address.length <= 56);
 
-const dexAddresses: Array<{ [chainId in ChainId]: string }> = [
+export const dexAddresses: Array<{ [chainId in ChainId]: string }> = [
 	LB_QUOTER_ADDRESS,
 	LB_ROUTER_ADDRESS,
 	LB_FACTORY_ADDRESS,
@@ -40,7 +41,7 @@ const dexAddresses: Array<{ [chainId in ChainId]: string }> = [
 	MULTICALL_ADDRESS
 ];
 
-const tokenAddresses: Array<{ [chainId in ChainId]: Token }> = [WETH, WMAS, USDC, USDT, WBTC];
+export const tokenAddresses: Array<{ [chainId in ChainId]: Token }> = [WETH, WMAS, USDC, USDT, WBTC];
 
 export const isVerified = (address: string) => isDusaContract(address) || isToken(address);
 export const isDusaContract = (address: string) =>
@@ -55,6 +56,7 @@ export const getAddressLabel = (address: string): string => {
 	if (contains(LIMIT_ORDER_MANAGER_ADDRESS, address)) return 'Limit Order Manager';
 	if (contains(VAULT_MANAGER_ADDRESS, address)) return 'Vault Manager';
 	if (contains(MULTICALL_ADDRESS, address)) return 'Multicall';
+	else if (isToken(address)) return 'Whitelisted token';
 	throw new Error('Address not found');
 };
 
@@ -106,3 +108,6 @@ export const chainIdToProviders = (chainId: ChainId): IProvider[] => {
 		{ type: ProviderType.PRIVATE, url }
 	];
 };
+
+export const toDatastoreInput = (address: string, keys: string[]) =>
+keys.map((key) => ({ address, key: strToBytes(key) }));

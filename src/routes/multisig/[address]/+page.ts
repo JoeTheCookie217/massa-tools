@@ -1,19 +1,11 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 import { Transaction } from '$lib/services/serialize.js';
 import clientStore from '$lib/store/client';
-import {
-	strToBytes,
-	bytesToI32,
-	byteToBool,
-	Args,
-	bytesToSerializableObjectArray
-} from '@massalabs/massa-web3';
+import { strToBytes, bytesToI32, byteToBool } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
-
-const toDatastoreInput = (address: string, keys: string[]) =>
-	keys.map((key) => ({ address, key: strToBytes(key) }));
+import { toDatastoreInput } from '$lib/utils/methods';
 
 const client = get(clientStore);
 
@@ -77,8 +69,12 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			for (let i = 0; i < txRes.length; i++) {
 				const res = txRes[i].final_value;
 				if (res) {
-					const tx = new Transaction().deserialize(res, 0);
-					transactions.push({ tx: tx.instance, approvals: [] });
+					try {
+						const tx = new Transaction().deserialize(res, 0);
+						transactions.push({ tx: tx.instance, approvals: [] });
+					} catch (e) {
+						console.log(e);
+					}
 				}
 			}
 

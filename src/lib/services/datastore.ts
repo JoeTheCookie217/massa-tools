@@ -3,6 +3,7 @@ import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { IERC20, parseUnits } from '@dusalabs/sdk';
+import { toDatastoreInput } from '$lib/utils/methods';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -44,7 +45,7 @@ export const fetchTokenAllowances = async (
 
 	return baseClient
 		.publicApi()
-		.getDatastoreEntries(keys.map((k) => ({ address, key: strToBytes(k) })))
+		.getDatastoreEntries(toDatastoreInput(address, keys))
 		.then((res) => {
 			return res.map((r, i) => {
 				const amount = r.final_value ? bytesToU256(r.final_value) : 0n;

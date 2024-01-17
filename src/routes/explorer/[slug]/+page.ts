@@ -1,10 +1,22 @@
 import { error } from '@sveltejs/kit';
-import { byteToU8, bytesToStr, strToBytes, type IDatastoreEntry } from '@massalabs/massa-web3';
+import {
+	byteToU8,
+	bytesToStr,
+	strToBytes,
+	type IDatastoreEntry,
+	bytesToU256,
+	Args
+} from '@massalabs/massa-web3';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore.js';
 import type { RouteParams } from './$types';
-import { isVerified } from '$lib/utils/methods';
+import {
+	isVerified,
+	providerToChainId,
+	toDatastoreInput,
+	tokenAddresses
+} from '$lib/utils/methods';
 import { ERC20_KEYS } from '$lib/utils/types';
 
 type Entry = {
@@ -18,9 +30,23 @@ type AddressInfo = {
 	isVerified: boolean;
 	isToken: boolean;
 	balance: bigint;
+	erc20Balances: bigint[];
 };
 
 const client = get(clientStore);
+const selectedNetwork = providerToChainId(client.getPublicProviders()[0]);
+
+const parseBalance = (val: Uint8Array | null) => {
+	try {
+		return val ? new Args(val).nextU256() : 0n;
+	} catch (err) {
+		try {
+			return val ? bytesToU256(val) : 0n;
+		} catch (err) {
+			return 0n;
+		}
+	}
+};
 
 export async function load({ params }: { params: RouteParams }): Promise<AddressInfo> {
 	const address = params.slug;
@@ -31,17 +57,27 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 		throw notFoundError;
 	});
 
-	const entries = await client
+	const erc20BalancesKeys = tokenAddresses.map((token) => ({
+		address: token[selectedNetwork].address,
+		key: strToBytes(`BALANCE${address}`)
+	}));
+
+	const { entries, erc20Balances } = await client
 		.publicApi()
-		.getDatastoreEntries(keys.map((k) => ({ address, key: strToBytes(k) })))
-		.then((res) =>
-			res
+		.getDatastoreEntries(toDatastoreInput(address, keys).concat(erc20BalancesKeys))
+		.then((res) => {
+			const resEntries = res.slice(erc20BalancesKeys.length);
+			const resBalances = res.slice(0, erc20BalancesKeys.length);
+			const entries = resEntries
 				.filter((entry) => entry.final_value)
 				.map((entry, i) => ({
 					value: entry.final_value as Uint8Array,
 					key: keys[i]
-				}))
-		)
+				}));
+			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
+
+			return { entries, erc20Balances };
+		})
 		.catch((err) => {
 			console.error(err);
 			throw error(404, 'Address invalid');
@@ -52,6 +88,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 		entries,
 		isVerified: isVerified(address),
 		isToken: ERC20_KEYS.every((key) => entries.some((entry) => entry.key === key)),
-		balance: await fetchMasBalance(address)
+		balance: await fetchMasBalance(address),
+		erc20Balances
 	};
 }

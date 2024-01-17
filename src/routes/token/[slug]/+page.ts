@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
-import { bytesToBigInt } from '$lib/utils/methods';
+import { bytesToBigInt, toDatastoreInput } from '$lib/utils/methods';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
@@ -29,7 +29,7 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 
 	const r = await client
 		.publicApi()
-		.getDatastoreEntries(keys.map((k) => ({ address, key: strToBytes(k) })))
+		.getDatastoreEntries(toDatastoreInput(address, keys))
 		.catch((err) => {
 			console.error(err);
 			throw error(404, 'Token invalid');

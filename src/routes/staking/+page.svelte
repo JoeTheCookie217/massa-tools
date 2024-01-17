@@ -13,6 +13,7 @@
 		buildWithdraw
 	} from '$lib/services/serialize';
 	import clientStore from '$lib/store/client';
+	import { toDatastoreInput } from '$lib/utils/methods';
 	dayjs.extend(relativeTime);
 
 	const stakingAddress = 'AS122MZkHytLQnBA6qExyfpYoRzy1No64j9oDqUHhmas3uBfhV38A';
@@ -97,20 +98,7 @@
 			});
 		$clientStore
 			.publicApi()
-			.getDatastoreEntries([
-				{
-					address: stakingAddress,
-					key: strToBytes('lastUpdateTimestamp')
-				},
-				{
-					address: stakingAddress,
-					key: strToBytes('rewardPerToken')
-				},
-				{
-					address: stakingAddress,
-					key: strToBytes('rewardRate')
-				}
-			])
+			.getDatastoreEntries(toDatastoreInput(stakingAddress, ['lastUpdateTimestamp', 'rewardPerToken', 'rewardRate']))
 			.then((result) => {
 				const res0 = result[0].final_value;
 				if (res0) {
