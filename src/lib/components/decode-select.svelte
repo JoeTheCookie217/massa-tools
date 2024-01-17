@@ -12,7 +12,7 @@
 	} from '@massalabs/massa-web3';
 
 	export let value: Uint8Array;
-	let decodedValue: string | number | boolean | bigint | {} | undefined;
+	let decodedValue: string | number | boolean | bigint | {} | undefined = undefined;
 
 	const methods: Function[] = [
 		// () => value,
@@ -36,20 +36,26 @@
 			try {
 				decodedValue = fn(value);
 			} catch (e) {
-				decodedValue = value;
+				decodedValue = undefined;
 				console.log(e);
 			}
 	}
 </script>
 
-<Select.Root bind:selected>
-	<Select.Trigger class="w-[180px]">
-		<Select.Value />
-	</Select.Trigger>
-	<Select.Content>
-		{#each methods as method}
-			<Select.Item value={getLabel(method)}>{getLabel(method)}</Select.Item>
-		{/each}
-	</Select.Content>
-</Select.Root>
-{decodedValue}
+<div class="flex items-center gap-2">
+	<Select.Root bind:selected>
+		<Select.Trigger class="w-[180px]">
+			<Select.Value />
+		</Select.Trigger>
+		<Select.Content>
+			{#each methods as method}
+				<Select.Item value={getLabel(method)}>{getLabel(method)}</Select.Item>
+			{/each}
+		</Select.Content>
+	</Select.Root>
+	{#if decodedValue}
+		<span>
+			{decodedValue}
+		</span>
+	{/if}
+</div>
