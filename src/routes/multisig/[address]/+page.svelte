@@ -18,6 +18,9 @@
 	import { addRecentMultisig } from '$lib/utils/localStorage';
 	import { fromMAS, toMAS } from '@massalabs/massa-web3';
 	import * as Table from '$lib/components/ui/table';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { DotsHorizontal } from 'radix-icons-svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import CopyButton from '$lib/components/copy-button.svelte';
@@ -44,7 +47,7 @@
 			const value = fromMAS(submitValue.toString());
 			const params = new Uint8Array(Object.values(JSON.parse(submitArgs)));
 			console.log(params);
-			const submitData = buildSubmit(multisigAddress, submitMethod, submitTo, value, params);
+			const submitData = buildSubmit(multisigAddress, submitTo, submitMethod, value, params);
 			send(submitData);
 		} catch (e) {
 			console.log(e);
@@ -165,41 +168,74 @@
 					<Table.Header>
 						<Table.Row>
 							<Table.Head>#</Table.Head>
-							<Table.Head>Address</Table.Head>
+							<Table.Head>Recipient</Table.Head>
+							<Table.Head>Method</Table.Head>
+							<Table.Head>Arguments</Table.Head>
 							<Table.Head>Value</Table.Head>
 							<Table.Head>Status</Table.Head>
 							<Table.Head>Approvals</Table.Head>
 							<Table.Head class="w-[50px]">Type</Table.Head>
 							<Table.Head class="text-center">Action</Table.Head>
-							<Table.Head class="text-center">Action</Table.Head>
-							<Table.Head class="text-center">Action</Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
 						{#each transactions as transaction, i}
-							{@const { to, executed, value } = transaction.tx}
+							{@const { to, method, executed, value, data } = transaction.tx}
+							{@const hasVoted = transaction.approvals.some((a) => a.address === connectedAddress)}
+							{@const isReady = transaction.approvals.length >= required}
 							<Table.Row>
-								{transaction.approvals}
 								<Table.Cell>{i}</Table.Cell>
 								<AddressCell address={to} />
+								<Table.Cell>{method}</Table.Cell>
+								<Table.Cell>{data}</Table.Cell>
 								<Table.Cell class="font-medium"
 									>{printMasBalance(toMAS(value).toFixed(2))}</Table.Cell
 								>
 								<Table.Cell>{executed ? 'Executed' : 'Pending'}</Table.Cell>
-								<Table.Cell>{transaction.approvals.length}</Table.Cell>
+
+								<Table.Cell>
+									<Tooltip.Root openDelay={50}>
+										<Tooltip.Trigger>
+											<span>
+												{transaction.approvals.length}
+											</span>
+										</Tooltip.Trigger>
+										<Tooltip.Content>
+											<span class="text-xs">
+												{JSON.stringify(transaction.approvals.map((a) => printAddress(a.address)))}
+											</span>
+										</Tooltip.Content>
+									</Tooltip.Root>
+								</Table.Cell>
+
 								<Table.Cell class="text-right">
 									<AccountTypeCell address={to} />
 								</Table.Cell>
 
-								<!-- TODO: use one dropdown menu with the different actions instead -->
-								<Table.Cell class="text-center">
-									<Button variant="ghost" on:click={() => approve(i)}>Approve</Button>
-								</Table.Cell>
-								<Table.Cell class="text-center">
-									<Button variant="ghost" on:click={() => revoke(i)}>Revoke</Button>
-								</Table.Cell>
-								<Table.Cell class="text-center">
-									<Button variant="ghost" on:click={() => execute(i)}>Execute</Button>
+								<Table.Cell>
+									<DropdownMenu.Root>
+										<DropdownMenu.Trigger asChild let:builder>
+											<Button
+												variant="ghost"
+												builders={[builder]}
+												class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+											>
+												<DotsHorizontal class="w-4 h-4" />
+												<span class="sr-only">Open menu</span>
+											</Button>
+										</DropdownMenu.Trigger>
+										<DropdownMenu.Content class="w-[160px]">
+											<DropdownMenu.Item disabled={hasVoted} on:click={() => approve(i)}
+												>Approve</DropdownMenu.Item
+											>
+											<DropdownMenu.Item disabled={!hasVoted} on:click={() => revoke(i)}
+												>Revoke</DropdownMenu.Item
+											>
+											<DropdownMenu.Item disabled={!isReady} on:click={() => execute(i)}
+												>Execute</DropdownMenu.Item
+											>
+										</DropdownMenu.Content>
+									</DropdownMenu.Root>
 								</Table.Cell>
 							</Table.Row>
 						{/each}

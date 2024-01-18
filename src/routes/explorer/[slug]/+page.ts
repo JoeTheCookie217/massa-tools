@@ -55,8 +55,8 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 		.publicApi()
 		.getDatastoreEntries(toDatastoreInput(address, keys).concat(erc20BalancesKeys))
 		.then((res) => {
-			const resEntries = res.slice(erc20BalancesKeys.length);
-			const resBalances = res.slice(0, erc20BalancesKeys.length);
+			const resEntries = res.slice(0, keys.length);
+			const resBalances = res.slice(keys.length);
 			const entries = resEntries
 				.filter((entry) => entry.final_value)
 				.map((entry, i) => ({

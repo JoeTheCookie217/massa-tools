@@ -134,7 +134,7 @@ export const buildDeployToken = (
 };
 
 export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
-	const deployerAddress = 'AS1JpoKqTqKNdDezoEGE9YsC3xW2nJidqwcJPipUaNCiBpu5PdBK';
+	const deployerAddress = 'AS121QxcfdhJD6oFxkb5JjVvQYx6JGgK2s6S6WrTqpEpzeaHsSQqL';
 	return {
 		...baseCallData,
 		targetAddress: deployerAddress,

@@ -1,7 +1,7 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 import { Transaction } from '$lib/services/serialize.js';
 import clientStore from '$lib/store/client';
-import { strToBytes, bytesToI32, byteToBool } from '@massalabs/massa-web3';
+import { strToBytes, bytesToI32, byteToBool, boolToByte } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
@@ -63,7 +63,8 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			if (!requiredRes) throw error(404, 'Multisig invalid');
 			const required = bytesToI32(requiredRes);
 
-			const ownersRes = result.slice(1, ownerKeys.length + 1);
+			let len = ownerKeys.length + 1;
+			const ownersRes = result.slice(1, len);
 			const owners = [];
 			for (let i = 0; i < ownersRes.length; i++) {
 				const res = ownersRes[i].final_value;
@@ -75,29 +76,29 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 				}
 			}
 
-			const txRes = result.slice(ownerKeys.length + 1, ownerKeys.length + 1 + txKeys.length);
+			const txRes = result.slice(len, len + txKeys.length);
 			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
 				const res = txRes[i].final_value;
 				if (res) {
-					try {
-						const tx = new Transaction().deserialize(res, 0);
-						transactions.push({ tx: tx.instance, approvals: [] });
-					} catch (e) {
-						console.log(e);
-					}
+					const tx = new Transaction().deserialize(res, 0);
+					transactions.push({ tx: tx.instance, approvals: [] });
 				}
 			}
+			len += txKeys.length;
 
-			// const approvalsRes = result.slice(ownerKeys.length + 1);
-			// const approvals: Approval[] = [];
-			// for (let i = 0; i < approvalsRes.length; i++) {
-			// 	const res = approvalsRes[i].final_value;
-			// 	if (res) {
-			// 		const approval: Approval = {address}
-			// 		approvals.push(approval);
-			// 	}
-			// }
+			const approvalsRes = result.slice(len, len + approvalsKeys.length);
+			const approvals: Approval[] = [];
+			for (let i = 0; i < approvalsRes.length; i++) {
+				const res = approvalsRes[i].final_value;
+				const [id, voter] = approvalsKeys[i].slice('approved::'.length).split('A');
+
+				if (res) {
+					const approval: Approval = { address: 'A' + voter, support: byteToBool(res) };
+					transactions[Number(id)].approvals.push(approval);
+				}
+			}
+			len += approvalsKeys.length;
 
 			const resBalances = result.slice(-erc20BalancesKeys.length);
 			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
