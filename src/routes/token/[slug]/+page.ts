@@ -4,7 +4,7 @@ import { bytesToBigInt, toDatastoreInput } from '$lib/utils/methods';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
-import { getDatastore } from '$lib/services/datastore.js';
+import { getDatastore } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
 
 type TokenInfo = {

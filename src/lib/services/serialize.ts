@@ -1,3 +1,4 @@
+import { erc20Deployer, multisigDeployer } from '$lib/utils/config';
 import { Token, parseUnits } from '@dusalabs/sdk';
 import {
 	Args,
@@ -117,10 +118,9 @@ export const buildDeployToken = (
 	mintable: boolean,
 	burnable: boolean
 ): ICallData => {
-	const deployerAddress = 'AS12evPxJYGrKxymqjG1nXUHW6Vxwy95Sm2uTn9rY5UvwJ6hAoM4i';
 	return {
 		...baseCallData,
-		targetAddress: deployerAddress,
+		targetAddress: erc20Deployer,
 		functionName: 'deploy',
 		parameter: new Args()
 			.addString(name)
@@ -134,10 +134,9 @@ export const buildDeployToken = (
 };
 
 export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
-	const deployerAddress = 'AS121QxcfdhJD6oFxkb5JjVvQYx6JGgK2s6S6WrTqpEpzeaHsSQqL';
 	return {
 		...baseCallData,
-		targetAddress: deployerAddress,
+		targetAddress: multisigDeployer,
 		functionName: 'deploy',
 		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
 		maxGas: 1_000_000_000n,

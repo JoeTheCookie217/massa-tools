@@ -93,6 +93,7 @@ export const chainIdToProviders = (chainId: ChainId): IProvider[] => {
 	switch (chainId) {
 		case ChainId.MAINNET:
 			url = DefaultProviderUrls.MAINNET;
+			break;
 		case ChainId.BUILDNET:
 		default:
 			url = DefaultProviderUrls.BUILDNET;

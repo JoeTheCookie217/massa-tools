@@ -9,7 +9,7 @@ import {
 } from '@massalabs/massa-web3';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
-import { fetchMasBalance, getDatastore } from '$lib/services/datastore.js';
+import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
 import {
 	isVerified,
@@ -47,7 +47,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	});
 
 	const erc20BalancesKeys = tokenAddresses.map((token) => ({
-		address: token[selectedNetwork].address,
+		address: token[selectedNetwork].address || address,
 		key: strToBytes(`BALANCE${address}`)
 	}));
 
