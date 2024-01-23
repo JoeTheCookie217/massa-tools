@@ -90,11 +90,12 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const approvalsRes = result.slice(len, len + approvalsKeys.length);
 			for (let i = 0; i < approvalsRes.length; i++) {
 				const res = approvalsRes[i].final_value;
-				const [id, voter] = approvalsKeys[i].slice('approved::'.length).split('A');
+				const regexPattern = /approved::(\d+)(AS1|AU1)(.*)/;
+				const match = approvalsKeys[i].match(regexPattern);
 
-				if (res) {
-					const approval: Approval = { address: 'A' + voter, support: byteToBool(res) };
-					transactions[Number(id)].approvals.push(approval);
+				if (res && match) {
+					const approval: Approval = { address: match[2] + match[3], support: byteToBool(res) };
+					transactions[Number(match[1])].approvals.push(approval);
 				}
 			}
 			len += approvalsKeys.length;

@@ -6,9 +6,13 @@
 	import { cn } from '$lib/utils';
 	import { page } from '$app/stores';
 	import ChainSelect from '$lib/components/chain-select.svelte';
+	import { inject } from '@vercel/analytics';
 	import '../app.css';
 
 	const options: SvelteToastOptions = {};
+
+	import { dev } from '$app/environment';
+	inject({ mode: dev ? 'development' : 'production' });
 
 	$: url = $page.url.pathname;
 </script>

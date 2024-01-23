@@ -93,7 +93,7 @@
 						<CopyButton copyText={multisigAddress} />
 					</div>
 					<span>Balance: {printMasBalance(toMAS(balance).toFixed())}</span>
-					<div class="flex flex-col gap-1">
+					<div class="flex gap-2 mx-6">
 						{#each erc20Balances as b, i}
 							{@const token = tokenAddresses[i][selectedNetwork]}
 							{#if b > 0 && b < 2n ** 256n - 1n}
@@ -102,15 +102,18 @@
 						{/each}
 					</div>
 				</div>
-				<div class="flex items-center">
+				<div class="flex items-start">
 					<div>
 						<span>Owners:</span>
 						<span>{owners.length}</span>
-						<div class="flex flex-col gap-1">
+						<div class="flex flex-col">
 							{#each owners as owner}
-								<a href={`/explorer/${owner}`}>
-									{printAddress(owner)}
-								</a>
+								<div class="flex items-center gap-1">
+									<a href={`/explorer/${owner}`}>
+										{printAddress(owner)}
+									</a>
+									<CopyButton copyText={owner} />
+								</div>
 							{/each}
 						</div>
 					</div>
@@ -123,7 +126,7 @@
 			<div>
 				<h3 class="text-lg">Submit</h3>
 
-				<div class="flex items-center gap-2">
+				<div class="flex items-end gap-2">
 					<div class="">
 						<Label for="recipient">Recipient</Label>
 						<Input type="text" id="recipient" placeholder="0x..." bind:value={submitTo} />
@@ -142,7 +145,7 @@
 					</div>
 					<Button on:click={submit}>Submit</Button>
 				</div>
-				<div class="flex flex-col gap-1 text-sm">
+				<div class="flex flex-col gap-1 mt-1 text-sm">
 					<i
 						>Leave <strong>method</strong> and <strong>arguments</strong> fields empty for MAS transfer</i
 					>
@@ -183,6 +186,7 @@
 							{@const { to, method, executed, value, data } = transaction.tx}
 							{@const hasVoted = transaction.approvals.some((a) => a.address === connectedAddress)}
 							{@const isReady = transaction.approvals.length >= required}
+							{@const forVotes = transaction.approvals.filter((a) => a.support)}
 							<Table.Row>
 								<Table.Cell>{i}</Table.Cell>
 								<AddressCell address={to} />
@@ -197,13 +201,15 @@
 									<Tooltip.Root openDelay={50}>
 										<Tooltip.Trigger>
 											<span>
-												{transaction.approvals.length}
+												{forVotes.length}
 											</span>
 										</Tooltip.Trigger>
 										<Tooltip.Content>
-											<span class="text-xs">
-												{JSON.stringify(transaction.approvals.map((a) => printAddress(a.address)))}
-											</span>
+											{#each transaction.approvals as approval}
+												<div class="text-xs">
+													{approval.address}
+												</div>
+											{/each}
 										</Tooltip.Content>
 									</Tooltip.Root>
 								</Table.Cell>
@@ -225,13 +231,13 @@
 											</Button>
 										</DropdownMenu.Trigger>
 										<DropdownMenu.Content class="w-[160px]">
-											<DropdownMenu.Item disabled={hasVoted} on:click={() => approve(i)}
+											<DropdownMenu.Item disabled={hasVoted || executed} on:click={() => approve(i)}
 												>Approve</DropdownMenu.Item
 											>
-											<DropdownMenu.Item disabled={!hasVoted} on:click={() => revoke(i)}
+											<DropdownMenu.Item disabled={!hasVoted || executed} on:click={() => revoke(i)}
 												>Revoke</DropdownMenu.Item
 											>
-											<DropdownMenu.Item disabled={!isReady} on:click={() => execute(i)}
+											<DropdownMenu.Item disabled={!isReady || executed} on:click={() => execute(i)}
 												>Execute</DropdownMenu.Item
 											>
 										</DropdownMenu.Content>
