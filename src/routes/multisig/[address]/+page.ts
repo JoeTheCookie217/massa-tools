@@ -1,5 +1,5 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
-import { Transaction } from '$lib/services/serialize.js';
+import { Transaction } from '$lib/services/serialize';
 import clientStore from '$lib/store/client';
 import { strToBytes, bytesToI32, byteToBool, boolToByte } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
@@ -88,7 +88,6 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			len += txKeys.length;
 
 			const approvalsRes = result.slice(len, len + approvalsKeys.length);
-			const approvals: Approval[] = [];
 			for (let i = 0; i < approvalsRes.length; i++) {
 				const res = approvalsRes[i].final_value;
 				const regexPattern = /approved::(\d+)(AS1|AU1)(.*)/;
@@ -106,7 +105,8 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 
 			return { required, owners, transactions, erc20Balances };
 		})
-		.catch(() => {
+		.catch((err) => {
+			console.log(err);
 			throw error(404, 'Multisig not found');
 		});
 

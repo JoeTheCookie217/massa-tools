@@ -9,7 +9,7 @@
 	import { ClientFactory, toMAS } from '@massalabs/massa-web3';
 	import useCopy from '$lib/hooks/useCopy';
 
-	let accounts: IAccount[];
+	let accounts: IAccount[] = [];
 	let selectedWallet: IProvider;
 	let stationWallet: IProvider | undefined;
 	let bearbyWallet: IProvider | undefined;
@@ -61,10 +61,8 @@
 
 	onMount(async () => {
 		const providers = await getProviders();
-		const _stationWallet = providers.find((provider) => provider.name() === 'MASSASTATION');
-		stationWallet = _stationWallet;
-		const _bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
-		bearbyWallet = _bearbyWallet;
+		stationWallet = providers.find((provider) => provider.name() === 'MASSASTATION');
+		bearbyWallet = providers.find((provider) => provider.name() === 'BEARBY');
 		const walletKey = localStorage.getItem('wallet');
 		const wallet = providers.find((provider) => provider.name() === walletKey);
 		if (!walletKey || !wallet) return;
@@ -77,6 +75,9 @@
 	let open = false;
 	const onOpenChange = (e: boolean | undefined) => {
 		if (e) open = e;
+		if (e === false) {
+			accounts = [];
+		}
 	};
 
 	const emojis = ['🐼', '🦩', '🐸', '🐮', '🐇', '🐤'];
@@ -128,7 +129,7 @@
 			{:else}
 				{#each accounts as account, index}
 					<div class="flex justify-between items-center p-2">
-						<span>{printAddress(account.address())}</span>
+						<span>{printAddress(account.address() || '')}</span>
 						{#await account.balance() then balance}
 							<span>{printMasBalance(balance.finalBalance)}</span>
 						{:catch error}
