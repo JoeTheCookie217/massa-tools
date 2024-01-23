@@ -14,6 +14,9 @@ dependencies:
   '@massalabs/wallet-provider':
     specifier: 1.5.2-dev.20240116123440
     version: 1.5.2-dev.20240116123440
+  '@vercel/analytics':
+    specifier: ^1.1.2
+    version: 1.1.2
   '@zerodevx/svelte-toast':
     specifier: ^0.9.5
     version: 0.9.5(svelte@4.2.0)
@@ -919,6 +922,12 @@ packages:
       '@typescript-eslint/types': 5.59.8
       eslint-visitor-keys: 3.4.1
     dev: true
+
+  /@vercel/analytics@1.1.2:
+    resolution: {integrity: sha512-CodhkLCQ/EHzjX8k+Qg+OzTBY0UadykrcfolfSOJVZZY/ZJM5nbhztm9KdbYvMfqKlasAr1+OYy0ThZnDA/MYA==}
+    dependencies:
+      server-only: 0.0.1
+    dev: false
 
   /@web3pack/base-x@1.0.2:
     resolution: {integrity: sha512-P3XgVnEQ1QFyUTmHzT1sXNprLyxE1aG8WAnk5/Fj+3j4AmsK4dRfMdV3t/aIdYP3i1KvjPRkQJhFXGpxUc+M8A==}
@@ -3245,6 +3254,10 @@ packages:
     dependencies:
       lru-cache: 6.0.0
     dev: true
+
+  /server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
+    dev: false
 
   /set-cookie-parser@2.6.0:
     resolution: {integrity: sha512-RVnVQxTXuerk653XfuliOxBP81Sf0+qfQE73LIYKcyMYHG94AuH0kgrQpRDuTZnSmjpysHmzxJXKNfa6PjFhyQ==}
