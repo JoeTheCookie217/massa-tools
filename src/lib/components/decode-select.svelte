@@ -45,7 +45,7 @@
 		}
 	};
 	const getMethod = (label: string) =>
-		methods.find((method) => getLabel(method) === label.replace(' ', ''));
+		label && methods.find((method) => getLabel(method) === label.replace(' ', ''));
 
 	$: selected = { value: methods[0], label: getLabel(methods[0]) };
 	$: {
