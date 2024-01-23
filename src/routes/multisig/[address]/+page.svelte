@@ -93,7 +93,7 @@
 						<CopyButton copyText={multisigAddress} />
 					</div>
 					<span>Balance: {printMasBalance(toMAS(balance).toFixed())}</span>
-					<div class="flex flex-col gap-1">
+					<div class="flex gap-2 mx-6">
 						{#each erc20Balances as b, i}
 							{@const token = tokenAddresses[i][selectedNetwork]}
 							{#if b > 0 && b < 2n ** 256n - 1n}
@@ -106,7 +106,7 @@
 					<div>
 						<span>Owners:</span>
 						<span>{owners.length}</span>
-						<div class="flex flex-col gap-1">
+						<div class="flex flex-col">
 							{#each owners as owner}
 								<div class="flex items-center gap-1">
 									<a href={`/explorer/${owner}`}>
@@ -231,13 +231,13 @@
 											</Button>
 										</DropdownMenu.Trigger>
 										<DropdownMenu.Content class="w-[160px]">
-											<DropdownMenu.Item disabled={hasVoted} on:click={() => approve(i)}
+											<DropdownMenu.Item disabled={hasVoted || executed} on:click={() => approve(i)}
 												>Approve</DropdownMenu.Item
 											>
-											<DropdownMenu.Item disabled={!hasVoted} on:click={() => revoke(i)}
+											<DropdownMenu.Item disabled={!hasVoted || executed} on:click={() => revoke(i)}
 												>Revoke</DropdownMenu.Item
 											>
-											<DropdownMenu.Item disabled={!isReady} on:click={() => execute(i)}
+											<DropdownMenu.Item disabled={!isReady || executed} on:click={() => execute(i)}
 												>Execute</DropdownMenu.Item
 											>
 										</DropdownMenu.Content>
