@@ -5,7 +5,7 @@
 	import { ChainId, parseUnits, Token, TokenAmount } from '@dusalabs/sdk';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
-	import { sendTx } from '$lib/hooks/sendTx';
+	import useSendTx from '$lib/hooks/useSendTx';
 	import {
 		buildDeposit,
 		buildHarvest,
@@ -98,7 +98,9 @@
 			});
 		$clientStore
 			.publicApi()
-			.getDatastoreEntries(toDatastoreInput(stakingAddress, ['lastUpdateTimestamp', 'rewardPerToken', 'rewardRate']))
+			.getDatastoreEntries(
+				toDatastoreInput(stakingAddress, ['lastUpdateTimestamp', 'rewardPerToken', 'rewardRate'])
+			)
 			.then((result) => {
 				const res0 = result[0].final_value;
 				if (res0) {
@@ -117,7 +119,7 @@
 			});
 	};
 
-	const { send } = sendTx();
+	const { send } = useSendTx();
 
 	const deposit = () => {
 		const amount = parseUnits(depositAmount.toString(), depositToken.decimals);

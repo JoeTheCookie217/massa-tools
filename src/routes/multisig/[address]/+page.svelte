@@ -4,7 +4,7 @@
 	dayjs.extend(relativeTime);
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
-	import { sendTx } from '$lib/hooks/sendTx';
+	import useSendTx from '$lib/hooks/useSendTx';
 	import { buildApprove, buildExecute, buildReceive, buildSubmit } from './methods';
 	import clientStore from '$lib/store/client';
 	import {
@@ -40,7 +40,7 @@
 	let submitValue: number;
 	let receiveValue: number;
 
-	const { send } = sendTx();
+	const { send } = useSendTx();
 
 	const submit = () => {
 		try {

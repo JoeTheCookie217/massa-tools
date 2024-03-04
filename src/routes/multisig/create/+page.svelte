@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { sendTx } from '$lib/hooks/sendTx';
+	import useSendTx from '$lib/hooks/useSendTx';
 	import { buildDeployMultisig } from '$lib/services/serialize';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
@@ -24,7 +24,7 @@
 	$: defaultOwners = owners;
 	$: defaultRequired = required || 2;
 
-	const { send } = sendTx();
+	const { send } = useSendTx();
 
 	const increment = () => {
 		ownersLength++;

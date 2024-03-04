@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { sendTx } from '$lib/hooks/sendTx';
+	import useSendTx from '$lib/hooks/useSendTx';
 	import { buildDeployToken } from '$lib/services/serialize';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
@@ -50,7 +50,10 @@ export function constructor(_: StaticArray<u8>): void {
 
 	const { copy, copied } = useCopy();
 
-	const { send } = sendTx();
+	const { send, subscribe } = useSendTx();
+	subscribe((tx) => {
+		console.log('tx', tx);
+	});
 
 	async function deploy() {
 		const totalSupply = BigInt(supply) * BigInt(10 ** decimals);

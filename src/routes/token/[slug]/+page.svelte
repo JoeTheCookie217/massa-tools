@@ -11,7 +11,7 @@
 		buildMint,
 		buildTransfer
 	} from '$lib/services/serialize';
-	import { sendTx } from '$lib/hooks/sendTx';
+	import useSendTx from '$lib/hooks/useSendTx.js';
 	import { onMount } from 'svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
 	// import Label from '$lib/components/ui/label/label.svelte';
@@ -61,7 +61,7 @@
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 	const token = new Token(selectedNetwork, tokenAddress, properties.decimals);
 
-	const { send } = sendTx();
+	const { send } = useSendTx();
 
 	const transfer = async () => {
 		const amount = BigInt(transferAmount * 10 ** properties.decimals);

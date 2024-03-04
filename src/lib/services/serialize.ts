@@ -21,7 +21,7 @@ export const buildTransfer = (amount: bigint, tokenAddress: string, to: string):
 	return {
 		...baseCallData,
 		targetAddress: tokenAddress,
-		functionName: 'transfer',
+		targetFunction: 'transfer',
 		parameter: new Args().addString(to).addU256(amount)
 	};
 };
@@ -34,7 +34,7 @@ export const buildIncreaseAllowance = (
 	return {
 		...baseCallData,
 		targetAddress: tokenAddress,
-		functionName: 'increaseAllowance',
+		targetFunction: 'increaseAllowance',
 		parameter: new Args().addString(spenderAddress).addU256(amount)
 	};
 };
@@ -47,7 +47,7 @@ export const buildMint = (
 	return {
 		...baseCallData,
 		targetAddress: tokenAddress,
-		functionName: 'mint',
+		targetFunction: 'mint',
 		parameter: new Args().addString(recipientAddress).addU256(amount)
 	};
 };
@@ -56,7 +56,7 @@ export const buildBurn = (amount: bigint, tokenAddress: string): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: tokenAddress,
-		functionName: 'burn',
+		targetFunction: 'burn',
 		parameter: new Args().addU256(amount)
 	};
 };
@@ -69,7 +69,7 @@ export const buildDecreaseAllowance = (
 	return {
 		...baseCallData,
 		targetAddress: tokenAddress,
-		functionName: 'decreaseAllowance',
+		targetFunction: 'decreaseAllowance',
 		parameter: new Args().addString(spenderAddress).addU256(amount)
 	};
 };
@@ -80,7 +80,7 @@ export const buildDeposit = (depositAmount: bigint, stakingAddress: string): ICa
 	return {
 		...baseCallData,
 		targetAddress: stakingAddress,
-		functionName: 'deposit',
+		targetFunction: 'deposit',
 		parameter: new Args().addU256(depositAmount)
 	};
 };
@@ -94,7 +94,7 @@ export const buildWithdraw = (
 	return {
 		...baseCallData,
 		targetAddress: stakingAddress,
-		functionName: 'withdraw',
+		targetFunction: 'withdraw',
 		parameter: new Args().addU256(amount)
 	};
 };
@@ -103,7 +103,7 @@ export const buildHarvest = (stakingAddress: string): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: stakingAddress,
-		functionName: 'harvest',
+		targetFunction: 'harvest',
 		parameter: new Args()
 	};
 };
@@ -121,7 +121,7 @@ export const buildDeployToken = (
 	return {
 		...baseCallData,
 		targetAddress: erc20Deployer,
-		functionName: 'deploy',
+		targetFunction: 'deploy',
 		parameter: new Args()
 			.addString(name)
 			.addString(symbol)
@@ -129,6 +129,7 @@ export const buildDeployToken = (
 			.addU256(supply)
 			.addBool(mintable)
 			.addBool(burnable),
+		maxGas: 1_000_000_000n,
 		coins: 35n * MassaUnits.oneMassa
 	};
 };
@@ -137,7 +138,7 @@ export const buildDeployMultisig = (owners: string[], required: number): ICallDa
 	return {
 		...baseCallData,
 		targetAddress: multisigDeployer,
-		functionName: 'deploy',
+		targetFunction: 'deploy',
 		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
 		maxGas: 1_000_000_000n,
 		coins: 35n * MassaUnits.oneMassa

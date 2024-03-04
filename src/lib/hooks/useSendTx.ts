@@ -18,7 +18,7 @@ const defaultState: TState = {
 	events: []
 };
 
-export function sendTx() {
+const useSendTx = () => {
 	let massaClient = get(clientStore);
 	clientStore.subscribe((client) => {
 		if (client) massaClient = client;
@@ -27,6 +27,7 @@ export function sendTx() {
 	const { subscribe, set, update } = writable(defaultState);
 
 	const send = async (data: ICallData) => {
+		console.log(data);
 		update((state) => ({ ...state, pending: true }));
 		try {
 			if (!massaClient || !massaClient.wallet().getBaseAccount())
@@ -36,11 +37,6 @@ export function sendTx() {
 			update((state) => ({ ...state, txId }));
 
 			const submitToast = toast.push('Tx pending...', {
-				theme: {
-					'--toastColor': 'mintcream',
-					'--toastBackground': 'rgba(72,187,120,0.9)',
-					'--toastBarBackground': '#2F855A'
-				},
 				initial: 0
 			});
 
@@ -62,7 +58,7 @@ export function sendTx() {
 				}
 			});
 		} catch (error: any) {
-			const errorMsg = EventDecoder.decodeError(error.message);
+			const errorMsg = EventDecoder.decodeError(error.message).split('"')[0];
 			update((state) => ({ ...state, error: errorMsg }));
 
 			toast.pop();
@@ -85,4 +81,6 @@ export function sendTx() {
 		subscribe,
 		send
 	};
-}
+};
+
+export default useSendTx;
