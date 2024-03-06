@@ -20,7 +20,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import DecodeSelect from '$lib/components/decode-select.svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
-	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
+	import { decodeFeeParameters, decodePairInformation, decodePreset } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
@@ -31,12 +31,18 @@
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
-	let showPersistentMap = false;
-	$: displayedEntries = showPersistentMap
-		? entries
-		: entries.filter(
-				({ key }) => !key.includes('::') && !key.includes('ALLOWANCE') && !key.includes('BALANCE')
-		  );
+	const separator = '::';
+	let prefixes = entries
+		.map(({ key }) => (key.includes(separator) ? key.split(separator)[0] : ''))
+		.filter((v, i, a) => v && a.indexOf(v) === i);
+	let prefixFilters = prefixes.map((p) => false);
+	$: displayedEntries = entries.filter(({ key }) =>
+		key.includes(separator) ? prefixFilters[prefixes.indexOf(key.split(separator)[0])] : true
+	);
+
+	// : entries.filter(
+	// 		({ key }) => !(key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE'))
+	//   );
 
 	onMount(() => {
 		addRecentAddress({
@@ -78,13 +84,24 @@
 	{#if displayedEntries.length > 0}
 		<h2 class="text-2xl">Datastore</h2>
 		<div>
-			<Checkbox id="mintable" bind:checked={showPersistentMap} />
 			<Label
-				for="mintable"
 				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 			>
 				Show Persistent Map entries
 			</Label>
+			<div class="flex flex-col gap-1">
+				{#each prefixes as prefix, i}
+					<div>
+						<Checkbox id={`mintable${i}`} bind:checked={prefixFilters[i]} />
+						<Label
+							for={`mintable${i}`}
+							class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+						>
+							{prefix}
+						</Label>
+					</div>
+				{/each}
+			</div>
 		</div>
 		<Table.Root>
 			<Table.Header>
@@ -98,19 +115,21 @@
 				{#each displayedEntries as { key, value }, i}
 					<Table.Row>
 						<Table.Cell>{key}</Table.Cell>
-						{#if key.startsWith('PAIR_INFORMATION')}
+						{#if key === 'PAIR_INFORMATION'}
 							{@const params = decodePairInformation(value)}
 							<Table.Cell>
 								{JSON.stringify(params, undefined, 2)}
 							</Table.Cell>
-						{:else if key.startsWith('FEES_PARAMETERS')}
+						{:else if key.startsWith('PAIR_INFORMATION::')}
+							{@const params = decodePreset(value)}
+							<Table.Cell>
+								{JSON.stringify(params, undefined, 2)}
+							</Table.Cell>
+						{:else if key === 'FEES_PARAMETERS'}
 							{@const params = decodeFeeParameters(value)}
 							<Table.Cell>
 								{JSON.stringify(params, undefined, 2)}
 							</Table.Cell>
-							<!-- {:else if isAddress(strValue)}
-								<AddressCell address={strValue} />
-							-->
 						{:else}
 							<Table.Cell>
 								<Textarea value={value.toString()} />

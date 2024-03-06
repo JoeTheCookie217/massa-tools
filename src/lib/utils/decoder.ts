@@ -33,3 +33,13 @@ export const decodePairInformation = (bs: Uint8Array) => {
 		oracleId: args.nextU32()
 	};
 };
+
+export const decodePreset = (bs: Uint8Array) => {
+	const args = new Args(bs);
+	return {
+		binStep: args.nextU32(),
+		pair: args.nextString(),
+		createdByOwner: args.nextBool(),
+		ignoredForRouting: args.nextBool()
+	};
+};

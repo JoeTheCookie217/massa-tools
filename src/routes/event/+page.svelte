@@ -4,6 +4,8 @@
 	import clientStore from '$lib/store/client';
 	import { withTimeoutRejection, type IEvent } from '@massalabs/massa-web3';
 	import { get } from 'svelte/store';
+	import { trpc } from '$lib/trpc/client';
+	import { page } from '$app/stores';
 
 	const massaClient = get(clientStore);
 	let txHash = '';
