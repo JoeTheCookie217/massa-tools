@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
-	import ChainSelect from '$lib/components/chain-select.svelte';
 	import { inject } from '@vercel/analytics';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import '../app.css';
