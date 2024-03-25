@@ -1,9 +1,9 @@
-import { type ICallData, type IEvent, withTimeoutRejection } from '@massalabs/massa-web3';
+import type { ICallData, IEvent } from '@massalabs/massa-web3';
 import { get, writable } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
-import { pollAsyncEvents } from '$lib/services/events';
 import { EventDecoder } from '@dusalabs/sdk';
+import { fetchEvents } from '$lib/services/datastore';
 
 type TState = {
 	txId: string | null;
@@ -40,11 +40,7 @@ const useSendTx = () => {
 				initial: 0
 			});
 
-			const { isError, eventPoller, events } = await withTimeoutRejection(
-				pollAsyncEvents(massaClient, txId),
-				45_000
-			);
-			eventPoller.stopPolling();
+			const { isError, events } = await fetchEvents(txId);
 
 			const eventsMsg = events.map((event) => event.data);
 			console.log(isError, eventsMsg);

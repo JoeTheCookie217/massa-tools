@@ -7,46 +7,33 @@ import {
 	ON_MASSA_EVENT_ERROR
 } from '@massalabs/massa-web3';
 
-interface IEventPollerResult {
+export interface IEventPollerResult {
 	isError: boolean;
-	eventPoller: EventPoller;
 	events: IEvent[];
 }
 
 const MASSA_EXEC_ERROR = 'massa_execution_error';
-const eventsFilter: Omit<IEventFilter, 'original_operation_id'> = {
+export const eventsFilter: Omit<IEventFilter, 'original_operation_id'> = {
 	start: null,
 	end: null,
 	original_caller_address: null,
 	emitter_address: null,
 	is_final: null
 };
-
-export const pollAsyncEvents = async (
-	web3Client: Client,
-	opId: string
-): Promise<IEventPollerResult> => {
-	const eventPoller = EventPoller.startEventsPolling(
-		{ ...eventsFilter, original_operation_id: opId },
-		1000,
-		web3Client
-	);
-
+export const pollAsyncEvents = async (eventPoller: EventPoller): Promise<IEventPollerResult> => {
 	return new Promise((resolve, reject) => {
 		eventPoller.on(ON_MASSA_EVENT_DATA, (events: Array<IEvent>) => {
-			const errorEvents: IEvent[] = events.filter((e) => e.data.includes(MASSA_EXEC_ERROR));
+			const errorEvents = events.filter((e) => e.data.includes(MASSA_EXEC_ERROR));
 			if (errorEvents.length > 0) {
 				return resolve({
 					isError: true,
-					eventPoller,
-					events: errorEvents
+					events
 				});
 			}
 
 			if (events.length > 0) {
 				return resolve({
 					isError: false,
-					eventPoller,
 					events
 				});
 			} else {

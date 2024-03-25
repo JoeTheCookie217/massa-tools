@@ -1,9 +1,10 @@
-import { Args, bytesToU256, strToBytes } from '@massalabs/massa-web3';
+import { EventPoller, bytesToU256 } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { IERC20, parseUnits } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
+import { pollAsyncEvents, type IEventPollerResult } from './events';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -57,4 +58,20 @@ export const fetchTokenAllowances = async (
 				};
 			});
 		});
+};
+
+export const fetchEvents = (txId: string) => {
+	const eventPoller = EventPoller.startEventsPolling(
+		{ ...eventsFilter, original_operation_id: txId },
+		1000,
+		baseClient
+	);
+	return pollAsyncEvents(eventPoller)
+		.catch(
+			(): IEventPollerResult => ({
+				isError: true,
+				events: []
+			})
+		)
+		.finally(() => eventPoller.stopPolling());
 };
