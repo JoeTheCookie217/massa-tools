@@ -4,7 +4,7 @@ import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { IERC20, parseUnits } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
-import { pollAsyncEvents, type IEventPollerResult } from './events';
+import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
