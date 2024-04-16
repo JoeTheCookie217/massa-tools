@@ -60,7 +60,7 @@ export const fetchTokenAllowances = async (
 		});
 };
 
-export const fetchEvents = (txId: string) => {
+export const fetchEvents = async (txId: string) => {
 	const eventPoller = EventPoller.startEventsPolling(
 		{ ...eventsFilter, original_operation_id: txId },
 		1000,
