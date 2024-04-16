@@ -37,12 +37,10 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	const address = params.slug;
 
 	const notFoundError = error(404, 'Address not found');
-	const keys = await getDatastore(address)
-		.then((res) => res.slice(0, MAX_PER_REQUEST - tokenAddresses.length))
-		.catch((err) => {
-			console.error(err);
-			throw notFoundError;
-		});
+	const keys = await getDatastore(address).catch((err) => {
+		console.error(err);
+		throw notFoundError;
+	});
 
 	const erc20BalancesKeys = tokenAddresses.map((token) => ({
 		address: token[selectedNetwork].address || address,

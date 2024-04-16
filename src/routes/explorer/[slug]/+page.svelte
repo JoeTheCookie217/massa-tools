@@ -15,7 +15,14 @@
 	// import Label from '$lib/components/ui/label/label.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Table from '$lib/components/ui/table';
-	import { Args, byteToU8, bytesToStr, bytesToU256, toMAS } from '@massalabs/massa-web3';
+	import {
+		Args,
+		byteToU8,
+		bytesToStr,
+		bytesToU256,
+		strToBytes,
+		toMAS
+	} from '@massalabs/massa-web3';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
 	import DecodeSelect from '$lib/components/decode-select.svelte';
@@ -31,14 +38,27 @@
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
-	let showPersistentMap = false;
-	$: displayedEntries = showPersistentMap
-		? keys
-		: keys.filter(
-				(key) => !key.includes('::') && !key.includes('ALLOWANCE') && !key.includes('BALANCE')
-		  );
+	const isPMEntry = (key: string) =>
+		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
-	console.log('displayedEntries', displayedEntries?.length);
+	let showPersistentMap = false;
+	$: displayedEntries = showPersistentMap ? keys : keys.filter((key) => !isPMEntry(key));
+
+	let values: Uint8Array[] = [];
+	$: values = Array(displayedEntries.length).fill(null);
+
+	const fetchEntry = async (key: string, index: number) => {
+		const res = await $clientStore
+			.publicApi()
+			.getDatastoreEntries([
+				{
+					address,
+					key: strToBytes(key)
+				}
+			])
+			.then((result) => result[0].final_value);
+		if (res) values[index] = res;
+	};
 
 	onMount(() => {
 		addRecentAddress({
@@ -98,11 +118,14 @@
 			</Table.Header>
 			<Table.Body>
 				{#each displayedEntries as key, i}
+					{@const value = values[i]}
 					<Table.Row>
 						<Table.Cell>{i + 1}</Table.Cell>
 						<Table.Cell>{key}</Table.Cell>
-						<!-- <Table.Cell>
-							{#if key.startsWith('PAIR_INFORMATION')}
+						<Table.Cell>
+							{#if !value}
+								<Button on:click={() => fetchEntry(key, i)}>Fetch</Button>
+							{:else if key.startsWith('PAIR_INFORMATION')}
 								{@const params = decodePairInformation(value)}
 
 								{JSON.stringify(params, undefined, 2)}
@@ -113,7 +136,7 @@
 							{:else}
 								<DecodeSelect {value} />
 							{/if}
-						</Table.Cell> -->
+						</Table.Cell>
 					</Table.Row>
 				{/each}
 			</Table.Body>
