@@ -26,17 +26,19 @@
 	import { TokenAmount } from '@dusalabs/sdk';
 
 	export let data;
-	const { entries, address, isVerified, isToken, balance, erc20Balances } = data;
+	const { keys, address, isVerified, isToken, balance, erc20Balances } = data;
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	let showPersistentMap = false;
 	$: displayedEntries = showPersistentMap
-		? entries
-		: entries.filter(
-				({ key }) => !key.includes('::') && !key.includes('ALLOWANCE') && !key.includes('BALANCE')
+		? keys
+		: keys.filter(
+				(key) => !key.includes('::') && !key.includes('ALLOWANCE') && !key.includes('BALANCE')
 		  );
+
+	console.log('displayedEntries', displayedEntries?.length);
 
 	onMount(() => {
 		addRecentAddress({
@@ -95,30 +97,23 @@
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each displayedEntries as { key, value }, i}
+				{#each displayedEntries as key, i}
 					<Table.Row>
+						<Table.Cell>{i + 1}</Table.Cell>
 						<Table.Cell>{key}</Table.Cell>
-						{#if key.startsWith('PAIR_INFORMATION')}
-							{@const params = decodePairInformation(value)}
-							<Table.Cell>
+						<!-- <Table.Cell>
+							{#if key.startsWith('PAIR_INFORMATION')}
+								{@const params = decodePairInformation(value)}
+
 								{JSON.stringify(params, undefined, 2)}
-							</Table.Cell>
-						{:else if key.startsWith('FEES_PARAMETERS')}
-							{@const params = decodeFeeParameters(value)}
-							<Table.Cell>
+							{:else if key.startsWith('FEES_PARAMETERS')}
+								{@const params = decodeFeeParameters(value)}
+
 								{JSON.stringify(params, undefined, 2)}
-							</Table.Cell>
-							<!-- {:else if isAddress(strValue)}
-								<AddressCell address={strValue} />
-							-->
-						{:else}
-							<Table.Cell>
-								<Textarea value={value.toString()} />
-							</Table.Cell>
-						{/if}
-						<Table.Cell>
-							<DecodeSelect {value} />
-						</Table.Cell>
+							{:else}
+								<DecodeSelect {value} />
+							{/if}
+						</Table.Cell> -->
 					</Table.Row>
 				{/each}
 			</Table.Body>

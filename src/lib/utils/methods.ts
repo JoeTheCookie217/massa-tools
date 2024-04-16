@@ -119,3 +119,8 @@ export const parseBalance = (val: Uint8Array | null) => {
 		}
 	}
 };
+
+export const chunk = (arr: string[], size: number) =>
+	Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+		arr.slice(i * size, i * size + size)
+	);
