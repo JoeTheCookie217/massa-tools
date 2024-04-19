@@ -6,6 +6,7 @@ import { get } from 'svelte/store';
 import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
 import { getDatastore } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
+import { MAX_PER_REQUEST } from '$lib/utils/config';
 
 type TokenInfo = {
 	balances: BalanceEntry[];
@@ -24,7 +25,7 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 			console.error(err);
 			return [];
 		});
-	const keys = [...new Set([...ERC20_KEYS, ...balanceKeys.slice(0, 100)])];
+	const keys = [...new Set([...ERC20_KEYS, ...balanceKeys.slice(0, MAX_PER_REQUEST)])];
 	console.log(keys);
 
 	const r = await client

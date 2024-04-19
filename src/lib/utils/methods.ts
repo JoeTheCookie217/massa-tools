@@ -9,9 +9,8 @@ import {
 	Token,
 	TokenAmount,
 	USDC,
-	USDT,
+	DAI,
 	VAULT_MANAGER_ADDRESS,
-	WBTC,
 	WETH,
 	WMAS
 } from '@dusalabs/sdk';
@@ -35,7 +34,7 @@ export const isAddress = (address: string): boolean =>
 // prettier-ignore
 export const dexAddresses: Array<{ [chainId in ChainId]: string }> = [ LB_QUOTER_ADDRESS, LB_ROUTER_ADDRESS, LB_FACTORY_ADDRESS, DCA_MANAGER_ADDRESS, LIMIT_ORDER_MANAGER_ADDRESS, VAULT_MANAGER_ADDRESS, MULTICALL_ADDRESS ];
 // prettier-ignore
-export const tokenAddresses: Array<{ [chainId in ChainId]: Token }> = [WETH, WMAS, USDC, USDT, WBTC];
+export const tokenAddresses: Array<{ [chainId in ChainId]: Token }> = [WETH, WMAS, USDC, DAI];
 
 export const isVerified = (address: string) => isDusaContract(address) || isToken(address);
 export const isDusaContract = (address: string) =>
@@ -120,3 +119,8 @@ export const parseBalance = (val: Uint8Array | null) => {
 		}
 	}
 };
+
+export const chunk = (arr: string[], size: number) =>
+	Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+		arr.slice(i * size, i * size + size)
+	);

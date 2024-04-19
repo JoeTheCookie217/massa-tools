@@ -6,11 +6,11 @@ settings:
 
 dependencies:
   '@dusalabs/sdk':
-    specifier: ^0.4.35
-    version: 0.4.35
+    specifier: ^0.5.11
+    version: 0.5.11
   '@massalabs/massa-web3':
-    specifier: 3.0.4-dev.20240215085640
-    version: 3.0.4-dev.20240215085640
+    specifier: 4.0.1
+    version: 4.0.1
   '@massalabs/wallet-provider':
     specifier: 1.5.3-dev.20240215082602
     version: 1.5.3-dev.20240215082602
@@ -123,11 +123,11 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.19
 
-  /@dusalabs/sdk@0.4.35:
-    resolution: {integrity: sha512-Ebe0sY4IqnyaXtBMdHMlCovArAFTpMJMrkd0oyhEBoDQqC3az3yNKfF2vbVpT35Ieynkh1UU3URtNF6G4Auucg==}
+  /@dusalabs/sdk@0.5.11:
+    resolution: {integrity: sha512-t7l1pQtat5kBMMFjTo2Xa07oUnW2ZgtDG7kVYIMARFanDheVD2lSfv+8gjecnQuljphh30MVc1f9sJyNwUxoYw==}
     engines: {node: '>=10'}
     dependencies:
-      '@massalabs/massa-web3': 3.0.4-dev.20240116124851
+      '@massalabs/massa-web3': 4.0.1
       '@massalabs/web3-utils': 1.4.8
       big.js: 6.2.1
       decimal.js-light: 2.5.1
@@ -394,6 +394,10 @@ packages:
     resolution: {integrity: sha512-UJVlercdsvSQ7i/mEgU9OvoQ4ysYu7/BN0H66o2rLFD111DF19iQSUH5mGeJcAGalx2dbvf34OnJjzL5O8Pd4g==}
     dev: false
 
+  /@hicaru/bearby.js@0.5.8:
+    resolution: {integrity: sha512-K6mLazzHkDNF5Qmx5iQ4+UqmvBJxtuwg1ZHEDEvOKB1SV/QNuKJ54/HRlLMqJE0RHam2zP7s++RlnMZUIfWgGg==}
+    dev: false
+
   /@humanwhocodes/config-array@0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
     engines: {node: '>=10.10.0'}
@@ -472,11 +476,11 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /@massalabs/massa-web3@3.0.4-dev.20240116124851:
-    resolution: {integrity: sha512-yw/XrQ+FGFGqVdcVSw5478VgJn9ruAHQw8lRV0DuFqz1s+ROGvir1d1knoDGZsLohkAnPDIbSBKMn1OR/tALXQ==}
+  /@massalabs/massa-web3@4.0.1:
+    resolution: {integrity: sha512-zkJgIt/iOr4E+a4dKOWHBF6Tx7Ov8vbNqG0OWyY1Pufq6TZY6BsoCTPiSUtJYHhgZYA+KCpogOeGmlG14MvtYA==}
     dependencies:
-      '@massalabs/wallet-provider': 1.5.1
-      '@massalabs/web3-utils': 1.4.8
+      '@massalabs/wallet-provider': 2.0.0
+      '@massalabs/web3-utils': 1.4.9
       '@noble/ed25519': 1.7.3
       '@noble/hashes': 1.3.0
       '@types/ws': 8.5.4
@@ -492,54 +496,6 @@ packages:
       string_decoder: 1.3.0
       tslib: 2.5.2
       util: 0.12.5
-      varint: 6.0.0
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 6.0.3
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@massalabs/massa-web3@3.0.4-dev.20240215085640:
-    resolution: {integrity: sha512-2E4REmAvz8uird637AgAa6mTxTcBVOrwt4fIr/wnPyh6KlcYOlBsQF2zLF0RhjNHTnJjKvXBb0HuccRD2tz/rg==}
-    dependencies:
-      '@massalabs/wallet-provider': 1.5.3-dev.20240215082602
-      '@massalabs/web3-utils': 1.4.8
-      '@noble/ed25519': 1.7.3
-      '@noble/hashes': 1.3.0
-      '@types/ws': 8.5.4
-      '@web3pack/base58-check': 1.0.3
-      axios: 0.26.1
-      bignumber.js: 9.1.2
-      bip39: 3.1.0
-      bs58check: 3.0.1
-      buffer: 6.0.3
-      crypto-js: 4.1.1
-      dotenv: 16.1.3
-      js-base64: 3.7.5
-      string_decoder: 1.3.0
-      tslib: 2.5.2
-      util: 0.12.5
-      varint: 6.0.0
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 6.0.3
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@massalabs/wallet-provider@1.5.1:
-    resolution: {integrity: sha512-Q/50oKteRXkVCtFMXDolkhhqzY/qFGE7UU60JdDyvl6k0QHam0AkSz550+q2IPqHpIv4MtKNMWFmdzhzrDKTZw==}
-    dependencies:
-      '@hicaru/bearby.js': 0.5.6
-      '@massalabs/web3-utils': 1.4.8
-      axios: 0.26.1
-      bignumber.js: 9.1.2
-      bs58check: 3.0.1
-      buffer: 6.0.3
-      npm-run-all: 4.1.5
-      rimraf: 5.0.5
-      uid: 2.0.2
       varint: 6.0.0
     optionalDependencies:
       bufferutil: 4.0.8
@@ -568,8 +524,33 @@ packages:
       - debug
     dev: false
 
+  /@massalabs/wallet-provider@2.0.0:
+    resolution: {integrity: sha512-3BKtYszSfKMOi85cxOB1q60uiMWYmdteV28stx2NjT42VtSyKOuWiTJq4KaWbf3ov+fkg+/HknXdl5bhDghbSQ==}
+    dependencies:
+      '@hicaru/bearby.js': 0.5.8
+      '@massalabs/web3-utils': 1.4.9
+      axios: 0.28.1
+      bs58check: 3.0.1
+      buffer: 6.0.3
+      uid: 2.0.2
+    optionalDependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 6.0.3
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /@massalabs/web3-utils@1.4.8:
     resolution: {integrity: sha512-mMmH/hnDLSe55O6YITMuOe/k8ju6i6n4/yOinXO717OMiYFthp+WYoHk9IbSiAuCyFTCimROhjvgiGcaqfdVYw==}
+    dependencies:
+      bignumber.js: 9.1.2
+      buffer: 6.0.3
+      events: 3.3.0
+      string_decoder: 1.3.0
+    dev: false
+
+  /@massalabs/web3-utils@1.4.9:
+    resolution: {integrity: sha512-8G91gs6HqpPpR860QDUOzugr81WJTGkBgXQS1gq/oXqt16fPkw2xlsq4c2CFHDjRF9/ftE/JaybiNZ4ilcbEyg==}
     dependencies:
       bignumber.js: 9.1.2
       buffer: 6.0.3
@@ -1040,6 +1021,10 @@ packages:
       util: 0.12.5
     dev: true
 
+  /asynckit@0.4.0:
+    resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
+    dev: false
+
   /autoprefixer@10.4.14(postcss@8.4.27):
     resolution: {integrity: sha512-FQzyfOsTlwVzjHxKEqRIAdJx9niO6VCBCoEwax/VLSoQF29ggECcPuBqUMZ+u8jCZOPSy8b8/8KnuFbp0SaFZQ==}
     engines: {node: ^10 || ^12 || >=14}
@@ -1064,6 +1049,16 @@ packages:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
       follow-redirects: 1.15.2
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /axios@0.28.1:
+    resolution: {integrity: sha512-iUcGA5a7p0mVb4Gm/sy+FSECNkPFT4y7wt6OM/CDpO/OnNCvSs3PoMG8ibrC9jRoGYU0gUK5pXVC4NPXq6lHRQ==}
+    dependencies:
+      follow-redirects: 1.15.2
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
     dev: false
@@ -1362,6 +1357,13 @@ packages:
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
+  /combined-stream@1.0.8:
+    resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      delayed-stream: 1.0.0
+    dev: false
+
   /commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
     engines: {node: '>= 6'}
@@ -1500,6 +1502,11 @@ packages:
     dependencies:
       has-property-descriptors: 1.0.0
       object-keys: 1.1.1
+
+  /delayed-stream@1.0.0:
+    resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
+    engines: {node: '>=0.4.0'}
+    dev: false
 
   /dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
@@ -1961,6 +1968,15 @@ packages:
     dependencies:
       cross-spawn: 7.0.3
       signal-exit: 4.1.0
+    dev: false
+
+  /form-data@4.0.0:
+    resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
+    engines: {node: '>= 6'}
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      mime-types: 2.1.35
     dev: false
 
   /fraction.js@4.2.0:
@@ -2543,6 +2559,18 @@ packages:
       brorand: 1.1.0
     dev: true
 
+  /mime-db@1.52.0:
+    resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
+    engines: {node: '>= 0.6'}
+    dev: false
+
+  /mime-types@2.1.35:
+    resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
+    engines: {node: '>= 0.6'}
+    dependencies:
+      mime-db: 1.52.0
+    dev: false
+
   /mime@3.0.0:
     resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
     engines: {node: '>=10.0.0'}
@@ -3018,6 +3046,10 @@ packages:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
     engines: {node: '>= 0.6.0'}
     dev: true
+
+  /proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+    dev: false
 
   /public-encrypt@4.0.3:
     resolution: {integrity: sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q==}
