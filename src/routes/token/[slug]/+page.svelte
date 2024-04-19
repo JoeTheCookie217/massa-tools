@@ -87,8 +87,8 @@
 		addRecentAddress({
 			address: tokenAddress,
 			chainId: selectedNetwork,
-			name: properties.name,
-			symbol: properties.symbol
+			label: properties.name,
+			type: 'token'
 		});
 	});
 </script>

@@ -15,7 +15,7 @@
 	} from '$lib/utils/methods';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { addRecentMultisig } from '$lib/utils/localStorage';
+	import { addRecentAddress } from '$lib/utils/localStorage';
 	import { fromMAS, toMAS } from '@massalabs/massa-web3';
 	import * as Table from '$lib/components/ui/table';
 	import * as Tooltip from '$lib/components/ui/tooltip';
@@ -77,7 +77,7 @@
 	};
 
 	onMount(() => {
-		addRecentMultisig(multisigAddress);
+		addRecentAddress({ address: multisigAddress, type: 'multisig', chainId: selectedNetwork });
 	});
 </script>
 

@@ -6,7 +6,7 @@ export type Address = {
 	address: string;
 	chainId: ChainId;
 	label?: string;
-	type: 'wallet' | 'contract' | 'multisig';
+	type: 'address' | 'token' | 'multisig';
 };
 
 const compareAddresses = (a: Address, b: Address): boolean =>

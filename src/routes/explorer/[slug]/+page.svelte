@@ -63,6 +63,7 @@
 	onMount(() => {
 		addRecentAddress({
 			address,
+			type: 'address',
 			chainId: selectedNetwork
 		});
 	});
