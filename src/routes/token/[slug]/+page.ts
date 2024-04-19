@@ -83,14 +83,14 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 	};
 }
 
-const functionExists = async (address: string, functionName: string) => {
+const functionExists = async (targetAddress: string, targetFunction: string) => {
 	return client
 		.smartContracts()
 		.readSmartContract({
 			maxGas: 100_000_000n,
 			parameter: [],
-			targetAddress: address,
-			targetFunction: functionName
+			targetAddress,
+			targetFunction
 		})
 		.then(() => true)
 		.catch((err) => {

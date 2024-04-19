@@ -3,22 +3,23 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import {
-		clearRecentMultisigs,
-		getRecentMultisigs,
-		removeRecentMultisig
+		clearRecentAddresses,
+		getRecentAddresses,
+		removeRecentAddress,
+		type Address
 	} from '$lib/utils/localStorage';
 
 	let address: string;
-	let history = getRecentMultisigs();
+	let history = getRecentAddresses();
 
 	const handleClear = () => {
-		clearRecentMultisigs();
+		clearRecentAddresses();
 		history = [];
 	};
 
-	const handleRemove = (item: string) => {
-		removeRecentMultisig(item);
-		history = getRecentMultisigs();
+	const handleRemove = (item: Address) => {
+		removeRecentAddress(item);
+		history = getRecentAddresses();
 	};
 </script>
 

@@ -5,8 +5,8 @@ const KEY = 'recent-addresses';
 export type Address = {
 	address: string;
 	chainId: ChainId;
-	name?: string;
-	symbol?: string;
+	label?: string;
+	type: 'wallet' | 'contract' | 'multisig';
 };
 
 const compareAddresses = (a: Address, b: Address): boolean =>

@@ -110,7 +110,7 @@
 		</div>
 		<div>
 			<span>Owner:</span>
-			<a href={`${properties.owner}`}>
+			<a href={`/explorer/${properties.owner}`}>
 				{printAddress(properties.owner, 8)}
 			</a>
 		</div>

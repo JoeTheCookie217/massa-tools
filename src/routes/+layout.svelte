@@ -12,6 +12,7 @@
 	const options: SvelteToastOptions = {};
 
 	import { dev } from '$app/environment';
+	import SearchBar from '$lib/components/search-bar.svelte';
 	inject({ mode: dev ? 'development' : 'production' });
 
 	$: url = $page.url.pathname;
@@ -48,7 +49,7 @@
 				</svg>
 				<span>massa-tools</span>
 			</a>
-			{#each ['explorer', 'create', 'multisig' /* , 'staking' */] as link}
+			{#each ['create', 'multisig' /* , 'staking' */] as link}
 				<a
 					href="/{link.toLowerCase()}"
 					class={cn(
@@ -58,6 +59,7 @@
 				>
 			{/each}
 		</nav>
+		<SearchBar />
 		<div class="flex items-center gap-2">
 			<ConnectModal />
 			<ChainSelect />

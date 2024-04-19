@@ -6,7 +6,7 @@ export const buildReceive = (multisigAddress: string, value: bigint): ICallData 
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'receive',
+		targetFunction: 'receive',
 		parameter: new Args().addBool(false), // temp fix
 		coins: value
 	};
@@ -22,7 +22,7 @@ export const buildSubmit = (
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'submit',
+		targetFunction: 'submit',
 		parameter: new Args().addString(to).addString(method).addU64(value).addUint8Array(data)
 	};
 };
@@ -31,7 +31,7 @@ export const buildApprove = (multisigAddress: string, txId: number): ICallData =
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'approve',
+		targetFunction: 'approve',
 		parameter: new Args().addU64(BigInt(txId))
 	};
 };
@@ -40,7 +40,7 @@ export const buildRevoke = (multisigAddress: string, txId: number): ICallData =>
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'revoke',
+		targetFunction: 'revoke',
 		parameter: new Args().addU64(BigInt(txId))
 	};
 };
@@ -49,7 +49,7 @@ export const buildExecute = (multisigAddress: string, txId: number): ICallData =
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'execute',
+		targetFunction: 'execute',
 		parameter: new Args().addU64(BigInt(txId))
 	};
 };

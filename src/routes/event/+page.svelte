@@ -39,30 +39,31 @@
 	</div>
 </div>
 {#if events.length}
-	{#each events as event}
-		{#if showDetails}
+	<div class="flex flex-col gap-2">
+		{#each events as { data, context }}
 			<div>
-				{JSON.stringify(event, null, 2)}
-			</div>
-		{:else}
-			<div>
-				{#if decodeSmart}
-					{@const method = event.data.startsWith('SWAP:')
+				{#if showDetails}
+					<div class="flex gap-1">
+						<div>#{context.index_in_slot}</div>
+						<div>{context.call_stack.at(-1)}</div>
+						<div>{data}</div>
+					</div>
+				{:else if decodeSmart}
+					{@const method = data.startsWith('SWAP:')
 						? EventDecoder.decodeSwap
-						: event.data.startsWith('DEPOSITED_TO_BIN:') ||
-						  event.data.startsWith('WITHDRAWN_FROM_BIN:')
+						: data.startsWith('DEPOSITED_TO_BIN:') || data.startsWith('WITHDRAWN_FROM_BIN:')
 						? EventDecoder.decodeLiquidity
-						: event.data.startsWith('FEES_COLLECTED:')
+						: data.startsWith('FEES_COLLECTED:')
 						? EventDecoder.decodeLiquidity
-						: event.data.startsWith('TransferSingle:')
+						: data.startsWith('TransferSingle:')
 						? EventDecoder.decodeLBTransfer
-						: () => event.data}
-					{EventDecoder.extractParams(event.data).length ? extractKeyword(event.data) : null}
-					{JSON.stringify(method(event.data))}
+						: EventDecoder.decodeError}
+					{EventDecoder.extractParams(data).length ? extractKeyword(data) : null}
+					{JSON.stringify(method(data))}
 				{:else}
-					{EventDecoder.decodeError(event.data)}
+					{EventDecoder.decodeError(data)}
 				{/if}
 			</div>
-		{/if}
-	{/each}
+		{/each}
+	</div>
 {/if}
