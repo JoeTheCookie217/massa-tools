@@ -35,14 +35,19 @@
 	export let data;
 	const { keys, address, isVerified, isToken, balance, erc20Balances } = data;
 
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
+	// TODO: highlight keys that contain the `connectedAddress`
+	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
 	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	const isPMEntry = (key: string) =>
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
 	let showPersistentMap = false;
-	$: displayedEntries = showPersistentMap ? keys : keys.filter((key) => !isPMEntry(key));
+	let filter = '';
+	$: filteredEntries = filter ? keys.filter((key) => key.includes(filter)) : keys;
+	$: displayedEntries = showPersistentMap
+		? filteredEntries
+		: filteredEntries.filter((key) => !isPMEntry(key));
 
 	let values: Uint8Array[] = [];
 	$: values = Array(displayedEntries.length).fill(null);
@@ -98,49 +103,62 @@
 		</div>
 	</div>
 
-	{#if displayedEntries.length > 0}
-		<h2 class="text-2xl">Datastore</h2>
+	<h2 class="text-2xl">Datastore</h2>
+	<div class="flex items-end gap-2">
 		<div>
 			<Checkbox id="mintable" bind:checked={showPersistentMap} />
-			<Label
-				for="mintable"
-				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-			>
-				Show Persistent Map entries
-			</Label>
+			<Label for="mintable">Show Persistent Map entries</Label>
 		</div>
-		<Table.Root>
-			<Table.Header>
+		<div>
+			<Input type="text" id="filter" placeholder="Filter by key" bind:value={filter} />
+		</div>
+	</div>
+	<Table.Root>
+		<Table.Header>
+			<Table.Row>
+				<Table.Head>#</Table.Head>
+				<Table.Head>Key</Table.Head>
+				<Table.Head>Value</Table.Head>
+				<Table.Head>Decode</Table.Head>
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each displayedEntries as key, i}
+				{@const value = values[i]}
 				<Table.Row>
-					<Table.Head>Key</Table.Head>
-					<Table.Head>Value</Table.Head>
-					<Table.Head>Decode</Table.Head>
+					<Table.Cell>{i + 1}</Table.Cell>
+					<Table.Cell>{key}</Table.Cell>
+					<Table.Cell>
+						{#if !value}
+							<Button on:click={() => fetchEntry(key, i)}>Fetch</Button>
+						{:else if key.startsWith('PAIR_INFORMATION')}
+							{@const params = decodePairInformation(value)}
+							{JSON.stringify(params, undefined, 2)}
+						{:else if key.startsWith('FEES_PARAMETERS')}
+							{@const params = decodeFeeParameters(value)}
+							{JSON.stringify(params, undefined, 2)}
+						{:else if key.startsWith('accrued_debts::')}
+							{@const args = new Args(value)}
+							{@const debtX = args.nextU256()}
+							{@const debtY = args.nextU256()}
+							{JSON.stringify({ debtX, debtY }, undefined, 2)}
+						{:else if key.startsWith('bin::')}
+							{@const args = new Args(value)}
+							{@const reserveX = args.nextU256()}
+							{@const reserveY = args.nextU256()}
+							{@const accTokenXPerShare = args.nextU256()}
+							{@const accTokenYPerShare = args.nextU256()}
+							{JSON.stringify(
+								{ reserveX, reserveY, accTokenXPerShare, accTokenYPerShare },
+								undefined,
+								2
+							)}
+						{:else}
+							<DecodeSelect {value} />
+						{/if}
+					</Table.Cell>
 				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{#each displayedEntries as key, i}
-					{@const value = values[i]}
-					<Table.Row>
-						<Table.Cell>{i + 1}</Table.Cell>
-						<Table.Cell>{key}</Table.Cell>
-						<Table.Cell>
-							{#if !value}
-								<Button on:click={() => fetchEntry(key, i)}>Fetch</Button>
-							{:else if key.startsWith('PAIR_INFORMATION')}
-								{@const params = decodePairInformation(value)}
-
-								{JSON.stringify(params, undefined, 2)}
-							{:else if key.startsWith('FEES_PARAMETERS')}
-								{@const params = decodeFeeParameters(value)}
-
-								{JSON.stringify(params, undefined, 2)}
-							{:else}
-								<DecodeSelect {value} />
-							{/if}
-						</Table.Cell>
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
-	{/if}
+			{/each}
+		</Table.Body>
+	</Table.Root>
 </div>
