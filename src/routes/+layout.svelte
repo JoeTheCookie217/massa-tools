@@ -67,7 +67,7 @@
 		</div>
 	</header>
 
-	<section class="grow grid place-items-center">
+	<section class="grow grid place-items-center m-12">
 		<slot />
 	</section>
 

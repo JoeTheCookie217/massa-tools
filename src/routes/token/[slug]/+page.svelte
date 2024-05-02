@@ -117,6 +117,7 @@
 		<div>Holders: {properties.holders}</div>
 		<div>Mintable: {properties.mintable}</div>
 		<div>Burnable: {properties.burnable}</div>
+		<div>Contract page: <a href={`/explorer/${properties.address}`} class="underline">View</a></div>
 	</div>
 	{#if balances.length > 0}
 		<h2 class="text-2xl">Balances</h2>

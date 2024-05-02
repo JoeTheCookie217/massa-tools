@@ -5,6 +5,7 @@
 		isAddress,
 		printAddress,
 		printMasBalance,
+		printUint8Array,
 		providerToChainId,
 		tokenAddresses
 	} from '$lib/utils/methods';
@@ -92,8 +93,9 @@
 				{/each}
 			</div>
 			{#if isVerified}
-				<div class="text-sm text-green-500">Verified</div>
-				<div class="text-sm">{getAddressLabel(address)}</div>
+				<div class="text-sm">
+					<span class="text-green-500 pr-1">Verified</span>{getAddressLabel(address)}
+				</div>
 			{/if}
 			{#if isToken}
 				<a href={`/token/${address}`}>
@@ -118,7 +120,7 @@
 			<Table.Row>
 				<Table.Head>#</Table.Head>
 				<Table.Head>Key</Table.Head>
-				<Table.Head>Value</Table.Head>
+				<Table.Head class="text-center">Value</Table.Head>
 				<Table.Head>Decode</Table.Head>
 			</Table.Row>
 		</Table.Header>
@@ -130,7 +132,15 @@
 					<Table.Cell>{key}</Table.Cell>
 					<Table.Cell>
 						{#if !value}
-							<Button on:click={() => fetchEntry(key, i)}>Fetch</Button>
+							<Button variant="ghost" on:click={() => fetchEntry(key, i)}>Fetch</Button>
+						{:else}
+							{printUint8Array(value)}
+							<CopyButton copyText={value.toString()} />
+						{/if}
+					</Table.Cell>
+					<Table.Cell>
+						{#if !value}
+							&nbsp;
 						{:else if key.startsWith('PAIR_INFORMATION')}
 							{@const params = decodePairInformation(value)}
 							{JSON.stringify(params, undefined, 2)}

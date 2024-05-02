@@ -42,17 +42,18 @@ export const isDusaContract = (address: string) =>
 export const isToken = (address: string) =>
 	tokenAddresses.some((addr) => Object.values(addr).some((z) => z.address === address));
 export const getAddressLabel = (address: string): string => {
+	let label = '';
+	if (isDusaContract(address)) label = '[Dusa Protocol]: ';
 	if (isToken(address)) return 'Whitelisted token';
-	if (contains(LB_QUOTER_ADDRESS, address)) return 'Quoter';
-	if (contains(LB_ROUTER_ADDRESS, address)) return 'Router';
-	if (contains(LB_FACTORY_ADDRESS, address)) return 'Factory';
-	if (contains(DCA_MANAGER_ADDRESS, address)) return 'DCA Manager';
-	if (contains(LIMIT_ORDER_MANAGER_ADDRESS, address)) return 'Limit Order Manager';
-	if (contains(VAULT_MANAGER_ADDRESS, address)) return 'Vault Manager';
-	if (contains(MULTICALL_ADDRESS, address)) return 'Multicall';
+	if (contains(LB_QUOTER_ADDRESS, address)) return label + 'Quoter';
+	if (contains(LB_ROUTER_ADDRESS, address)) return label + 'Router';
+	if (contains(LB_FACTORY_ADDRESS, address)) return label + 'Factory';
+	if (contains(DCA_MANAGER_ADDRESS, address)) return label + 'DCA Manager';
+	if (contains(LIMIT_ORDER_MANAGER_ADDRESS, address)) return label + 'Limit Order Manager';
+	if (contains(VAULT_MANAGER_ADDRESS, address)) return label + 'Vault Manager';
+	if (contains(MULTICALL_ADDRESS, address)) return label + 'Multicall';
 	throw new Error('Address not found');
 };
-
 const contains = (map: { [chainId in ChainId]: string }, address: string): boolean =>
 	Object.values(map).some((z) => z === address);
 
@@ -62,6 +63,10 @@ export const printAddress = (address: string, chars = 6): string =>
 	address.slice(0, chars) + '...' + address.slice(-(chars - 2));
 export const printTokenAmount = (amount: TokenAmount): string =>
 	Number(amount.toSignificant()).toLocaleString();
+export const printUint8Array = (arr: Uint8Array): string =>
+	arr.length > 10
+		? '[' + arr.slice(0, 4).toString() + '...' + arr.slice(-4).toString() + ']'
+		: '[' + arr.toString() + ']';
 
 export const bytesToBigInt = (bytes: Uint8Array): bigint => {
 	try {
