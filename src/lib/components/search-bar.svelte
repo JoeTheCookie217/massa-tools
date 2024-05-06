@@ -23,10 +23,10 @@
 	};
 </script>
 
-<div>
+<div class="grow">
 	<Input
 		type="text"
-		placeholder="Smart contract/user address"
+		placeholder="Search by address, transaction hash or token"
 		bind:value={address}
 		on:keydown={onKeyDown}
 	/>

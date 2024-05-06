@@ -5,8 +5,8 @@
 	import LightSwitch from '$lib/components/light-switch/light-switch.svelte';
 	import { cn } from '$lib/utils';
 	import { page } from '$app/stores';
-	import ChainSelect from '$lib/components/chain-select.svelte';
 	import { inject } from '@vercel/analytics';
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import '../app.css';
 
 	const options: SvelteToastOptions = {};
@@ -14,14 +14,15 @@
 	import { dev } from '$app/environment';
 	import SearchBar from '$lib/components/search-bar.svelte';
 	inject({ mode: dev ? 'development' : 'production' });
+	injectSpeedInsights();
 
 	$: url = $page.url.pathname;
 </script>
 
 <main class="h-screen flex flex-col">
-	<header class="flex justify-around items-center p-2">
-		<nav class="flex items-center gap-8">
-			<a class="font-medium text-lg flex items-center gap-2" href="/">
+	<header class="flex justify-around gap-20 items-center p-6 mx-20">
+		<nav class="flex items-center gap-6">
+			<a class="font-medium text-lg flex items-center gap-1" href="/">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="h-6 w-6">
 					<rect width="256" height="256" fill="none" />
 					<line
@@ -49,7 +50,7 @@
 				</svg>
 				<span>massa-tools</span>
 			</a>
-			{#each ['create', 'multisig' /* , 'staking' */] as link}
+			{#each ['create' /*'multisig', 'staking'*/] as link}
 				<a
 					href="/{link.toLowerCase()}"
 					class={cn(
@@ -62,7 +63,6 @@
 		<SearchBar />
 		<div class="flex items-center gap-2">
 			<ConnectModal />
-			<ChainSelect />
 			<LightSwitch />
 		</div>
 	</header>

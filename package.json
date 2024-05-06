@@ -41,6 +41,7 @@
 		"@massalabs/massa-web3": "4.0.1",
 		"@massalabs/wallet-provider": "2.0.0",
 		"@vercel/analytics": "^1.1.2",
+		"@vercel/speed-insights": "^1.0.10",
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"bits-ui": "^0.5.6",
 		"clsx": "^2.0.0",
