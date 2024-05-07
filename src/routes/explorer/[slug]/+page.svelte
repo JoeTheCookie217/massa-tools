@@ -66,13 +66,13 @@
 		if (res) values[index] = res;
 	};
 
-	onMount(() => {
+	const save = (label: string) =>
 		addRecentAddress({
 			address,
+			label,
 			type: 'address',
 			chainId: selectedNetwork
 		});
-	});
 </script>
 
 <div class="flex flex-col gap-4">

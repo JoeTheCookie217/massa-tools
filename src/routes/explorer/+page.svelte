@@ -37,13 +37,13 @@
 		</Button>
 	</div>
 	{#if history.length}
-		<div>
+		<div class="mt-4">
 			<div class="flex items-center gap-2">
 				<h2>Recent addresses</h2>
 				<Button variant="link" on:click={handleClear}>Clear</Button>
 			</div>
 			{#each history as historyItem}
-				<div class="hover:bg-slate-500">
+				<div class="">
 					{#if historyItem.label}
 						<span>
 							{historyItem.label}

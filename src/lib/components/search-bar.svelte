@@ -17,7 +17,7 @@
 				goto(`/explorer/${value}`);
 			} else if (value.startsWith('O1')) {
 				address = '';
-				goto('/event');
+				goto(`/event/${value}`);
 			}
 		}
 	};

@@ -4,7 +4,7 @@
   - [x] account of choice
   - [x] persist on refresh
   - [x] with Massa Station
-  - [x] with Bearby
+  - [ ] with Bearby
 - [x] disconnect wallet
 - [x] display toast notifications
 - [x] select network
@@ -20,7 +20,7 @@
   - [x] revoke
   - [x] mint
   - [x] burn
-- [x] save recently viewed history
+- [ ] save into history
 
 ## Create
 
