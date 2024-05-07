@@ -12,7 +12,7 @@ import {
 export const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
 	coins: 0n,
 	maxGas: 100_000_000n,
-	fee: 0n
+	fee: MassaUnits.oneMassa / 100n // 0.01 MAS
 };
 
 // TOKEN
@@ -71,6 +71,27 @@ export const buildDecreaseAllowance = (
 		targetAddress: tokenAddress,
 		targetFunction: 'decreaseAllowance',
 		parameter: new Args().addString(spenderAddress).addU256(amount)
+	};
+};
+
+// WMAS
+
+export const buildWrap = (amount: bigint, wmasAddress: string): ICallData => {
+	return {
+		...baseCallData,
+		targetAddress: wmasAddress,
+		targetFunction: 'deposit',
+		parameter: new Args(),
+		coins: amount
+	};
+};
+
+export const buildUnwrap = (amount: bigint, to: string, wmasAddress: string): ICallData => {
+	return {
+		...baseCallData,
+		targetAddress: wmasAddress,
+		targetFunction: 'withdraw',
+		parameter: new Args().addU64(amount).addString(to)
 	};
 };
 
