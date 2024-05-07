@@ -5,7 +5,7 @@ export const PROVIDER_URL_KEY = 'providerUrl';
 
 const defaultPublicApi =
 	(typeof window !== 'undefined' && window.localStorage.getItem(PROVIDER_URL_KEY)) ||
-	DefaultProviderUrls.BUILDNET;
+	DefaultProviderUrls.MAINNET;
 const providers = [
 	{ url: defaultPublicApi, type: ProviderType.PUBLIC },
 	{ url: defaultPublicApi, type: ProviderType.PRIVATE }

@@ -7,8 +7,11 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import Highlight from 'svelte-highlight';
 	import { typescript } from 'svelte-highlight/languages';
-	import styles from 'svelte-highlight/styles/dracula';
+	// import stylesDark from 'svelte-highlight/styles/tokyo-night-dark';
+	// import stylesLight from 'svelte-highlight/styles/tokyo-night-light';
+	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
+	import { modeCurrent } from '$lib/components/light-switch/light-switch';
 
 	let name: string;
 	let symbol: string;
@@ -64,10 +67,11 @@ export function constructor(_: StaticArray<u8>): void {
 
 <svelte:head>
 	<title>Create Token</title>
+	<!-- {@html `<style>${modeCurrent ? stylesDark : stylesLight}</style>`} -->
 	{@html styles}
 </svelte:head>
 
-<div class="flex gap-4">
+<div class="flex gap-10">
 	<div class="grid grid-cols-2">
 		<div>
 			<Label for="name">Name</Label>
@@ -109,11 +113,11 @@ export function constructor(_: StaticArray<u8>): void {
 			</Label>
 		</div>
 		<Button on:click={deploy} {disabled}>Deploy</Button>
-	</div>
-	<div>
-		<Button on:click={() => copy(code)}>
+		<Button variant="ghost" on:click={() => copy(code)}>
 			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
+	</div>
+	<div>
 		<Highlight language={typescript} {code} />
 	</div>
 </div>
