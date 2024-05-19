@@ -15,7 +15,7 @@
 	import { dev } from '$app/environment';
 	import SearchBar from '$lib/components/search-bar.svelte';
 	inject({ mode: dev ? 'development' : 'production' });
-	injectSpeedInsights();
+	!dev && injectSpeedInsights();
 
 	$: url = $page.url.pathname;
 </script>

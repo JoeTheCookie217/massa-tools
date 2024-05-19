@@ -1,7 +1,7 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 import { Transaction } from '$lib/services/serialize';
 import clientStore from '$lib/store/client';
-import { strToBytes, bytesToI32, byteToBool, boolToByte } from '@massalabs/massa-web3';
+import { strToBytes, bytesToI32, byteToBool } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';

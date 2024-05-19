@@ -4,7 +4,7 @@
   - [x] account of choice
   - [x] persist on refresh
   - [x] with Massa Station
-  - [ ] with Bearby
+  - [x] with Bearby
 - [x] disconnect wallet
 - [x] display toast notifications
 - [x] select network
