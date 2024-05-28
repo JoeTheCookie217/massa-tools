@@ -6,7 +6,6 @@
 		printAddress,
 		printMasBalance,
 		printUint8Array,
-		providerToChainId,
 		tokenAddresses
 	} from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
@@ -32,13 +31,13 @@
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
+	import { CHAIN_ID } from '$lib/utils/config.js';
 
 	export let data;
 	const { keys, address, isVerified, isToken, balance, erc20Balances } = data;
 
 	// TODO: highlight keys that contain the `connectedAddress`
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
-	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	const isPMEntry = (key: string) =>
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
@@ -70,8 +69,7 @@
 		addRecentAddress({
 			address,
 			label,
-			type: 'address',
-			chainId: selectedNetwork
+			type: 'address'
 		});
 </script>
 
@@ -86,7 +84,7 @@
 				<CopyButton copyText={address} />
 				<span>{printMasBalance(toMAS(balance).toFixed(2))}</span>
 				{#each erc20Balances as b, i}
-					{@const token = tokenAddresses[i][selectedNetwork]}
+					{@const token = tokenAddresses[i][CHAIN_ID]}
 					{#if b > 0 && b < 2n ** 256n - 1n}
 						<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
 					{/if}

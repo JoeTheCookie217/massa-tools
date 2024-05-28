@@ -1,16 +1,12 @@
-import type { ChainId } from '@dusalabs/sdk';
-
 const KEY = 'recent-addresses';
 
 export type Address = {
 	address: string;
-	chainId: ChainId;
 	label?: string;
 	type: 'address' | 'token' | 'multisig';
 };
 
-const compareAddresses = (a: Address, b: Address): boolean =>
-	a.address === b.address && a.chainId === b.chainId;
+const compareAddresses = (a: Address, b: Address): boolean => a.address === b.address;
 const setRecentAddresses = (addresses: Address[]): void => {
 	localStorage.setItem(KEY, JSON.stringify(addresses));
 };

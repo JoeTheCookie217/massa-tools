@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ChainId, Token, TokenAmount, WMAS as _WMAS } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
-	import { printAddress, printTokenAmount, providerToChainId } from '$lib/utils/methods';
+	import { printAddress, printTokenAmount } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 	import {
 		fetchMasBalance,
@@ -28,6 +28,8 @@
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import TokenAmountInput from '$lib/components/TokenAmountInput.svelte';
+	import AddressInput from '$lib/components/AddressInput.svelte';
+	import { CHAIN_ID } from '$lib/utils/config.js';
 
 	export let data;
 	const { properties, balances } = data;
@@ -37,12 +39,12 @@
 
 	let allowances: Allowance[] = [];
 	let masBalance: bigint;
-	$: parsedMasBalance = new TokenAmount(_WMAS[selectedNetwork], masBalance ?? 0n);
+	$: parsedMasBalance = new TokenAmount(_WMAS[CHAIN_ID], masBalance ?? 0n);
 	$: fullyParsedMasBalance = Number(parsedMasBalance.toSignificant(6));
 
 	let userBalance: bigint;
 	$: parsedBalance = new TokenAmount(
-		new Token(selectedNetwork, tokenAddress, properties.decimals),
+		new Token(CHAIN_ID, tokenAddress, properties.decimals),
 		userBalance ?? 0n
 	);
 	$: fullyParsedBalance = Number(parsedBalance.toSignificant(properties.decimals));
@@ -83,8 +85,7 @@
 		});
 	};
 
-	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
-	const token = new Token(selectedNetwork, tokenAddress, properties.decimals);
+	const token = new Token(CHAIN_ID, tokenAddress, properties.decimals);
 
 	const { send } = useSendTx();
 
@@ -123,7 +124,6 @@
 	onMount(() => {
 		addRecentAddress({
 			address: tokenAddress,
-			chainId: selectedNetwork,
 			label: properties.name,
 			type: 'token'
 		});
@@ -200,12 +200,7 @@
 				<div>
 					<h3 class="text-lg">Transfer</h3>
 					<div class="flex items-center gap-2">
-						<Input
-							type="text"
-							placeholder="Receiver address"
-							id="transferReceiver"
-							bind:value={transferReceiver}
-						/>
+						<AddressInput recipient={transferReceiver} />
 
 						<div>
 							<!-- <Label for="transferAmount">Amount</Label> -->
@@ -257,7 +252,7 @@
 					</div>
 				</div>
 			{/if}
-			{#if properties.address === _WMAS[selectedNetwork].address}
+			{#if properties.address === _WMAS[CHAIN_ID].address}
 				<div class="flex justify-between">
 					<div>
 						<h3 class="text-lg">Wrap</h3>

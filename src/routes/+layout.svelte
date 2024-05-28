@@ -2,7 +2,6 @@
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
 	import ConnectModal from '$lib/components/connect-modal.svelte';
-	import ChainSelect from '$lib/components/chain-select.svelte';
 	import LightSwitch from '$lib/components/light-switch/light-switch.svelte';
 	import { cn } from '$lib/utils';
 	import { page } from '$app/stores';
@@ -64,7 +63,6 @@
 		<SearchBar />
 		<div class="flex items-center gap-2">
 			<ConnectModal />
-			<ChainSelect />
 			<LightSwitch />
 		</div>
 	</header>

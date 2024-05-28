@@ -3,6 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
+		"postinstall": "cp .env.example .env",
 		"start": "vite",
 		"dev": "vite --open --host 0.0.0.0 --port 3000",
 		"build": "vite build",

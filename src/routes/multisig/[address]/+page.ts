@@ -5,15 +5,10 @@ import { strToBytes, bytesToI32, byteToBool } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
-import {
-	parseBalance,
-	providerToChainId,
-	toDatastoreInput,
-	tokenAddresses
-} from '$lib/utils/methods';
+import { parseBalance, toDatastoreInput, tokenAddresses } from '$lib/utils/methods';
+import { CHAIN_ID } from '$lib/utils/config';
 
 const client = get(clientStore);
-const selectedNetwork = providerToChainId(client.getPublicProviders()[0]);
 
 type Approval = {
 	address: string;
@@ -42,7 +37,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const txKeys = datastore.filter((entry) => entry.startsWith(TX_PREFIX));
 	const approvalsKeys = datastore.filter((entry) => entry.startsWith('approved::'));
 	const erc20BalancesKeys = tokenAddresses.map((token) => ({
-		address: token[selectedNetwork].address,
+		address: token[CHAIN_ID].address,
 		key: strToBytes(`BALANCE${address}`)
 	}));
 

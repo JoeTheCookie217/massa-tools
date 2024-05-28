@@ -8,8 +8,7 @@
 	import { typescript } from 'svelte-highlight/languages';
 	import styles from 'svelte-highlight/styles/dracula';
 	import useCopy from '$lib/hooks/useCopy';
-	import { isAddress, providerToChainId } from '$lib/utils/methods';
-	import clientStore from '$lib/store/client';
+	import { isAddress } from '$lib/utils/methods';
 
 	let owners: string[] = [];
 	let ownersLength: number = 0;
@@ -25,8 +24,6 @@
 	$: defaultOwners = owners;
 	$: defaultRequired = required || 2;
 
-	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
-
 	const { send } = useSendTx();
 
 	const increment = () => {
@@ -39,7 +36,7 @@
 	};
 
 	async function deploy() {
-		const deployData = buildDeployMultisig(owners, required, selectedNetwork);
+		const deployData = buildDeployMultisig(owners, required);
 		send(deployData);
 	}
 

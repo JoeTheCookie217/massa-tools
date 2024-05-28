@@ -11,15 +11,9 @@ import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
-import {
-	isVerified,
-	parseBalance,
-	providerToChainId,
-	toDatastoreInput,
-	tokenAddresses
-} from '$lib/utils/methods';
+import { isVerified, parseBalance, tokenAddresses } from '$lib/utils/methods';
 import { ERC20_KEYS } from '$lib/utils/types';
-import { MAX_PER_REQUEST } from '$lib/utils/config';
+import { CHAIN_ID, MAX_PER_REQUEST } from '$lib/utils/config';
 
 type AddressInfo = {
 	address: string;
@@ -31,7 +25,6 @@ type AddressInfo = {
 };
 
 const client = get(clientStore);
-const selectedNetwork = providerToChainId(client.getPublicProviders()[0]);
 
 export async function load({ params }: { params: RouteParams }): Promise<AddressInfo> {
 	const address = params.slug;
@@ -43,7 +36,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	});
 
 	const erc20BalancesKeys = tokenAddresses.map((token) => ({
-		address: token[selectedNetwork].address || address,
+		address: token[CHAIN_ID].address || address,
 		key: strToBytes(`BALANCE${address}`)
 	}));
 

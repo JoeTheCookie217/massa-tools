@@ -7,12 +7,7 @@
 	import useSendTx from '$lib/hooks/useSendTx';
 	import { buildApprove, buildExecute, buildReceive, buildSubmit } from './methods';
 	import clientStore from '$lib/store/client';
-	import {
-		printAddress,
-		printMasBalance,
-		providerToChainId,
-		tokenAddresses
-	} from '$lib/utils/methods';
+	import { printAddress, printMasBalance, tokenAddresses } from '$lib/utils/methods';
 	import { onMount } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
@@ -25,6 +20,7 @@
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
+	import { CHAIN_ID } from '$lib/utils/config';
 
 	export let data;
 
@@ -32,7 +28,6 @@
 	const argsPlaceholder = '{"0": 45, "1": 19, "2": 0, "3": 21}';
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
-	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	let submitTo: string;
 	let submitMethod: string = '';
@@ -77,7 +72,7 @@
 	};
 
 	onMount(() => {
-		addRecentAddress({ address: multisigAddress, type: 'multisig', chainId: selectedNetwork });
+		addRecentAddress({ address: multisigAddress, type: 'multisig' });
 	});
 </script>
 
@@ -95,7 +90,7 @@
 					<span>Balance: {printMasBalance(toMAS(balance).toFixed())}</span>
 					<div class="flex gap-2 mx-6">
 						{#each erc20Balances as b, i}
-							{@const token = tokenAddresses[i][selectedNetwork]}
+							{@const token = tokenAddresses[i][CHAIN_ID]}
 							{#if b > 0 && b < 2n ** 256n - 1n}
 								<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
 							{/if}
