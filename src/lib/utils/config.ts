@@ -1,5 +1,13 @@
-export const multisigDeployer = 'AS1YiJNYFd6zvj2gxkPtSYc6tuSjHkCzQMCRV14cn83we84pnYXH';
-export const erc20Deployer = 'AS1YiJNYFd6zvj2gxkPtSYc6tuSjHkCzQMCRV14cn83we84pnYXH';
+import { ChainId } from '@dusalabs/sdk';
+
+export const MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
+	[ChainId.MAINNET]: '',
+	[ChainId.BUILDNET]: ''
+};
+export const ERC20_DEPLOYER: { [chainId in ChainId]: string } = {
+	[ChainId.MAINNET]: '',
+	[ChainId.BUILDNET]: ''
+};
 
 // max number of datastore entries to fetch in a single request
 export const MAX_PER_REQUEST = 1000;

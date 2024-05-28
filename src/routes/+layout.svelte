@@ -51,7 +51,7 @@
 				</svg>
 				<span>massa-tools</span>
 			</a>
-			{#each ['create' /*'multisig', 'staking'*/] as link}
+			{#each ['create', 'multisig' /*'staking'*/] as link}
 				<a
 					href="/{link.toLowerCase()}"
 					class={cn(

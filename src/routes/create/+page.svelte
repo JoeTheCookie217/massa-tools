@@ -12,6 +12,8 @@
 	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
 	import { modeCurrent } from '$lib/components/light-switch/light-switch';
+	import clientStore from '$lib/store/client';
+	import { providerToChainId } from '$lib/utils/methods';
 
 	let name: string;
 	let symbol: string;
@@ -20,6 +22,8 @@
 	let mintable = false;
 	let burnable = false;
 	$: disabled = !name || !symbol || !decimals || !supply;
+
+	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
 
 	const defaultName = 'MyToken';
 	const defaultSymbol = 'MYT';
@@ -60,7 +64,15 @@ export function constructor(_: StaticArray<u8>): void {
 
 	async function deploy() {
 		const totalSupply = BigInt(supply) * BigInt(10 ** decimals);
-		const deployData = buildDeployToken(name, symbol, decimals, totalSupply, mintable, burnable);
+		const deployData = buildDeployToken(
+			name,
+			symbol,
+			decimals,
+			totalSupply,
+			mintable,
+			burnable,
+			selectedNetwork
+		);
 		send(deployData);
 	}
 </script>

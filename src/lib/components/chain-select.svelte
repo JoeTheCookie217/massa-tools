@@ -19,6 +19,7 @@
 
 	$: selected = { value: selectedNetwork, label: toTitle(ChainId[selectedNetwork].toLowerCase()) };
 	$: {
+		console.log(selected, selectedNetwork);
 		if (selected.value !== selectedNetwork) {
 			changeChain(selected.value);
 		}

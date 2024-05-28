@@ -1,12 +1,11 @@
 import { baseCallData } from '$lib/services/serialize';
-import { Token, parseUnits } from '@dusalabs/sdk';
 import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
 
 export const buildReceive = (multisigAddress: string, value: bigint): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		targetFunction: 'receive',
+		targetFunction: 'receiveCoins',
 		parameter: new Args().addBool(false), // temp fix
 		coins: value
 	};

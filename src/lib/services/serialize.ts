@@ -1,5 +1,5 @@
-import { erc20Deployer, multisigDeployer } from '$lib/utils/config';
-import { Token, parseUnits } from '@dusalabs/sdk';
+import { ERC20_DEPLOYER, MULTISIG_DEPLOYER } from '$lib/utils/config';
+import { ChainId, Token, parseUnits } from '@dusalabs/sdk';
 import {
 	Args,
 	MassaUnits,
@@ -137,11 +137,12 @@ export const buildDeployToken = (
 	decimals: number,
 	supply: bigint,
 	mintable: boolean,
-	burnable: boolean
+	burnable: boolean,
+	chainId: ChainId
 ): ICallData => {
 	return {
 		...baseCallData,
-		targetAddress: erc20Deployer,
+		targetAddress: ERC20_DEPLOYER[chainId],
 		targetFunction: 'deploy',
 		parameter: new Args()
 			.addString(name)
@@ -155,10 +156,14 @@ export const buildDeployToken = (
 	};
 };
 
-export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
+export const buildDeployMultisig = (
+	owners: string[],
+	required: number,
+	chainId: ChainId
+): ICallData => {
 	return {
 		...baseCallData,
-		targetAddress: multisigDeployer,
+		targetAddress: MULTISIG_DEPLOYER[chainId],
 		targetFunction: 'deploy',
 		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
 		maxGas: 1_000_000_000n,
