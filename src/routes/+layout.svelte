@@ -13,14 +13,28 @@
 
 	import { dev } from '$app/environment';
 	import SearchBar from '$lib/components/search-bar.svelte';
+	import { onMount } from 'svelte';
+	import clientStore from '$lib/store/client';
+	import { CHAIN_NAME } from '$lib/utils/config';
 	inject({ mode: dev ? 'development' : 'production' });
 	!dev && injectSpeedInsights();
+
+	let currentBlock: number;
+
+	onMount(() => {
+		setInterval(() => {
+			$clientStore
+				.publicApi()
+				.getNodeStatus()
+				.then((r) => (currentBlock = r.last_slot.period));
+		}, 1000);
+	});
 
 	$: url = $page.url.pathname;
 </script>
 
 <main class="h-screen flex flex-col">
-	<header class="flex justify-around gap-20 items-center p-6 mx-20">
+	<header class="flex justify-around gap-10 items-center p-2 mx-4">
 		<nav class="flex items-center gap-6">
 			<a class="font-medium text-lg flex items-center gap-1" href="/">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="h-6 w-6">
@@ -81,6 +95,16 @@
 				Made with ❤️ by JoeTheCookie217</a
 			>
 		</p>
+		<div class="text-xs text-green-200">
+			{#if currentBlock}
+				<span>
+					{CHAIN_NAME}
+				</span>
+				<span>
+					{currentBlock}
+				</span>
+			{/if}
+		</div>
 	</footer>
 </main>
 <SvelteToast {options} />
