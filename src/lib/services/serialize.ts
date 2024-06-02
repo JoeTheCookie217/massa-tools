@@ -174,6 +174,7 @@ export class Transaction implements ISerializable<Transaction> {
 		public method: string = '',
 		public value: bigint = 0n,
 		public data: Uint8Array = new Uint8Array(0),
+		public timestamp: number = 0,
 		public executed: boolean = false
 	) {}
 
@@ -183,6 +184,7 @@ export class Transaction implements ISerializable<Transaction> {
 			.addString(this.method)
 			.addU64(this.value)
 			.addUint8Array(this.data)
+			.addU64(BigInt(this.timestamp))
 			.addBool(this.executed);
 		return Uint8Array.from(args.serialize());
 	}
@@ -193,6 +195,7 @@ export class Transaction implements ISerializable<Transaction> {
 		this.method = args.nextString();
 		this.value = args.nextU64();
 		this.data = args.nextUint8Array();
+		this.timestamp = Number(args.nextU64());
 		this.executed = args.nextBool();
 		return {
 			instance: this,

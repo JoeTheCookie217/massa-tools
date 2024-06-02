@@ -47,8 +47,14 @@
 				<Button variant="link" on:click={handleClear}>Clear</Button>
 			</div>
 			{#each history as historyItem}
-				<div>
-					<a href="/multisig/{historyItem}">{historyItem}</a>
+				<div class="">
+					{#if historyItem.label}
+						<span>
+							{historyItem.label}
+						</span>
+					{/if}
+
+					<a href="/multisig/{historyItem.address}">{historyItem.address}</a>
 					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
 				</div>
 			{/each}

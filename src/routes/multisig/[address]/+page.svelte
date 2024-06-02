@@ -5,7 +5,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import useSendTx from '$lib/hooks/useSendTx';
-	import { buildApprove, buildExecute, buildReceive, buildSubmit } from './methods';
+	import { buildApprove, buildExecute, buildReceive, buildRevoke, buildSubmit } from './methods';
 	import clientStore from '$lib/store/client';
 	import { printAddress, printMasBalance, tokenAddresses } from '$lib/utils/methods';
 	import { onMount } from 'svelte';
@@ -24,7 +24,8 @@
 
 	export let data;
 
-	const { address: multisigAddress, balance, owners, required, transactions, erc20Balances } = data;
+	// prettier-ignore
+	const { address: multisigAddress, balance, owners, required, transactions, erc20Balances, executionDelay, upgradeDelay } = data;
 	const argsPlaceholder = '{"0": 45, "1": 19, "2": 0, "3": 21}';
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
@@ -33,7 +34,9 @@
 	let submitMethod: string = '';
 	let submitArgs: string = '';
 	let submitValue: number;
+	$: disabledSubmit = !submitTo;
 	let receiveValue: number;
+	$: disabledDeposit = !receiveValue;
 
 	const { send } = useSendTx();
 
@@ -55,7 +58,7 @@
 	};
 
 	const revoke = (index: number) => {
-		const revokeData = buildApprove(multisigAddress, index);
+		const revokeData = buildRevoke(multisigAddress, index);
 		send(revokeData);
 	};
 
@@ -97,7 +100,7 @@
 						{/each}
 					</div>
 				</div>
-				<div class="flex items-start">
+				<div class="flex items-start gap-4">
 					<div>
 						<span>Owners:</span>
 						<span>{owners.length}</span>
@@ -115,6 +118,14 @@
 					<div>
 						<span>Required:</span>
 						<span>{required}</span>
+					</div>
+					<div>
+						<span>Upgrade delay:</span>
+						<span>{dayjs(Date.now() + upgradeDelay).fromNow(true)}</span>
+					</div>
+					<div>
+						<span>Execution delay:</span>
+						<span>{dayjs(Date.now() + executionDelay).fromNow(true)}</span>
 					</div>
 				</div>
 			</div>
@@ -138,15 +149,18 @@
 						<Label for="submitValue">Value (MAS)</Label>
 						<Input type="number" id="submitValue" placeholder="1.234" bind:value={submitValue} />
 					</div>
-					<Button on:click={submit}>Submit</Button>
+					<Button on:click={submit} disabled={disabledSubmit}>Submit</Button>
 				</div>
 				<div class="flex flex-col gap-1 mt-1 text-sm">
 					<i
 						>Leave <strong>method</strong> and <strong>arguments</strong> fields empty for MAS transfer</i
 					>
 					<i
-						>Use this <a href="https://massexplo.io/readcontract" target="_blank" rel="noreferrer"
-							>massexplo tool</a
+						>Use this <a
+							href="https://massexplo.io/readcontract"
+							target="_blank"
+							rel="noreferrer"
+							class="text-blue-500 underline">massexplo tool</a
 						> to build arguments</i
 					>
 				</div>
@@ -157,7 +171,7 @@
 					<div>
 						<Input type="number" id="receiveValue" placeholder="Amount" bind:value={receiveValue} />
 					</div>
-					<Button on:click={receive}>Deposit</Button>
+					<Button on:click={receive} disabled={disabledDeposit}>Deposit</Button>
 				</div>
 			</div>
 			<div>

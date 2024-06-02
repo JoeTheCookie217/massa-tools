@@ -1,7 +1,7 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
 import { Transaction } from '$lib/services/serialize';
 import clientStore from '$lib/store/client';
-import { strToBytes, bytesToI32, byteToBool } from '@massalabs/massa-web3';
+import { strToBytes, bytesToI32, byteToBool, bytesToU64 } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
@@ -21,6 +21,8 @@ type MultisigInfo = {
 	address: string;
 	balance: bigint;
 	required: number;
+	upgradeDelay: number;
+	executionDelay: number;
 	owners: string[];
 	transactions: FullTransaction[];
 	erc20Balances: bigint[];
@@ -33,9 +35,10 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const datastore = await getDatastore(address);
 	const OWNER_PREFIX = 'is_owner::';
 	const TX_PREFIX = 'transactions::';
+	const APPROVAL_PREFIX = 'approved::';
 	const ownerKeys = datastore.filter((entry) => entry.startsWith(OWNER_PREFIX));
 	const txKeys = datastore.filter((entry) => entry.startsWith(TX_PREFIX));
-	const approvalsKeys = datastore.filter((entry) => entry.startsWith('approved::'));
+	const approvalsKeys = datastore.filter((entry) => entry.startsWith(APPROVAL_PREFIX));
 	const erc20BalancesKeys = tokenAddresses.map((token) => ({
 		address: token[CHAIN_ID].address,
 		key: strToBytes(`BALANCE${address}`)
@@ -44,10 +47,9 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const r = await client
 		.publicApi()
 		.getDatastoreEntries([
-			{
-				address,
-				key: strToBytes('required')
-			},
+			{ address, key: strToBytes('required') },
+			{ address, key: strToBytes('delay') },
+			{ address, key: strToBytes('upgradeable_period') },
 			...toDatastoreInput(address, ownerKeys),
 			...toDatastoreInput(address, txKeys),
 			...toDatastoreInput(address, approvalsKeys),
@@ -58,8 +60,16 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			if (!requiredRes) throw error(404, 'Multisig invalid');
 			const required = bytesToI32(requiredRes);
 
-			let len = ownerKeys.length + 1;
-			const ownersRes = result.slice(1, len);
+			const executionDelayRes = result[1].final_value;
+			if (!executionDelayRes) throw error(404, 'Multisig invalid');
+			const executionDelay = Number(bytesToU64(executionDelayRes));
+
+			const upgradeDelayRes = result[2].final_value;
+			if (!upgradeDelayRes) throw error(404, 'Multisig invalid');
+			const upgradeDelay = Number(bytesToU64(upgradeDelayRes));
+
+			let len = ownerKeys.length + 3;
+			const ownersRes = result.slice(3, len);
 			const owners = [];
 			for (let i = 0; i < ownersRes.length; i++) {
 				const res = ownersRes[i].final_value;
@@ -75,6 +85,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
 				const res = txRes[i].final_value;
+				console.log(res);
 				if (res) {
 					const tx = new Transaction().deserialize(res, 0);
 					transactions.push({ tx: tx.instance, approvals: [] });
@@ -85,7 +96,8 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const approvalsRes = result.slice(len, len + approvalsKeys.length);
 			for (let i = 0; i < approvalsRes.length; i++) {
 				const res = approvalsRes[i].final_value;
-				const regexPattern = /approved::(\d+)(AS1|AU1)(.*)/;
+				// const regexPattern = /${APPROVAL_PREFIX}(\d+)(AS1|AU1)(.*)/;
+				const regexPattern = new RegExp(`${APPROVAL_PREFIX}(\\d+)(AS1|AU1)(.*)`);
 				const match = approvalsKeys[i].match(regexPattern);
 
 				if (res && match) {
@@ -98,7 +110,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const resBalances = result.slice(-erc20BalancesKeys.length);
 			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
 
-			return { required, owners, transactions, erc20Balances };
+			return { required, owners, transactions, erc20Balances, upgradeDelay, executionDelay };
 		})
 		.catch((err) => {
 			console.log(err);

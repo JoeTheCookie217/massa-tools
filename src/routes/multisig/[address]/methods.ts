@@ -6,7 +6,7 @@ export const buildReceive = (multisigAddress: string, value: bigint): ICallData 
 		...baseCallData,
 		targetAddress: multisigAddress,
 		targetFunction: 'receiveCoins',
-		parameter: new Args().addBool(false), // temp fix
+		parameter: new Args(),
 		coins: value
 	};
 };

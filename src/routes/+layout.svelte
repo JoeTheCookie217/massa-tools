@@ -27,7 +27,7 @@
 				.publicApi()
 				.getNodeStatus()
 				.then((r) => (currentBlock = r.last_slot.period));
-		}, 1000);
+		}, 16_000);
 	});
 
 	$: url = $page.url.pathname;
