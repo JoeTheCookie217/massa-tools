@@ -4,6 +4,7 @@ import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
 import { EventDecoder } from '@dusalabs/sdk';
 import { fetchEvents } from '$lib/services/datastore';
+import { MASSA_CHAIN_ID } from '$lib/utils/config';
 
 type TState = {
 	txId: string | null;
@@ -32,6 +33,9 @@ const useSendTx = () => {
 		try {
 			if (!massaClient || !massaClient.wallet().getBaseAccount())
 				throw new Error('Massa client is not initialized');
+
+			const walletChainId = (await massaClient.publicApi().getNodeStatus()).chain_id;
+			if (walletChainId !== MASSA_CHAIN_ID) throw new Error('Invalid network');
 
 			const txId = await massaClient.smartContracts().callSmartContract(data);
 			update((state) => ({ ...state, txId }));
@@ -68,6 +72,10 @@ const useSendTx = () => {
 			throw error;
 		}
 	};
+
+	subscribe((state) => {
+		if (state.txId) console.log(state);
+	});
 
 	return {
 		subscribe,
