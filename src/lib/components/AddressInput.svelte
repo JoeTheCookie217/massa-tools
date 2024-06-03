@@ -3,6 +3,7 @@
 	import { Input } from './ui/input';
 
 	export let recipient: string;
+	export let valid: boolean;
 
 	$: valid = isAddress(recipient);
 </script>

@@ -12,15 +12,15 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
 	import { fromMAS, toMAS } from '@massalabs/massa-web3';
-	import * as Table from '$lib/components/ui/table';
-	import * as Tooltip from '$lib/components/ui/tooltip';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { DotsHorizontal } from 'radix-icons-svelte';
-	import AddressCell from '$lib/components/address-cell.svelte';
-	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
 	import { CHAIN_ID } from '$lib/utils/config';
+	import Transactions from './transactions.svelte';
+	import AddressBuble from '$lib/components/address-bubble.svelte';
+	import Modal from '$lib/components/modal.svelte';
+	import AddOwnerModal from './add-owner-modal.svelte';
+	import RemoveOwnerModal from './remove-owner-modal.svelte';
+	import ReplaceOwnerModal from './replace-owner-modal.svelte';
 
 	export let data;
 
@@ -42,9 +42,8 @@
 
 	const submit = () => {
 		try {
-			const value = fromMAS(submitValue.toString());
-			const params = new Uint8Array(Object.values(JSON.parse(submitArgs)));
-			console.log(params);
+			const value = fromMAS((submitValue || 0).toString());
+			const params = new Uint8Array(Object.values(JSON.parse(submitArgs || '{}')));
 			const submitData = buildSubmit(multisigAddress, submitTo, submitMethod, value, params);
 			send(submitData);
 		} catch (e) {
@@ -52,26 +51,11 @@
 		}
 	};
 
-	const approve = (index: number) => {
-		const approveData = buildApprove(multisigAddress, index);
-		send(approveData);
-	};
-
-	const revoke = (index: number) => {
-		const revokeData = buildRevoke(multisigAddress, index);
-		send(revokeData);
-	};
-
 	const receive = () => {
 		const value = fromMAS(receiveValue.toString());
 		console.log(value);
 		const receiveData = buildReceive(multisigAddress, value);
 		send(receiveData);
-	};
-
-	const execute = (index: number) => {
-		const executeData = buildExecute(multisigAddress, index);
-		send(executeData);
 	};
 
 	onMount(() => {
@@ -102,20 +86,6 @@
 				</div>
 				<div class="flex items-start gap-4">
 					<div>
-						<span>Owners:</span>
-						<span>{owners.length}</span>
-						<div class="flex flex-col">
-							{#each owners as owner}
-								<div class="flex items-center gap-1">
-									<a href={`/explorer/${owner}`}>
-										{printAddress(owner)}
-									</a>
-									<CopyButton copyText={owner} />
-								</div>
-							{/each}
-						</div>
-					</div>
-					<div>
 						<span>Required:</span>
 						<span>{required}</span>
 					</div>
@@ -129,6 +99,37 @@
 					</div>
 				</div>
 			</div>
+
+			<div>
+				<h3 class="text-lg">Owners {owners.length}</h3>
+				<AddOwnerModal {multisigAddress} />
+				<RemoveOwnerModal {multisigAddress} {owners} />
+				<ReplaceOwnerModal {multisigAddress} {owners} />
+				<div class="flex flex-col">
+					{#each owners as owner}
+						<div class="flex items-center gap-1">
+							<a href={`/explorer/${owner}`}>
+								{printAddress(owner)}
+							</a>
+							<AddressBuble address={owner} />
+							<CopyButton copyText={owner} />
+						</div>
+					{/each}
+				</div>
+			</div>
+
+			<Transactions {multisigAddress} {transactions} {required} />
+
+			<div>
+				<h3 class="text-lg">Deposit</h3>
+				<div class="flex items-center gap-2">
+					<div>
+						<Input type="number" id="receiveValue" placeholder="Amount" bind:value={receiveValue} />
+					</div>
+					<Button on:click={receive} disabled={disabledDeposit}>Deposit</Button>
+				</div>
+			</div>
+
 			<div>
 				<h3 class="text-lg">Submit</h3>
 
@@ -164,98 +165,6 @@
 						> to build arguments</i
 					>
 				</div>
-			</div>
-			<div>
-				<h3 class="text-lg">Deposit</h3>
-				<div class="flex items-center gap-2">
-					<div>
-						<Input type="number" id="receiveValue" placeholder="Amount" bind:value={receiveValue} />
-					</div>
-					<Button on:click={receive} disabled={disabledDeposit}>Deposit</Button>
-				</div>
-			</div>
-			<div>
-				<h3 class="text-lg">Transactions</h3>
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>#</Table.Head>
-							<Table.Head>Recipient</Table.Head>
-							<Table.Head>Method</Table.Head>
-							<Table.Head>Arguments</Table.Head>
-							<Table.Head>Value</Table.Head>
-							<Table.Head>Status</Table.Head>
-							<Table.Head>Approvals</Table.Head>
-							<Table.Head class="w-[50px]">Type</Table.Head>
-							<Table.Head class="text-center">Action</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each transactions as transaction, i}
-							{@const { to, method, executed, value, data } = transaction.tx}
-							{@const hasVoted = transaction.approvals.some((a) => a.address === connectedAddress)}
-							{@const isReady = transaction.approvals.length >= required}
-							{@const forVotes = transaction.approvals.filter((a) => a.support)}
-							<Table.Row>
-								<Table.Cell>{i}</Table.Cell>
-								<AddressCell address={to} />
-								<Table.Cell>{method}</Table.Cell>
-								<Table.Cell>{data}</Table.Cell>
-								<Table.Cell class="font-medium"
-									>{printMasBalance(toMAS(value).toFixed(2))}</Table.Cell
-								>
-								<Table.Cell>{executed ? 'Executed' : 'Pending'}</Table.Cell>
-
-								<Table.Cell>
-									<Tooltip.Root openDelay={50}>
-										<Tooltip.Trigger>
-											<span>
-												{forVotes.length}
-											</span>
-										</Tooltip.Trigger>
-										<Tooltip.Content>
-											{#each transaction.approvals as approval}
-												<div class="text-xs">
-													{approval.address}
-												</div>
-											{/each}
-										</Tooltip.Content>
-									</Tooltip.Root>
-								</Table.Cell>
-
-								<Table.Cell class="text-right">
-									<AccountTypeCell address={to} />
-								</Table.Cell>
-
-								<Table.Cell>
-									<DropdownMenu.Root>
-										<DropdownMenu.Trigger asChild let:builder>
-											<Button
-												variant="ghost"
-												builders={[builder]}
-												class="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-											>
-												<DotsHorizontal class="w-4 h-4" />
-												<span class="sr-only">Open menu</span>
-											</Button>
-										</DropdownMenu.Trigger>
-										<DropdownMenu.Content class="w-[160px]">
-											<DropdownMenu.Item disabled={hasVoted || executed} on:click={() => approve(i)}
-												>Approve</DropdownMenu.Item
-											>
-											<DropdownMenu.Item disabled={!hasVoted || executed} on:click={() => revoke(i)}
-												>Revoke</DropdownMenu.Item
-											>
-											<DropdownMenu.Item disabled={!isReady || executed} on:click={() => execute(i)}
-												>Execute</DropdownMenu.Item
-											>
-										</DropdownMenu.Content>
-									</DropdownMenu.Root>
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
 			</div>
 		</div>
 	{:else}
