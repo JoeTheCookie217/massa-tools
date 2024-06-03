@@ -1,5 +1,5 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
-import { Transaction } from '$lib/services/serialize';
+import { Transaction } from '@dusalabs/sdk';
 import clientStore from '$lib/store/client';
 import { strToBytes, bytesToI32, byteToBool, bytesToU64 } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
@@ -15,7 +15,7 @@ type Approval = {
 	support: boolean;
 };
 
-type FullTransaction = { tx: Transaction; approvals: Approval[] };
+export type FullTransaction = { tx: Transaction; approvals: Approval[] };
 
 type MultisigInfo = {
 	address: string;

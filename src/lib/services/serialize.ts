@@ -155,51 +155,22 @@ export const buildDeployToken = (
 	};
 };
 
-export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
+export const buildDeployMultisig = (
+	owners: string[],
+	required: number,
+	upgradeDelay: number,
+	executionDelay: number
+): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: MULTISIG_DEPLOYER[CHAIN_ID],
 		targetFunction: 'deploy',
-		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
+		parameter: new Args()
+			.addArray(owners, ArrayTypes.STRING)
+			.addI32(required)
+			.addU64(BigInt(upgradeDelay))
+			.addU64(BigInt(executionDelay)),
 		maxGas: 1_000_000_000n,
 		coins: 35n * MassaUnits.oneMassa
 	};
 };
-
-// SERIALIZABLE
-
-export class Transaction implements ISerializable<Transaction> {
-	constructor(
-		public to: string = '',
-		public method: string = '',
-		public value: bigint = 0n,
-		public data: Uint8Array = new Uint8Array(0),
-		public timestamp: number = 0,
-		public executed: boolean = false
-	) {}
-
-	serialize(): Uint8Array {
-		const args = new Args()
-			.addString(this.to)
-			.addString(this.method)
-			.addU64(this.value)
-			.addUint8Array(this.data)
-			.addU64(BigInt(this.timestamp))
-			.addBool(this.executed);
-		return Uint8Array.from(args.serialize());
-	}
-
-	deserialize(data: Uint8Array, offset: number): IDeserializedResult<Transaction> {
-		const args = new Args(data, offset);
-		this.to = args.nextString();
-		this.method = args.nextString();
-		this.value = args.nextU64();
-		this.data = args.nextUint8Array();
-		this.timestamp = Number(args.nextU64());
-		this.executed = args.nextBool();
-		return {
-			instance: this,
-			offset: args.getOffset()
-		};
-	}
-}

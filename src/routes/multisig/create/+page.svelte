@@ -13,6 +13,8 @@
 	let owners: string[] = [];
 	let ownersLength: number = 0;
 	let required: number;
+	let executionDelay: number = 3600000;
+	let upgradeDelay: number = 86400000;
 	$: disabled =
 		!owners ||
 		!required ||
@@ -36,7 +38,7 @@
 	};
 
 	async function deploy() {
-		const deployData = buildDeployMultisig(owners, required);
+		const deployData = buildDeployMultisig(owners, required, upgradeDelay, executionDelay);
 		send(deployData);
 	}
 
@@ -50,8 +52,11 @@ import { constructor as _constructor } from '${importPath}';
 export function constructor(_: StaticArray<u8>): void {
 	const owners = ${JSON.stringify(defaultOwners, undefined, 4)};
 	const required = ${defaultRequired};
+	const upgradeDelay = 86_400_000; // 1 day
+	const executionDelay = 3_600_000; // 1 hour
 
-	const args = new Args().add(owners).add(required);
+
+	const args = new Args().add(owners).add(required).add(upgradeDelay).add(executionDelay);
 	_constructor(args.serialize());
 }
 	`;
@@ -78,6 +83,14 @@ export function constructor(_: StaticArray<u8>): void {
 				<Input type="text" id="owner" placeholder="0x..." bind:value={owners[i]} />
 			</div>
 		{/each}
+		<div>
+			<Label for="upgradeDelay">Upgrade Delay</Label>
+			<Input type="number" id="upgradeDelay" bind:value={upgradeDelay} />
+		</div>
+		<div>
+			<Label for="executionDelay">Execution Delay</Label>
+			<Input type="number" id="executionDelay" bind:value={executionDelay} />
+		</div>
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 	</div>
 	<div>

@@ -15,8 +15,8 @@ export const buildSubmit = (
 	multisigAddress: string,
 	to: string,
 	method: string,
-	value: bigint,
-	data: Uint8Array
+	value: bigint = 0n,
+	data: Uint8Array = new Uint8Array()
 ): ICallData => {
 	return {
 		...baseCallData,
