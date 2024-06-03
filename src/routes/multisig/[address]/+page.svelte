@@ -105,14 +105,16 @@
 				<AddOwnerModal {multisigAddress} />
 				<RemoveOwnerModal {multisigAddress} {owners} />
 				<ReplaceOwnerModal {multisigAddress} {owners} />
-				<div class="flex flex-col">
+				<div class="flex gap-2">
 					{#each owners as owner}
-						<div class="flex items-center gap-1">
-							<a href={`/explorer/${owner}`}>
-								{printAddress(owner)}
+						<div class="">
+							<a
+								href={`/explorer/${owner}`}
+								class="flex items-center gap-4 p-4 rounded-md border-input border"
+							>
+								<AddressBuble address={owner} />
+								<span>{printAddress(owner)}</span>
 							</a>
-							<AddressBuble address={owner} />
-							<CopyButton copyText={owner} />
 						</div>
 					{/each}
 				</div>

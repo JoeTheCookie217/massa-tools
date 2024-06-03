@@ -44,16 +44,18 @@
 			<Dialog.Title>Replace Owner</Dialog.Title>
 			<Dialog.Description>Description</Dialog.Description>
 		</Dialog.Header>
-		<Dialog.Footer class="flex justify-center">
-			<div>
-				<Label>Old owner</Label>
-				<OwnerSelect {owners} bind:selectedOwner={oldOwnerAddress} />
+		<Dialog.Footer>
+			<div class="flex flex-col justify-center">
+				<div>
+					<Label>Old owner</Label>
+					<OwnerSelect {owners} bind:selectedOwner={oldOwnerAddress} />
+				</div>
+				<div>
+					<Label>New owner</Label>
+					<AddressInput bind:recipient={newOwnerAddress} bind:valid />
+				</div>
+				<Button variant="outline" on:click={replaceOwner} {disabled}>Replace Owner</Button>
 			</div>
-			<div>
-				<Label>New owner</Label>
-				<AddressInput bind:recipient={newOwnerAddress} bind:valid />
-			</div>
-			<Button variant="outline" on:click={replaceOwner} {disabled}>Replace Owner</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
