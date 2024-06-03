@@ -17,7 +17,6 @@
 	import { CHAIN_ID } from '$lib/utils/config';
 	import Transactions from './transactions.svelte';
 	import AddressBuble from '$lib/components/address-bubble.svelte';
-	import Modal from '$lib/components/modal.svelte';
 	import AddOwnerModal from './add-owner-modal.svelte';
 	import RemoveOwnerModal from './remove-owner-modal.svelte';
 	import ReplaceOwnerModal from './replace-owner-modal.svelte';

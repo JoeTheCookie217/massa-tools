@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '@fontsource-variable/space-grotesk';
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
 	import ConnectModal from '$lib/components/connect-modal.svelte';
@@ -108,3 +109,9 @@
 	</footer>
 </main>
 <SvelteToast {options} />
+
+<style>
+	:global(body) {
+		font-family: 'Space Grotesk Variable', sans-serif;
+	}
+</style>
