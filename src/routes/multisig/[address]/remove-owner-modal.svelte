@@ -4,6 +4,7 @@
 	import useSendTx from '$lib/hooks/useSendTx';
 	import { buildSubmit } from './methods';
 	import { Args } from '@massalabs/massa-web3';
+	import OwnerSelect from './owner-select.svelte';
 
 	export let multisigAddress: string;
 	export let owners: string[];
@@ -40,6 +41,7 @@
 			<Dialog.Description>Description</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex justify-center">
+			<OwnerSelect {owners} bind:selectedOwner={removeOwnerAddress} />
 			<Button variant="outline" on:click={removeOwner} {disabled}>Remove Owner</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

@@ -80,34 +80,6 @@ export const bytesToBigInt = (bytes: Uint8Array): bigint => {
 	}
 };
 
-// PROVIDER <-> CHAIN ID
-
-export const providerToChainId = (provider: IProvider): ChainId => {
-	switch (provider.url) {
-		case DefaultProviderUrls.MAINNET:
-			return ChainId.MAINNET;
-		case DefaultProviderUrls.BUILDNET:
-		default:
-			return ChainId.BUILDNET;
-	}
-};
-
-export const chainIdToProviders = (chainId: ChainId): IProvider[] => {
-	let url = '';
-	switch (chainId) {
-		case ChainId.MAINNET:
-			url = DefaultProviderUrls.MAINNET;
-			break;
-		case ChainId.BUILDNET:
-		default:
-			url = DefaultProviderUrls.BUILDNET;
-	}
-	return [
-		{ type: ProviderType.PUBLIC, url },
-		{ type: ProviderType.PRIVATE, url }
-	];
-};
-
 // DATASTORE
 
 export const toDatastoreInput = (address: string, keys: string[]) =>

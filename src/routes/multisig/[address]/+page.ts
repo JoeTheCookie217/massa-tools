@@ -85,7 +85,6 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
 				const res = txRes[i].final_value;
-				console.log(res);
 				if (res) {
 					const tx = new Transaction().deserialize(res, 0);
 					transactions.push({ tx: tx.instance, approvals: [] });

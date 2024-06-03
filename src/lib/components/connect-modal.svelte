@@ -128,14 +128,20 @@
 				</div>
 			{:else}
 				{#each accounts as account, index}
+					{@const address = account.address()}
+					{@const name = account.name() === 'BEARBY' ? '' : account.name()}
 					<div class="flex justify-between items-center p-2">
-						<span>{printAddress(account.address() || '')}</span>
-						{#await account.balance() then balance}
-							<span>{printMasBalance(balance.finalBalance)}</span>
-						{:catch error}
-							<span>{error.message}</span>
-						{/await}
-						<Button on:click={() => select(account, index)}>Connect</Button>
+						{#if address}
+							<span>{name || printAddress(address)}</span>
+							{#await account.balance() then balance}
+								<span>{printMasBalance(balance.finalBalance)}</span>
+							{:catch error}
+								{@debug error}
+							{/await}
+							<Button on:click={() => select(account, index)}>Connect</Button>
+						{:else}
+							Unlock wallet first
+						{/if}
 					</div>
 				{/each}
 			{/if}

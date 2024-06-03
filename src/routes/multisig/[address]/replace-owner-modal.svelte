@@ -4,13 +4,17 @@
 	import useSendTx from '$lib/hooks/useSendTx';
 	import { buildSubmit } from './methods';
 	import { Args } from '@massalabs/massa-web3';
+	import OwnerSelect from './owner-select.svelte';
+	import AddressInput from '$lib/components/AddressInput.svelte';
+	import { Label } from '$lib/components/ui/label';
 
 	export let multisigAddress: string;
 	export let owners: string[];
 
 	let oldOwnerAddress: string = '';
 	let newOwnerAddress: string = '';
-	$: disabled = !oldOwnerAddress || !newOwnerAddress;
+	let valid: boolean = false;
+	$: disabled = !oldOwnerAddress || !newOwnerAddress || !valid;
 
 	const { send } = useSendTx();
 
@@ -41,7 +45,15 @@
 			<Dialog.Description>Description</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex justify-center">
-			<Button variant="outline" on:click={replaceOwner}>Replace Owner</Button>
+			<div>
+				<Label>Old owner</Label>
+				<OwnerSelect {owners} bind:selectedOwner={oldOwnerAddress} />
+			</div>
+			<div>
+				<Label>New owner</Label>
+				<AddressInput bind:recipient={newOwnerAddress} bind:valid />
+			</div>
+			<Button variant="outline" on:click={replaceOwner} {disabled}>Replace Owner</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

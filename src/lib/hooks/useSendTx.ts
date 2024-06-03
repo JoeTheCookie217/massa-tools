@@ -69,10 +69,6 @@ const useSendTx = () => {
 		}
 	};
 
-	subscribe((state) => {
-		console.log(state);
-	});
-
 	return {
 		subscribe,
 		send

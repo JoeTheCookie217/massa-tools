@@ -12,7 +12,7 @@
 	<div>
 		<Input type="text" placeholder="Recipient" id="recipient" bind:value={recipient} />
 		{#if !valid && recipient.length > 0}
-			<p class="text-red-500 text-xs">Invalid address</p>
+			<p class="text-red-500 text-xs">Invalid format</p>
 		{/if}
 	</div>
 </div>

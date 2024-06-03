@@ -38,7 +38,7 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Add Owner</Dialog.Title>
-			<Dialog.Description>{disabled.toString()}</Dialog.Description>
+			<Dialog.Description>Description</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex justify-center">
 			<AddressInput bind:recipient={addOwnerAddress} bind:valid />
