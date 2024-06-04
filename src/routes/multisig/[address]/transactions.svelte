@@ -7,11 +7,13 @@
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import type { FullTransaction } from './+page';
 	import clientStore from '$lib/store/client';
-	import { printAddress, printMasBalance } from '$lib/utils/methods';
-	import { toMAS } from '@massalabs/massa-web3';
+	import { printAddress, printMasBalance, printUint8Array } from '$lib/utils/methods';
+	import { Args, toMAS } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { buildApprove, buildExecute, buildReceive, buildRevoke, buildSubmit } from './methods';
 	import useSendTx from '$lib/hooks/useSendTx';
+	import CopyButton from '$lib/components/copy-button.svelte';
+	import dayjs from 'dayjs';
 
 	export let multisigAddress: string;
 	export let transactions: FullTransaction[];
@@ -56,24 +58,59 @@
 		<Table.Body>
 			{#each transactions as transaction, i}
 				{@const { to, method, executed, value, data } = transaction.tx}
-				{@const hasVoted = transaction.approvals.some((a) => a.address === connectedAddress)}
-				{@const isReady = transaction.approvals.length >= required}
+				{@const hasVotedFor = transaction.approvals.some(
+					(a) => a.address === connectedAddress && a.support
+				)}
+				{@const hasVotedAgainst = transaction.approvals.some(
+					(a) => a.address === connectedAddress && !a.support
+				)}
+				{@const isReady = transaction.approvals.filter((a) => a.support).length >= required}
 				{@const forVotes = transaction.approvals.filter((a) => a.support)}
-				{@const againstVotes = transaction.approvals.filter((a) => !a.support)}
+				{@const delay = Number(transaction.tx.timestamp)}
 
 				<Table.Row>
 					<Table.Cell>{i}</Table.Cell>
 					<AddressCell address={to} />
 					<Table.Cell>{method}</Table.Cell>
-					<Table.Cell>{data}</Table.Cell>
+					<Table.Cell>
+						{#if method === 'addOwner' && to == multisigAddress}
+							{new Args(data).nextString()}
+						{:else if method === 'removeOwner' && to == multisigAddress}
+							{new Args(data).nextString()}
+						{:else if method === 'replaceOwner' && to == multisigAddress}
+							<div class="flex flex-col">
+								<span>
+									{new Args(data).nextString()}
+								</span>
+								<span>
+									{new Args(data).nextString()}
+								</span>
+							</div>
+						{:else if data.length}
+							<div>
+								{printUint8Array(data)}
+								<CopyButton copyText={value.toString()} />
+							</div>
+						{:else}
+							<span>-</span>
+						{/if}
+					</Table.Cell>
 					<Table.Cell class="font-medium">{printMasBalance(toMAS(value).toFixed(2))}</Table.Cell>
-					<Table.Cell>{executed ? 'Executed' : 'Pending'}</Table.Cell>
+					<Table.Cell>
+						{#if executed}
+							Executed
+						{:else if forVotes.length >= required}
+							Ready {delay > Date.now() ? dayjs(delay).fromNow() : ''}
+						{:else}
+							Pending
+						{/if}
+					</Table.Cell>
 
 					<Table.Cell>
 						<Tooltip.Root openDelay={50}>
 							<Tooltip.Trigger>
 								<span>
-									{forVotes.length} / {againstVotes.length}
+									{forVotes.length} / {required}
 								</span>
 							</Tooltip.Trigger>
 							<Tooltip.Content>
@@ -103,10 +140,10 @@
 								</Button>
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Content class="w-[160px]">
-								<DropdownMenu.Item disabled={hasVoted || executed} on:click={() => approve(i)}
+								<DropdownMenu.Item disabled={hasVotedFor || executed} on:click={() => approve(i)}
 									>Approve</DropdownMenu.Item
 								>
-								<DropdownMenu.Item disabled={!hasVoted || executed} on:click={() => revoke(i)}
+								<DropdownMenu.Item disabled={hasVotedAgainst || executed} on:click={() => revoke(i)}
 									>Revoke</DropdownMenu.Item
 								>
 								<DropdownMenu.Item disabled={!isReady || executed} on:click={() => execute(i)}

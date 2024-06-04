@@ -20,6 +20,7 @@ type AddressInfo = {
 	keys: string[];
 	isVerified: boolean;
 	isToken: boolean;
+	isMultisig: boolean;
 	balance: bigint;
 	erc20Balances: bigint[];
 };
@@ -50,6 +51,9 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 		keys,
 		isVerified: isVerified(address),
 		isToken: ERC20_KEYS.every((key) => keys.some((k) => k === key)),
+		isMultisig: ['required', 'delay', 'upgradeable_period', 'owners'].every((key) =>
+			keys.some((k) => k === key)
+		),
 		balance: await fetchMasBalance(address),
 		erc20Balances
 	};

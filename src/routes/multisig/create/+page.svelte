@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import Highlight from 'svelte-highlight';
 	import { typescript } from 'svelte-highlight/languages';
-	import styles from 'svelte-highlight/styles/dracula';
+	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
 	import { isAddress } from '$lib/utils/methods';
 
@@ -50,7 +50,7 @@ import { Args } from '@massalabs/as-types';
 import { constructor as _constructor } from '${importPath}';
 
 export function constructor(_: StaticArray<u8>): void {
-	const owners = ${JSON.stringify(defaultOwners, undefined, 4)};
+	const owners: string[] = ${JSON.stringify(defaultOwners, undefined, 2)};
 	const required = ${defaultRequired};
 	const upgradeDelay = 86_400_000; // 1 day
 	const executionDelay = 3_600_000; // 1 hour
@@ -69,34 +69,40 @@ export function constructor(_: StaticArray<u8>): void {
 	{@html styles}
 </svelte:head>
 
-<div class="flex">
-	<div class="">
+<div class="flex gap-10">
+	<div class="flex flex-col gap-6">
 		<div>
 			<Label for="required">Required</Label>
 			<Input type="number" id="required" placeholder="2" bind:value={required} />
 		</div>
-		<Button variant="ghost" on:click={increment}>+</Button>
-		<Button variant="ghost" on:click={decrement}>-</Button>
-		{#each Array(ownersLength) as _, i}
-			<div>
-				<Label for="owner">Owner {i + 1}</Label>
-				<Input type="text" id="owner" placeholder="0x..." bind:value={owners[i]} />
-			</div>
-		{/each}
+
+		<div>
+			<Label>Owners: {owners.length}</Label>
+			<Button variant="outline" on:click={increment}>+</Button>
+			<Button variant="outline" on:click={decrement}>-</Button>
+			{#each Array(ownersLength) as _, i}
+				<div>
+					<Label for="owner">Owner {i + 1}</Label>
+					<Input type="text" id="owner" placeholder="0x..." bind:value={owners[i]} />
+				</div>
+			{/each}
+		</div>
+
 		<div>
 			<Label for="upgradeDelay">Upgrade Delay</Label>
 			<Input type="number" id="upgradeDelay" bind:value={upgradeDelay} />
 		</div>
+
 		<div>
 			<Label for="executionDelay">Execution Delay</Label>
 			<Input type="number" id="executionDelay" bind:value={executionDelay} />
 		</div>
 		<Button on:click={deploy} {disabled}>Deploy</Button>
-	</div>
-	<div>
-		<Button on:click={() => copy(code)}>
+		<Button variant="ghost" on:click={() => copy(code)}>
 			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
+	</div>
+	<div>
 		<Highlight language={typescript} {code} />
 	</div>
 </div>

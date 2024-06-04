@@ -34,7 +34,7 @@
 	import { CHAIN_ID } from '$lib/utils/config.js';
 
 	export let data;
-	const { keys, address, isVerified, isToken, balance, erc20Balances } = data;
+	const { keys, address, isVerified, isToken, isMultisig, balance, erc20Balances } = data;
 
 	// TODO: highlight keys that contain the `connectedAddress`
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
@@ -98,6 +98,11 @@
 			{#if isToken}
 				<a href={`/token/${address}`}>
 					<div class="text-sm underline">Token page</div>
+				</a>
+			{/if}
+			{#if isMultisig}
+				<a href={`/multisig/${address}`}>
+					<div class="text-sm underline">Multisig page</div>
 				</a>
 			{/if}
 		</div>
