@@ -12,31 +12,25 @@
 - [ ] display tx status & fetch events (address created)
 - [ ] search bar
 
-## Explorer (token)
+## Contract
 
-- [x] view its datastore (balance, allowance)
+- [x] view its datastore
+- [ ] save into history
+
+## Token
+
+- [x] create an ERC20
+- [x] view basic info (top holders, own allowance)
 - [x] interact with it
   - [x] transfer
   - [x] revoke
   - [x] mint
   - [x] burn
-- [ ] save into history
-
-## Create
-
-- [x] deploy an ERC20
-- [ ] deploy an ERC721
 
 ## Multisig
 
 - [x] create a multisig wallet
 - [ ] submit actions (transfer, add/remove keys, change threshold)
-- [ ] confirm actions
-- [ ] delete actions
+- [x] confirm actions
+- [x] delete actions
 - [x] view wallet's datastore (balance, owners, threshold)
-
-## Staking
-
-- [x] approve/deposit
-- [x] withdraw
-- [ ] view pending rewards
