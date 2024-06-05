@@ -1,29 +1,16 @@
 import {
-	ChainId,
-	DCA_MANAGER_ADDRESS,
-	LB_FACTORY_ADDRESS,
-	LB_QUOTER_ADDRESS,
-	LB_ROUTER_ADDRESS,
-	LIMIT_ORDER_MANAGER_ADDRESS,
-	MULTICALL_ADDRESS,
+	DCA_MANAGER_ADDRESS as _DCA_MANAGER_ADDRESS,
+	LB_FACTORY_ADDRESS as _LB_FACTORY_ADDRESS,
+	LB_QUOTER_ADDRESS as _LB_QUOTER_ADDRESS,
+	LB_ROUTER_ADDRESS as _LB_ROUTER_ADDRESS,
+	LIMIT_ORDER_MANAGER_ADDRESS as _LIMIT_ORDER_MANAGER_ADDRESS,
+	MULTICALL_ADDRESS as _MULTICALL_ADDRESS,
 	Token,
 	TokenAmount,
-	USDC,
-	DAI,
-	VAULT_MANAGER_ADDRESS,
-	WETH,
-	WMAS
+	VAULT_MANAGER_ADDRESS as _VAULT_MANAGER_ADDRESS
 } from '@dusalabs/sdk';
-import {
-	bytesToU256,
-	bytesToU64,
-	ProviderType,
-	type IProvider,
-	DefaultProviderUrls,
-	strToBytes,
-	Args,
-	Address
-} from '@massalabs/massa-web3';
+import { bytesToU256, bytesToU64, strToBytes, Args, Address } from '@massalabs/massa-web3';
+import { CHAIN_ID, DAI, USDC, WETH, WMAS } from './config';
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -39,31 +26,45 @@ export const isAddress = (address: string): boolean => {
 	}
 };
 
-// prettier-ignore
-export const dexAddresses: Array<{ [chainId in ChainId]: string }> = [ LB_QUOTER_ADDRESS, LB_ROUTER_ADDRESS, LB_FACTORY_ADDRESS, DCA_MANAGER_ADDRESS, LIMIT_ORDER_MANAGER_ADDRESS, VAULT_MANAGER_ADDRESS, MULTICALL_ADDRESS ];
-// prettier-ignore
-export const tokenAddresses: Array<{ [chainId in ChainId]: Token }> = [WETH, WMAS, USDC, DAI];
+const LB_QUOTER_ADDRESS = _LB_QUOTER_ADDRESS[CHAIN_ID];
+const LB_ROUTER_ADDRESS = _LB_ROUTER_ADDRESS[CHAIN_ID];
+const LB_FACTORY_ADDRESS = _LB_FACTORY_ADDRESS[CHAIN_ID];
+const DCA_MANAGER_ADDRESS = _DCA_MANAGER_ADDRESS[CHAIN_ID];
+const LIMIT_ORDER_MANAGER_ADDRESS = _LIMIT_ORDER_MANAGER_ADDRESS[CHAIN_ID];
+const VAULT_MANAGER_ADDRESS = _VAULT_MANAGER_ADDRESS[CHAIN_ID];
+const MULTICALL_ADDRESS = _MULTICALL_ADDRESS[CHAIN_ID];
+export const dexAddresses = [
+	LB_QUOTER_ADDRESS,
+	LB_ROUTER_ADDRESS,
+	LB_FACTORY_ADDRESS,
+	DCA_MANAGER_ADDRESS,
+	LIMIT_ORDER_MANAGER_ADDRESS,
+	VAULT_MANAGER_ADDRESS,
+	MULTICALL_ADDRESS
+];
+export const tokenAddresses = [WMAS, USDC, WETH, DAI];
 
-export const isVerified = (address: string) => isDusaContract(address) || isToken(address);
-export const isDusaContract = (address: string) =>
-	dexAddresses.some((addr) => Object.values(addr).some((z) => z === address));
-export const isToken = (address: string) =>
-	tokenAddresses.some((addr) => Object.values(addr).some((z) => z.address === address));
+export const isVerified = (address: string) => isDusaContract(address) || isTokenAddress(address);
+export const isDusaContract = (address: string) => dexAddresses.some((addr) => addr === address);
+export const isTokenAddress = (address: string) =>
+	tokenAddresses.some((token) => token.address === address);
+export const isTokenSymbol = (symbol: string) =>
+	tokenAddresses.some((token) => token.symbol === symbol);
+export const isToken = (address: string) => isTokenAddress(address) || isTokenSymbol(address);
+
 export const getAddressLabel = (address: string): string => {
 	let label = '';
 	if (isDusaContract(address)) label = '[Dusa Protocol]: ';
-	if (isToken(address)) return 'Whitelisted token';
-	if (contains(LB_QUOTER_ADDRESS, address)) return label + 'Quoter';
-	if (contains(LB_ROUTER_ADDRESS, address)) return label + 'Router';
-	if (contains(LB_FACTORY_ADDRESS, address)) return label + 'Factory';
-	if (contains(DCA_MANAGER_ADDRESS, address)) return label + 'DCA Manager';
-	if (contains(LIMIT_ORDER_MANAGER_ADDRESS, address)) return label + 'Limit Order Manager';
-	if (contains(VAULT_MANAGER_ADDRESS, address)) return label + 'Vault Manager';
-	if (contains(MULTICALL_ADDRESS, address)) return label + 'Multicall';
+	if (isTokenAddress(address)) return 'Whitelisted token';
+	if (LB_QUOTER_ADDRESS === address) return label + 'Quoter';
+	if (LB_ROUTER_ADDRESS === address) return label + 'Router';
+	if (LB_FACTORY_ADDRESS === address) return label + 'Factory';
+	if (DCA_MANAGER_ADDRESS === address) return label + 'DCA Manager';
+	if (LIMIT_ORDER_MANAGER_ADDRESS === address) return label + 'Limit Order Manager';
+	if (VAULT_MANAGER_ADDRESS === address) return label + 'Vault Manager';
+	if (MULTICALL_ADDRESS === address) return label + 'Multicall';
 	throw new Error('Address not found');
 };
-const contains = (map: { [chainId in ChainId]: string }, address: string): boolean =>
-	Object.values(map).some((z) => z === address);
 
 export const printMasBalance = (balance: string): string =>
 	Number(balance).toLocaleString() + ' MAS';

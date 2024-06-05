@@ -1,11 +1,11 @@
-import { ChainId } from '@dusalabs/sdk';
+import { ChainId, WMAS as _WMAS, USDC as _USDC, DAI as _DAI, WETH as _WETH } from '@dusalabs/sdk';
 import { CHAIN_ID as MassaChainId } from '@massalabs/massa-web3';
 
-export const MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
+const _MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
 	[ChainId.BUILDNET]: ''
 };
-export const ERC20_DEPLOYER: { [chainId in ChainId]: string } = {
+const _ERC20_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
 	[ChainId.BUILDNET]: ''
 };
@@ -25,3 +25,10 @@ export const FEATURE_FLAGS = {
 	CREATE_TOKEN: false,
 	CREATE_MULTISIG: false
 };
+
+export const WMAS = _WMAS[CHAIN_ID];
+export const USDC = _USDC[CHAIN_ID];
+export const DAI = _DAI[CHAIN_ID];
+export const WETH = _WETH[CHAIN_ID];
+export const MULTISIG_DEPLOYER = _MULTISIG_DEPLOYER[CHAIN_ID];
+export const ERC20_DEPLOYER = _ERC20_DEPLOYER[CHAIN_ID];

@@ -1,13 +1,6 @@
 import { CHAIN_ID, ERC20_DEPLOYER, MULTISIG_DEPLOYER } from '$lib/utils/config';
-import { ChainId, Token, parseUnits } from '@dusalabs/sdk';
-import {
-	Args,
-	MassaUnits,
-	type ICallData,
-	ArrayTypes,
-	type ISerializable,
-	type IDeserializedResult
-} from '@massalabs/massa-web3';
+import { Token, parseUnits } from '@dusalabs/sdk';
+import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
 
 export const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
 	coins: 0n,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ChainId, Token, TokenAmount, WMAS as _WMAS } from '@dusalabs/sdk';
+	import { Token, TokenAmount, WMAS as _WMAS } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
 	import { printAddress, printTokenAmount } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
@@ -51,8 +51,13 @@
 
 	let transferReceiver: string;
 	let transferAmount: number;
+	let valid = false;
 	$: disabledTransfer =
-		!connectedAddress || !transferReceiver || !transferAmount || transferAmount > userBalance;
+		!connectedAddress ||
+		!transferReceiver ||
+		!transferAmount ||
+		transferAmount > userBalance ||
+		!valid;
 
 	let burnAmount: number;
 	$: disabledBurn = !connectedAddress || !burnAmount || burnAmount > userBalance;
@@ -200,7 +205,7 @@
 				<div>
 					<h3 class="text-lg">Transfer</h3>
 					<div class="flex items-center gap-2">
-						<AddressInput recipient={transferReceiver} />
+						<AddressInput bind:recipient={transferReceiver} bind:valid />
 
 						<div>
 							<!-- <Label for="transferAmount">Amount</Label> -->
