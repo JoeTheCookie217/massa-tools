@@ -7,6 +7,9 @@
 	export let address: string;
 </script>
 
-<div class="rounded-full p-4 text-sm" style={`background-color: #${stringHexNumber(address)}`}>
+<div
+	class="rounded-full text-sm size-16 w-16 h-16 grid place-items-center"
+	style={`background-color: #${stringHexNumber(address)}`}
+>
 	{'.' + address.slice(-3)}
 </div>

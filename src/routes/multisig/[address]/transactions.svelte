@@ -40,7 +40,7 @@
 </script>
 
 <div>
-	<h3 class="text-lg">Transactions</h3>
+	<h3 class="text-2xl">Transactions</h3>
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
@@ -78,12 +78,13 @@
 						{:else if method === 'removeOwner' && to == multisigAddress}
 							{new Args(data).nextString()}
 						{:else if method === 'replaceOwner' && to == multisigAddress}
+							{@const args = new Args(data)}
 							<div class="flex flex-col">
 								<span>
-									{new Args(data).nextString()}
+									{args.nextString()}
 								</span>
 								<span>
-									{new Args(data).nextString()}
+									{args.nextString()}
 								</span>
 							</div>
 						{:else if data.length}

@@ -33,7 +33,7 @@
 
 <Dialog.Root {open} {onOpenChange}>
 	<Dialog.Trigger>
-		<Button variant="outline">Add Owner</Button>
+		<Button variant="outline">Add</Button>
 	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>

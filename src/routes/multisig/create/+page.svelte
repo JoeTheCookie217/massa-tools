@@ -79,7 +79,7 @@ export function constructor(_: StaticArray<u8>): void {
 		<div>
 			<Label>Owners: {owners.length}</Label>
 			<Button variant="outline" on:click={increment}>+</Button>
-			<Button variant="outline" on:click={decrement}>-</Button>
+			<Button variant="outline" on:click={decrement} disabled={!ownersLength}>-</Button>
 			{#each Array(ownersLength) as _, i}
 				<div>
 					<Label for="owner">Owner {i + 1}</Label>

@@ -37,7 +37,7 @@
 
 <Dialog.Root {open} {onOpenChange}>
 	<Dialog.Trigger>
-		<Button variant="outline">Replace Owner</Button>
+		<Button variant="outline">Replace</Button>
 	</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>

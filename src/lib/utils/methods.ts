@@ -21,15 +21,23 @@ import {
 	type IProvider,
 	DefaultProviderUrls,
 	strToBytes,
-	Args
+	Args,
+	Address
 } from '@massalabs/massa-web3';
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const isEOA = (address: string): boolean => address.startsWith('AU1');
 export const isSC = (address: string): boolean => address.startsWith('AS1');
-export const isAddress = (address: string): boolean =>
-	(isEOA(address) || isSC(address)) && (address.length >= 50 || address.length <= 56);
+export const isAddress = (address: string): boolean => {
+	try {
+		new Address(address);
+		return true;
+	} catch (e) {
+		console.log(e);
+		return false;
+	}
+};
 
 // prettier-ignore
 export const dexAddresses: Array<{ [chainId in ChainId]: string }> = [ LB_QUOTER_ADDRESS, LB_ROUTER_ADDRESS, LB_FACTORY_ADDRESS, DCA_MANAGER_ADDRESS, LIMIT_ORDER_MANAGER_ADDRESS, VAULT_MANAGER_ADDRESS, MULTICALL_ADDRESS ];
@@ -67,6 +75,12 @@ export const printUint8Array = (arr: Uint8Array): string =>
 	arr.length > 10
 		? '[' + arr.slice(0, 4).toString() + '...' + arr.slice(-4).toString() + ']'
 		: '[' + arr.toString() + ']';
+export const printUSD = (value: number, keepCents = true, precision = 2) =>
+	value.toLocaleString('en-US', {
+		maximumSignificantDigits: value < 1 ? precision : undefined,
+		maximumFractionDigits: keepCents ? precision : 0,
+		minimumFractionDigits: keepCents ? precision : 0
+	});
 
 export const bytesToBigInt = (bytes: Uint8Array): bigint => {
 	try {
