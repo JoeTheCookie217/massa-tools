@@ -56,13 +56,13 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			...erc20BalancesInput
 		])
 		.then(async (result) => {
-			const requiredRes = result[0].final_value;
+			const requiredRes = result[0].candidate_value;
 			if (!requiredRes) throw error(404, 'Multisig invalid');
 			const required = bytesToI32(requiredRes);
-			const executionDelayRes = result[1].final_value;
+			const executionDelayRes = result[1].candidate_value;
 			if (!executionDelayRes) throw error(404, 'Multisig invalid');
 			const executionDelay = Number(bytesToU64(executionDelayRes));
-			const upgradeDelayRes = result[2].final_value;
+			const upgradeDelayRes = result[2].candidate_value;
 			if (!upgradeDelayRes) throw error(404, 'Multisig invalid');
 			const upgradeDelay = Number(bytesToU64(upgradeDelayRes));
 
@@ -70,7 +70,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const ownersRes = result.slice(multisigKeys.length, len);
 			const owners = [];
 			for (let i = 0; i < ownersRes.length; i++) {
-				const res = ownersRes[i].final_value;
+				const res = ownersRes[i].candidate_value;
 				if (res) {
 					if (byteToBool(res)) {
 						const caller = ownerKeys[i].slice(OWNER_PREFIX.length);
@@ -82,7 +82,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const txRes = result.slice(len, len + txKeys.length);
 			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
-				const res = txRes[i].final_value;
+				const res = txRes[i].candidate_value;
 				if (res) {
 					const tx = new Transaction().deserialize(res, 0);
 					transactions.push({ tx: tx.instance, approvals: [] });
@@ -92,7 +92,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 
 			const approvalsRes = result.slice(len, len + approvalsKeys.length);
 			for (let i = 0; i < approvalsRes.length; i++) {
-				const res = approvalsRes[i].final_value;
+				const res = approvalsRes[i].candidate_value;
 				// const regexPattern = /${APPROVAL_PREFIX}(\d+)(AS1|AU1)(.*)/;
 				const regexPattern = new RegExp(`${APPROVAL_PREFIX}(\\d+)(AS1|AU1)(.*)`);
 				const match = approvalsKeys[i].match(regexPattern);

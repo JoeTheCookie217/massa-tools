@@ -40,16 +40,22 @@
 	let submitMethod: string = '';
 	let submitArgs: string = '';
 	let submitValue: number;
-	$: disabledSubmit = !submitTo;
+	$: disabledSubmit = !submitTo && (!submitValue || !submitMethod || !submitArgs);
 	let receiveValue: number;
 	$: disabledDeposit = !receiveValue;
 
 	const { send } = useSendTx();
 
+	const parse = (stringifiedValue: string): Uint8Array => {
+		if (!stringifiedValue.length || stringifiedValue[0] === '{')
+			return new Uint8Array(Object.values(JSON.parse(submitArgs || '{}')));
+		else if (stringifiedValue[0] === '[') return new Uint8Array(JSON.parse(stringifiedValue));
+		else throw new Error('Invalid arguments');
+	};
 	const submit = () => {
 		try {
 			const value = fromMAS((submitValue || 0).toString());
-			const params = new Uint8Array(Object.values(JSON.parse(submitArgs || '{}')));
+			const params = parse(submitArgs);
 			const submitData = buildSubmit(multisigAddress, submitTo, submitMethod, value, params);
 			send(submitData);
 		} catch (e) {
@@ -80,10 +86,10 @@
 						<CopyButton copyText={multisigAddress} />
 					</div>
 
-					<div>
+					<!-- <div>
 						<span>Token Balance:</span>
 						<span>${printUSD(usdBalance, false)}</span>
-					</div>
+					</div> -->
 
 					{#if erc20Balances.length > 0}
 						<span>Owned Tokens:</span>

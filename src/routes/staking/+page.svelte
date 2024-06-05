@@ -102,17 +102,17 @@
 				toDatastoreInput(stakingAddress, ['lastUpdateTimestamp', 'rewardPerToken', 'rewardRate'])
 			)
 			.then((result) => {
-				const res0 = result[0].final_value;
+				const res0 = result[0].candidate_value;
 				if (res0) {
 					lastUpdate = Number(bytesToU64(res0));
 				}
 
-				const res1 = result[1].final_value;
+				const res1 = result[1].candidate_value;
 				if (res1) {
 					rewardPerToken = Number(bytesToU256(res1));
 				}
 
-				const res2 = result[2].final_value;
+				const res2 = result[2].candidate_value;
 				if (res2) {
 					rewardRate = Number(bytesToU64(res2));
 				}

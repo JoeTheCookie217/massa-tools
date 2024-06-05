@@ -44,7 +44,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	const erc20Balances = await client
 		.publicApi()
 		.getDatastoreEntries(erc20BalancesKeys)
-		.then((res) => res.map(({ final_value }) => parseBalance(final_value)));
+		.then((res) => res.map(({ candidate_value }) => parseBalance(candidate_value)));
 
 	return {
 		address,

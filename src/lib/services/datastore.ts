@@ -49,7 +49,7 @@ export const fetchTokenAllowances = async (
 		.getDatastoreEntries(toDatastoreInput(address, keys))
 		.then((res) => {
 			return res.map((r, i) => {
-				const amount = r.final_value ? bytesToU256(r.final_value) : 0n;
+				const amount = r.candidate_value ? bytesToU256(r.candidate_value) : 0n;
 				const spender = keys[i].slice(owner.length);
 				return {
 					owner,

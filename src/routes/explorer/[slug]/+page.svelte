@@ -61,7 +61,7 @@
 					key: strToBytes(key)
 				}
 			])
-			.then((result) => result[0].final_value);
+			.then((result) => result[0].candidate_value);
 		if (res) values[index] = res;
 	};
 

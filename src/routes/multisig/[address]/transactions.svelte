@@ -4,7 +4,6 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { DotsHorizontal } from 'radix-icons-svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
-	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import type { FullTransaction } from './+page';
 	import clientStore from '$lib/store/client';
 	import { printAddress, printMasBalance, printUint8Array } from '$lib/utils/methods';
@@ -14,6 +13,8 @@
 	import useSendTx from '$lib/hooks/useSendTx';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import dayjs from 'dayjs';
+	import { LB_ROUTER_ADDRESS, decodeSwapTx, isSwapMethod } from '@dusalabs/sdk';
+	import { CHAIN_ID } from '$lib/utils/config';
 
 	export let multisigAddress: string;
 	export let transactions: FullTransaction[];
@@ -51,7 +52,6 @@
 				<Table.Head>Value</Table.Head>
 				<Table.Head>Status</Table.Head>
 				<Table.Head>Approvals</Table.Head>
-				<Table.Head class="w-[50px]">Type</Table.Head>
 				<Table.Head class="text-center">Action</Table.Head>
 			</Table.Row>
 		</Table.Header>
@@ -71,7 +71,7 @@
 				<Table.Row>
 					<Table.Cell>{i}</Table.Cell>
 					<AddressCell address={to} />
-					<Table.Cell>{method}</Table.Cell>
+					<Table.Cell>{method || '-'}</Table.Cell>
 					<Table.Cell>
 						{#if method === 'addOwner' && to == multisigAddress}
 							{new Args(data).nextString()}
@@ -80,17 +80,21 @@
 						{:else if method === 'replaceOwner' && to == multisigAddress}
 							{@const args = new Args(data)}
 							<div class="flex flex-col">
-								<span>
-									{args.nextString()}
-								</span>
-								<span>
-									{args.nextString()}
-								</span>
+								<span>Old: {args.nextString()}</span>
+								<span>New: {args.nextString()}</span>
 							</div>
+						{:else if method === 'changeRequirement' && to == multisigAddress}
+							{new Args(data).nextI32()}
+						{:else if method === 'changeExecutionDelay' && to == multisigAddress}
+							{dayjs(Date.now() + Number(new Args(data).nextU64())).fromNow(true)}
+						{:else if method === 'changeUpgradeDelay' && to == multisigAddress}
+							{dayjs(Date.now() + Number(new Args(data).nextU64())).fromNow(true)}
+						{:else if isSwapMethod(method) && to == LB_ROUTER_ADDRESS[CHAIN_ID]}
+							{JSON.stringify(decodeSwapTx(method, data, value), undefined, 2)}
 						{:else if data.length}
 							<div>
 								{printUint8Array(data)}
-								<CopyButton copyText={value.toString()} />
+								<CopyButton copyText={data.toString()} />
 							</div>
 						{:else}
 							<span>-</span>
@@ -122,10 +126,6 @@
 								{/each}
 							</Tooltip.Content>
 						</Tooltip.Root>
-					</Table.Cell>
-
-					<Table.Cell class="text-right">
-						<AccountTypeCell address={to} />
 					</Table.Cell>
 
 					<Table.Cell>
