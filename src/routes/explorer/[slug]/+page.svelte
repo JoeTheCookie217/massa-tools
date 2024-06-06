@@ -29,9 +29,7 @@
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
-	import { CHAIN_ID } from '$lib/utils/config.js';
 
 	export let data;
 	const { keys, address, isVerified, isToken, isMultisig, balance, erc20Balances } = data;
@@ -84,7 +82,7 @@
 				<CopyButton copyText={address} />
 				<span>{printMasBalance(toMAS(balance).toFixed(2))}</span>
 				{#each erc20Balances as b, i}
-					{@const token = tokenAddresses[i][CHAIN_ID]}
+					{@const token = tokenAddresses[i]}
 					{#if b > 0 && b < 2n ** 256n - 1n}
 						<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
 					{/if}

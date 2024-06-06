@@ -37,7 +37,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	});
 
 	const erc20BalancesKeys = tokenAddresses.map((token) => ({
-		address: token[CHAIN_ID].address || address,
+		address: token.address || address,
 		key: strToBytes(`BALANCE${address}`)
 	}));
 

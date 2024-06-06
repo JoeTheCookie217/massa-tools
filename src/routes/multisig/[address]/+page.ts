@@ -41,7 +41,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const txKeys = datastore.filter((entry) => entry.startsWith(TX_PREFIX));
 	const approvalsKeys = datastore.filter((entry) => entry.startsWith(APPROVAL_PREFIX));
 	const erc20BalancesInput = tokenAddresses.map((token) => ({
-		address: token[CHAIN_ID].address,
+		address: token.address,
 		key: strToBytes(`BALANCE${address}`)
 	}));
 	const multisigKeys = ['required', 'delay', 'upgradeable_period'];

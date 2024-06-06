@@ -96,7 +96,7 @@
 						<div class="flex gap-2 mx-2">
 							<span>{printMasBalance(toMAS(balance).toFixed())}</span>
 							{#each rawErc20Balances as b, i}
-								{@const token = tokenAddresses[i][CHAIN_ID]}
+								{@const token = tokenAddresses[i]}
 								{#if b > 0}
 									<span>{printTokenAmount(new TokenAmount(token, b))} {token.symbol}</span>
 								{/if}

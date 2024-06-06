@@ -17,7 +17,7 @@
 		buildUnwrap,
 		buildWrap
 	} from '$lib/services/serialize';
-	import useSendTx from '$lib/hooks/useSendTx.js';
+	import useSendTx from '$lib/hooks/useSendTx';
 	import { onMount } from 'svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
 	// import Label from '$lib/components/ui/label/label.svelte';
@@ -29,7 +29,7 @@
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import TokenAmountInput from '$lib/components/TokenAmountInput.svelte';
 	import AddressInput from '$lib/components/AddressInput.svelte';
-	import { CHAIN_ID } from '$lib/utils/config.js';
+	import { CHAIN_ID, WMAS } from '$lib/utils/config';
 
 	export let data;
 	const { properties, balances } = data;
@@ -39,7 +39,7 @@
 
 	let allowances: Allowance[] = [];
 	let masBalance: bigint;
-	$: parsedMasBalance = new TokenAmount(_WMAS[CHAIN_ID], masBalance ?? 0n);
+	$: parsedMasBalance = new TokenAmount(WMAS, masBalance ?? 0n);
 	$: fullyParsedMasBalance = Number(parsedMasBalance.toSignificant(6));
 
 	let userBalance: bigint;

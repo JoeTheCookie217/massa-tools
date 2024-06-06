@@ -6,14 +6,19 @@
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import type { FullTransaction } from './+page';
 	import clientStore from '$lib/store/client';
-	import { printAddress, printMasBalance, printUint8Array } from '$lib/utils/methods';
+	import {
+		LB_ROUTER_ADDRESS,
+		printAddress,
+		printMasBalance,
+		printUint8Array
+	} from '$lib/utils/methods';
 	import { Args, toMAS } from '@massalabs/massa-web3';
 	import { Button } from '$lib/components/ui/button';
 	import { buildApprove, buildExecute, buildReceive, buildRevoke, buildSubmit } from './methods';
 	import useSendTx from '$lib/hooks/useSendTx';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import dayjs from 'dayjs';
-	import { LB_ROUTER_ADDRESS, decodeSwapTx, isSwapMethod } from '@dusalabs/sdk';
+	import { decodeSwapTx, isSwapMethod } from '@dusalabs/sdk';
 	import { CHAIN_ID } from '$lib/utils/config';
 
 	export let multisigAddress: string;
@@ -89,7 +94,7 @@
 							{dayjs(Date.now() + Number(new Args(data).nextU64())).fromNow(true)}
 						{:else if method === 'changeUpgradeDelay' && to == multisigAddress}
 							{dayjs(Date.now() + Number(new Args(data).nextU64())).fromNow(true)}
-						{:else if isSwapMethod(method) && to == LB_ROUTER_ADDRESS[CHAIN_ID]}
+						{:else if isSwapMethod(method) && to == LB_ROUTER_ADDRESS}
 							{JSON.stringify(decodeSwapTx(method, data, value), undefined, 2)}
 						{:else if data.length}
 							<div>
