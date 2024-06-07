@@ -18,6 +18,8 @@
 	import useSendTx from '$lib/hooks/useSendTx';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime';
+	dayjs.extend(relativeTime);
 	import { decodeSwapTx, isSwapMethod } from '@dusalabs/sdk';
 	import { CHAIN_ID } from '$lib/utils/config';
 

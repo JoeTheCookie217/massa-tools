@@ -29,8 +29,9 @@
 
 ## Multisig
 
-- [x] create a multisig wallet
-- [ ] submit actions (transfer, add/remove keys, change threshold)
-- [x] confirm actions
-- [x] delete actions
-- [x] view wallet's datastore (balance, owners, threshold)
+- [ ] create a multisig wallet
+- [ ] list wallets you're part of
+- [x] submit actions (transfer, add/remove keys, change threshold)
+- [x] confirm/revoke/execute actions
+- [ ] view usd balance
+- [x] view basic info (balance, owners, threshold)
