@@ -9,19 +9,26 @@
 	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
 	import { isAddress } from '$lib/utils/methods';
+	import AddressInput from '$lib/components/AddressInput.svelte';
+	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime';
+	dayjs.extend(relativeTime);
 
 	let owners: string[] = [];
+	let validOwners: boolean[] = [];
 	let ownersLength: number = 0;
 	let required: number;
 	let executionDelay: number = 3600000;
 	let upgradeDelay: number = 86400000;
-	$: disabled =
-		!owners ||
-		!required ||
+	$: disabledText =
+		(!owners && 'No owners set') ||
+		(!required && 'No requirement set') ||
 		required > owners.length ||
 		required < 1 ||
+		validOwners.some((valid) => !valid) ||
 		owners.some((owner) => !isAddress(owner)) ||
 		owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0; // contains duplicates
+	$: disabled = !!disabledText;
 
 	$: defaultOwners = owners;
 	$: defaultRequired = required || 2;
@@ -31,10 +38,12 @@
 	const increment = () => {
 		ownersLength++;
 		owners = [...owners, ''];
+		validOwners = [...validOwners, false];
 	};
 	const decrement = () => {
 		ownersLength--;
 		owners = owners.slice(0, ownersLength);
+		validOwners = validOwners.slice(0, ownersLength);
 	};
 
 	async function deploy() {
@@ -52,8 +61,8 @@ import { constructor as _constructor } from '${importPath}';
 export function constructor(_: StaticArray<u8>): void {
 	const owners: string[] = ${JSON.stringify(defaultOwners, undefined, 2)};
 	const required = ${defaultRequired};
-	const upgradeDelay = 86_400_000; // 1 day
-	const executionDelay = 3_600_000; // 1 hour
+	const upgradeDelay = ${upgradeDelay};
+	const executionDelay = ${executionDelay};
 
 
 	const args = new Args().add(owners).add(required).add(upgradeDelay).add(executionDelay);
@@ -83,19 +92,21 @@ export function constructor(_: StaticArray<u8>): void {
 			{#each Array(ownersLength) as _, i}
 				<div>
 					<Label for="owner">Owner {i + 1}</Label>
-					<Input type="text" id="owner" placeholder="0x..." bind:value={owners[i]} />
+					<AddressInput bind:recipient={owners[i]} bind:valid={validOwners[i]} />
 				</div>
 			{/each}
 		</div>
 
 		<div>
-			<Label for="upgradeDelay">Upgrade Delay</Label>
+			<Label for="upgradeDelay">Upgrade Delay (in ms)</Label>
 			<Input type="number" id="upgradeDelay" bind:value={upgradeDelay} />
+			<span class="text-xs">{dayjs(Date.now() + Number(upgradeDelay)).fromNow(true)}</span>
 		</div>
 
 		<div>
-			<Label for="executionDelay">Execution Delay</Label>
+			<Label for="executionDelay">Execution Delay (in ms)</Label>
 			<Input type="number" id="executionDelay" bind:value={executionDelay} />
+			<span class="text-xs">{dayjs(Date.now() + Number(executionDelay)).fromNow(true)}</span>
 		</div>
 		<Button on:click={deploy} {disabled}>Deploy</Button>
 		<Button variant="ghost" on:click={() => copy(code)}>
