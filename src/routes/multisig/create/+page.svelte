@@ -22,12 +22,14 @@
 	let upgradeDelay: number = 86400000;
 	$: disabledText =
 		(!owners && 'No owners set') ||
-		(!required && 'No requirement set') ||
-		required > owners.length ||
-		required < 1 ||
-		validOwners.some((valid) => !valid) ||
-		owners.some((owner) => !isAddress(owner)) ||
-		owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0; // contains duplicates
+		((!required || required < 1) && 'No requirement set') ||
+		(required > owners.length && 'Not enough owners set') ||
+		(validOwners.some((valid) => !valid) && 'Invalid owners') ||
+		(owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0 &&
+			'Duplicate owners') ||
+		(upgradeDelay > 31_536_000_000 && 'Upgrade delay too long') ||
+		(executionDelay > 2_592_000_000 && 'Execution delay too long');
+
 	$: disabled = !!disabledText;
 
 	$: defaultOwners = owners;
@@ -108,7 +110,12 @@ export function constructor(_: StaticArray<u8>): void {
 			<Input type="number" id="executionDelay" bind:value={executionDelay} />
 			<span class="text-xs">{dayjs(Date.now() + Number(executionDelay)).fromNow(true)}</span>
 		</div>
-		<Button on:click={deploy} {disabled}>Deploy</Button>
+
+		<div class="flex flex-col">
+			<Button on:click={deploy} {disabled}>Deploy</Button>
+			<span class="text-xs">{disabledText}</span>
+		</div>
+
 		<Button variant="ghost" on:click={() => copy(code)}>
 			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
