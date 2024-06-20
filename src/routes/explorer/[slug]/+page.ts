@@ -23,6 +23,7 @@ type AddressInfo = {
 	isMultisig: boolean;
 	balance: bigint;
 	erc20Balances: bigint[];
+	tooBig?: boolean;
 };
 
 const client = get(clientStore);
@@ -31,7 +32,13 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	const address = params.slug;
 
 	const notFoundError = error(404, 'Address not found');
+
+	let tooBig = false;
 	const keys = await getDatastore(address).catch((err) => {
+		if (err.message === 'Response is too big') {
+			tooBig = true;
+			return [];
+		}
 		console.error(err);
 		throw notFoundError;
 	});
@@ -55,6 +62,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 			keys.some((k) => k === key)
 		),
 		balance: await fetchMasBalance(address),
-		erc20Balances
+		erc20Balances,
+		tooBig
 	};
 }

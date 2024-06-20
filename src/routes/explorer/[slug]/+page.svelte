@@ -30,9 +30,11 @@
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
+	import { getBigDatastore } from '$lib/services/datastore.js';
 
 	export let data;
-	const { keys, address, isVerified, isToken, isMultisig, balance, erc20Balances } = data;
+	// prettier-ignore
+	const { keys: k, address, isVerified, isToken, isMultisig, balance, erc20Balances, tooBig } = data;
 
 	// TODO: highlight keys that contain the `connectedAddress`
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
@@ -41,11 +43,19 @@
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
 	let showPersistentMap = false;
+	let keys = k;
 	let filter = '';
 	$: filteredEntries = filter ? keys.filter((key) => key.includes(filter)) : keys;
 	$: displayedEntries = showPersistentMap
 		? filteredEntries
 		: filteredEntries.filter((key) => !isPMEntry(key));
+
+	$: {
+		if (tooBig) {
+			if (!filter.length) keys = [];
+			else getBigDatastore(address, filter).then((res) => (keys = res));
+		}
+	}
 
 	let values: Uint8Array[] = [];
 	$: values = Array(displayedEntries.length).fill(null);
@@ -116,6 +126,11 @@
 			<Input type="text" id="filter" placeholder="Filter by key" bind:value={filter} />
 		</div>
 	</div>
+
+	{#if tooBig}
+		<div class="text-center text-sm">Too many keys to display. Please specify a prefix</div>
+	{/if}
+
 	<Table.Root>
 		<Table.Header>
 			<Table.Row>
