@@ -135,6 +135,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{properties.name} ({properties.symbol})</title>
+</svelte:head>
+
 <div class="flex flex-col gap-4">
 	<h1 class="text-4xl">{properties.name} ({properties.symbol})</h1>
 	<div class="flex">
