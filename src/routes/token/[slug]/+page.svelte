@@ -49,7 +49,7 @@
 	);
 	$: fullyParsedBalance = Number(parsedBalance.toSignificant(properties.decimals));
 
-	let transferReceiver: string;
+	let transferReceiver: string = '';
 	let transferAmount: number;
 	let valid = false;
 	$: disabledTransfer =

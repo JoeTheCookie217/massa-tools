@@ -5,7 +5,7 @@
 	export let recipient: string;
 	export let valid: boolean;
 
-	$: valid = isAddress(recipient);
+	$: valid = isAddress(recipient || '');
 </script>
 
 <div class="flex items-center gap-2">
