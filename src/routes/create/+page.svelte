@@ -66,7 +66,7 @@ export function constructor(_: StaticArray<u8>): void {
 </script>
 
 <svelte:head>
-	<title>Create Token</title>
+	<title>Create Token - Massa Tools</title>
 	<!-- {@html `<style>${modeCurrent ? stylesDark : stylesLight}</style>`} -->
 	{@html styles}
 </svelte:head>

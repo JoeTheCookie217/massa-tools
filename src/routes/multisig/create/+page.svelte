@@ -76,7 +76,7 @@ export function constructor(_: StaticArray<u8>): void {
 </script>
 
 <svelte:head>
-	<title>Create Multisig</title>
+	<title>Create Multisig - Massa Tools</title>
 	{@html styles}
 </svelte:head>
 

@@ -136,7 +136,7 @@
 </script>
 
 <svelte:head>
-	<title>{properties.name} ({properties.symbol})</title>
+	<title>{properties.name} ({properties.symbol}) - Massa Tools</title>
 </svelte:head>
 
 <div class="flex flex-col gap-4">
