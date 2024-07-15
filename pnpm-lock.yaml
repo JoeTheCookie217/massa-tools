@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@dusalabs/sdk':
-    specifier: ^0.6.1
-    version: 0.6.1
+    specifier: ^0.6.2
+    version: 0.6.2
   '@fontsource-variable/space-grotesk':
     specifier: ^5.0.18
     version: 5.0.18
@@ -129,12 +129,12 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.19
 
-  /@dusalabs/sdk@0.6.1:
-    resolution: {integrity: sha512-OHvK6MEyb0M8Z3zV1UKRMFlL35Xro9Dp4FU5Wi0HZ++JszoFdgrf4UQCECuVlgdTFRIBDnepW0OUQGhhHqomhg==}
+  /@dusalabs/sdk@0.6.2:
+    resolution: {integrity: sha512-Lm+8QBk944OI5iTZUeBvuT4khICIjudBmiAj6z1Y2f7E9z/M5ZYeokG3Qq5LynEJGnxT3CTxvWA75DPZNb1ZAA==}
     engines: {node: '>=10'}
     dependencies:
       '@massalabs/massa-web3': 4.0.3
-      '@massalabs/web3-utils': 1.4.9
+      '@massalabs/web3-utils': 1.4.11
       big.js: 6.2.1
       decimal.js-light: 2.5.1
       tiny-invariant: 1.3.1
