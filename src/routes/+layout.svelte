@@ -4,6 +4,7 @@
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
 	import ConnectModal from '$lib/components/connect-modal.svelte';
 	import LightSwitch from '$lib/components/light-switch/light-switch.svelte';
+	import { ExternalLink } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { inject } from '@vercel/analytics';
@@ -16,7 +17,7 @@
 	import SearchBar from '$lib/components/search-bar.svelte';
 	import { onMount } from 'svelte';
 	import clientStore from '$lib/store/client';
-	import { CHAIN_NAME } from '$lib/utils/config';
+	import { CHAIN_NAME, OTHER_CHAIN_DOMAIN, OTHER_CHAIN_NAME } from '$lib/utils/config';
 	inject({ mode: dev ? 'development' : 'production' });
 	!dev && injectSpeedInsights();
 
@@ -86,7 +87,7 @@
 		<slot />
 	</section>
 
-	<footer class="text-center p-2">
+	<footer class="flex flex-col items-center text-center p-2">
 		<p class="text-sm">
 			<a
 				class="hover:underline"
@@ -96,15 +97,24 @@
 				Made with ❤️ by JoeTheCookie217</a
 			>
 		</p>
-		<div class="text-xs text-green-200">
-			{#if currentBlock}
+		<div class="flex gap-1 text-xs text-green-200">
+			<div>
 				<span>
 					{CHAIN_NAME}
 				</span>
-				<span>
-					{currentBlock}
-				</span>
-			{/if}
+				{#if currentBlock}
+					<span>
+						{currentBlock}
+					</span>
+				{/if}
+			</div>
+			<span> - </span>
+			<div>
+				<a class="flex hover:underline" href={OTHER_CHAIN_DOMAIN} target="_blank" rel="noreferrer">
+					<span>{OTHER_CHAIN_NAME} version</span>
+					<ExternalLink class="h-4 w-4" />
+				</a>
+			</div>
 		</div>
 	</footer>
 </main>

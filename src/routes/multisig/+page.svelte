@@ -8,6 +8,7 @@
 		removeRecentAddress,
 		type Address
 	} from '$lib/utils/localStorage';
+	import { printAddress } from '$lib/utils/methods';
 
 	let address: string;
 	let history = getRecentAddresses();
@@ -54,7 +55,7 @@
 						</span>
 					{/if}
 
-					<a href="/multisig/{historyItem.address}">{historyItem.address}</a>
+					<a href="/multisig/{historyItem.address}">{printAddress(historyItem.address)}</a>
 					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
 				</div>
 			{/each}

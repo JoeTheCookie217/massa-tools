@@ -1,4 +1,12 @@
-import { ChainId, WMAS as _WMAS, USDC as _USDC, DAI as _DAI, WETH as _WETH } from '@dusalabs/sdk';
+import {
+	ChainId,
+	WMAS as _WMAS,
+	USDC as _USDC,
+	USDT as _USDT,
+	DAI as _DAI,
+	WETH as _WETH,
+	WETH_B as _WETH_B
+} from '@dusalabs/sdk';
 import { CHAIN_ID as MassaChainId } from '@massalabs/massa-web3';
 
 const _MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
@@ -15,6 +23,13 @@ if (!import.meta.env.VITE_CHAIN_ID || !import.meta.env.VITE_CHAIN_URL)
 export const CHAIN_ID = import.meta.env.VITE_CHAIN_ID as any as ChainId;
 export const CHAIN_URL = import.meta.env.VITE_CHAIN_URL as string;
 export const CHAIN_NAME = Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? 'buildnet' : 'mainnet';
+export const OTHER_CHAIN_NAME =
+	Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? 'mainnet' : 'buildnet';
+export const OTHER_CHAIN_DOMAIN =
+	'https://' +
+	(Number(CHAIN_ID) === Number(ChainId.BUILDNET)
+		? 'massa-tools.netlify.app'
+		: 'massa-tools-buildnet.netlify.app');
 export const MASSA_CHAIN_ID =
 	Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? MassaChainId.BuildNet : MassaChainId.MainNet;
 
@@ -30,5 +45,7 @@ export const WMAS = _WMAS[CHAIN_ID];
 export const USDC = _USDC[CHAIN_ID];
 export const DAI = _DAI[CHAIN_ID];
 export const WETH = _WETH[CHAIN_ID];
+export const WETH_B = _WETH_B[CHAIN_ID];
+export const USDT = _USDT[CHAIN_ID];
 export const MULTISIG_DEPLOYER = _MULTISIG_DEPLOYER[CHAIN_ID];
 export const ERC20_DEPLOYER = _ERC20_DEPLOYER[CHAIN_ID];

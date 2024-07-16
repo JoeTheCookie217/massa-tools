@@ -40,14 +40,19 @@ export * from '${importPath}/token-burn';`
 			: ''
 	}
 
+import * as FT from '${importPath}';
 import { Args } from '@massalabs/as-types';
-import { constructor as _constructor } from '${importPath}/token';
+import { u256 } from 'as-bignum/assembly/integer/u256';
 
 export function constructor(_: StaticArray<u8>): void {
-	const args = new Args().add('${name || defaultName}').add('${symbol || defaultSymbol}').add(${
+	const args = new Args()
+		.add('${name || defaultName}')
+		.add('${symbol || defaultSymbol}')
+		.add(${decimals || defaultDecimals})
+		.add(u256.mul(u256.from(${supply || defaultSupply}), u256.from(10 ** ${
 		decimals || defaultDecimals
-	}).add(${supply || defaultSupply} * 10 ** ${decimals || defaultDecimals});
-	_constructor(args.serialize());
+	})));
+	FT.constructor(args.serialize());
 }
 	`;
 
