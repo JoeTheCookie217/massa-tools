@@ -15,7 +15,7 @@ const _MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
 };
 const _ERC20_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
-	[ChainId.BUILDNET]: ''
+	[ChainId.BUILDNET]: 'AS1guX4XxHYaSWgykPYA7hB6CTYhXc4EfhE51ooXojF5UUnzjN6H'
 };
 
 if (!import.meta.env.VITE_CHAIN_ID || !import.meta.env.VITE_CHAIN_URL)

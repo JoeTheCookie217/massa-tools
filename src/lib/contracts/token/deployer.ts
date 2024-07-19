@@ -21,7 +21,7 @@ export function deploy(bs: StaticArray<u8>): StaticArray<u8> {
 	const name = args.nextString().unwrap();
 	const symbol = args.nextString().unwrap();
 	const decimals = args.nextU8().unwrap();
-	const totalSupply = args.nextU64().unwrap();
+	const totalSupply = args.nextU256().unwrap();
 	const mintable = args.nextBool().unwrap();
 	const burnable = args.nextBool().unwrap();
 

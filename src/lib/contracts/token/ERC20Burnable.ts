@@ -1,3 +1,2 @@
 export * from './ERC20';
-export * from './ERC20Mintable';
-export * from './ERC20Burnable';
+export * from '@massalabs/sc-standards/assembly/contracts/FT/burnable';
