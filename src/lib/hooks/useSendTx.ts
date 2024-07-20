@@ -47,8 +47,11 @@ const useSendTx = () => {
 			const { isError, events } = await fetchEvents(txId);
 
 			const eventsMsg = events.map((event) => event.data);
+			const errorMsg = isError ? EventDecoder.decodeError(eventsMsg[eventsMsg.length - 1]) : null;
+			update((state) => ({ ...state, pending: false, events, error: errorMsg }));
 			console.log(isError, eventsMsg);
-			if (isError) throw new Error(eventsMsg[eventsMsg.length - 1]);
+			if (errorMsg) throw new Error(errorMsg);
+
 			toast.pop(submitToast);
 			toast.push('Tx confirmed!', {
 				theme: {
@@ -59,7 +62,7 @@ const useSendTx = () => {
 			});
 		} catch (error: any) {
 			const errorMsg = EventDecoder.decodeError(error.message).split('"')[0];
-			update((state) => ({ ...state, error: errorMsg }));
+			update((state) => ({ ...state, pending: false, error: errorMsg }));
 
 			toast.pop();
 			toast.push(errorMsg, {
