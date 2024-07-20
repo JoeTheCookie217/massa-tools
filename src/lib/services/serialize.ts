@@ -1,4 +1,4 @@
-import { CHAIN_ID, ERC20_DEPLOYER, MULTISIG_DEPLOYER } from '$lib/utils/config';
+import { ERC20_DEPLOYER, MULTISIG_DEPLOYER } from '$lib/utils/config';
 import { Token, parseUnits } from '@dusalabs/sdk';
 import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
 
@@ -132,9 +132,10 @@ export const buildDeployToken = (
 	mintable: boolean,
 	burnable: boolean
 ): ICallData => {
+	console.log(ERC20_DEPLOYER);
 	return {
 		...baseCallData,
-		targetAddress: ERC20_DEPLOYER[CHAIN_ID],
+		targetAddress: ERC20_DEPLOYER,
 		targetFunction: 'deploy',
 		parameter: new Args()
 			.addString(name)
@@ -156,7 +157,7 @@ export const buildDeployMultisig = (
 ): ICallData => {
 	return {
 		...baseCallData,
-		targetAddress: MULTISIG_DEPLOYER[CHAIN_ID],
+		targetAddress: MULTISIG_DEPLOYER,
 		targetFunction: 'deploy',
 		parameter: new Args()
 			.addArray(owners, ArrayTypes.STRING)

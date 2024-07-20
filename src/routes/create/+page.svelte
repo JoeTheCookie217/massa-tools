@@ -12,6 +12,9 @@
 	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
 	import { modeCurrent } from '$lib/components/light-switch/light-switch';
+	import RedirectModal from './redirect-modal.svelte';
+
+	let tokenAddress: string;
 
 	let name: string;
 	let symbol: string;
@@ -60,7 +63,8 @@ export function constructor(_: StaticArray<u8>): void {
 
 	const { send, subscribe } = useSendTx();
 	subscribe((tx) => {
-		console.log('tx', tx);
+		console.log(tx.events.length);
+		if (tx.events.length) tokenAddress = tx.events.at(-1)!.data;
 	});
 
 	async function deploy() {
@@ -77,6 +81,9 @@ export function constructor(_: StaticArray<u8>): void {
 </svelte:head>
 
 <div class="flex gap-10">
+	{#if tokenAddress}
+		<RedirectModal {tokenAddress} />
+	{/if}
 	<div class="grid grid-cols-2">
 		<div>
 			<Label for="name">Name</Label>
