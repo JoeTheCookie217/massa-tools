@@ -43,19 +43,15 @@
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
 	const separator = '::';
-	let prefixes = entries
-		.map(({ key }) => (key.includes(separator) ? key.split(separator)[0] : ''))
+	let prefixes = k
+		.map((key) => (key.includes(separator) ? key.split(separator)[0] : ''))
 		.filter((v, i, a) => v && a.indexOf(v) === i);
 	let prefixFilters = prefixes.map((p) => false);
-	$: displayedEntries = entries.filter(({ key }) =>
-		key.includes(separator) ? prefixFilters[prefixes.indexOf(key.split(separator)[0])] : true
-	);
 
 	// : entries.filter(
 	// 		({ key }) => !(key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE'))
 	//   );
 
-	onMount(() => {
 	let showPersistentMap = false;
 	let keys = k;
 	let filter = '';
@@ -63,6 +59,10 @@
 	$: displayedEntries = showPersistentMap
 		? filteredEntries
 		: filteredEntries.filter((key) => !isPMEntry(key));
+
+	// $: displayedEntries = k.filter((key ) =>
+	// 	key.includes(separator) ? prefixFilters[prefixes.indexOf(key.split(separator)[0])] : true
+	// );
 
 	$: {
 		if (tooBig) {
