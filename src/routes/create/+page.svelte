@@ -52,9 +52,9 @@ export function constructor(_: StaticArray<u8>): void {
 		.add('${name || defaultName}')
 		.add('${symbol || defaultSymbol}')
 		.add(${decimals || defaultDecimals})
-		.add(u256.mul(u256.from(${supply || defaultSupply}), u256.from(10 ** ${
+		.add(u256.mul(u256.from(${supply || defaultSupply}), u256.from(u64(10 ** ${
 		decimals || defaultDecimals
-	})));
+	}))));
 	FT.constructor(args.serialize());
 }
 	`;

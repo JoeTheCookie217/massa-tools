@@ -28,8 +28,8 @@ export const OTHER_CHAIN_NAME =
 export const OTHER_CHAIN_DOMAIN =
 	'https://' +
 	(Number(CHAIN_ID) === Number(ChainId.BUILDNET)
-		? 'massa-tools.netlify.app'
-		: 'massa-tools-buildnet.netlify.app');
+		? 'massa-tools.vercel.app'
+		: 'massa-tools-buildnet.vercel.app');
 export const MASSA_CHAIN_ID =
 	Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? MassaChainId.BuildNet : MassaChainId.MainNet;
 
