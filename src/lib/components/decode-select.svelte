@@ -22,6 +22,7 @@
 	const bytesToU256Array = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.U256);
 
 	const methods: Function[] = [
+		() => '',
 		bytesToStr,
 		byteToBool,
 		byteToU8,
@@ -58,7 +59,7 @@
 	}
 </script>
 
-<div class="flex items-center gap-2">
+<div class="flex flex-col items-center gap-2">
 	<Select.Root bind:selected>
 		<Select.Trigger class="w-[180px]">
 			<Select.Value />

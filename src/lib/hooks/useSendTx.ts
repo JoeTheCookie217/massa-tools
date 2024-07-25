@@ -1,9 +1,10 @@
-import { type ICallData, type IEvent, withTimeoutRejection } from '@massalabs/massa-web3';
+import type { ICallData, IEvent } from '@massalabs/massa-web3';
 import { get, writable } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { toast } from '@zerodevx/svelte-toast';
-import { pollAsyncEvents } from '$lib/services/events';
 import { EventDecoder } from '@dusalabs/sdk';
+import { fetchEvents } from '$lib/services/datastore';
+import { MASSA_CHAIN_ID } from '$lib/utils/config';
 
 type TState = {
 	txId: string | null;
@@ -33,6 +34,9 @@ const useSendTx = () => {
 			if (!massaClient || !massaClient.wallet().getBaseAccount())
 				throw new Error('Massa client is not initialized');
 
+			const walletChainId = (await massaClient.publicApi().getNodeStatus()).chain_id;
+			if (walletChainId !== MASSA_CHAIN_ID) throw new Error('Invalid network');
+
 			const txId = await massaClient.smartContracts().callSmartContract(data);
 			update((state) => ({ ...state, txId }));
 
@@ -40,15 +44,14 @@ const useSendTx = () => {
 				initial: 0
 			});
 
-			const { isError, eventPoller, events } = await withTimeoutRejection(
-				pollAsyncEvents(massaClient, txId),
-				45_000
-			);
-			eventPoller.stopPolling();
+			const { isError, events } = await fetchEvents(txId);
 
 			const eventsMsg = events.map((event) => event.data);
+			const errorMsg = isError ? EventDecoder.decodeError(eventsMsg[eventsMsg.length - 1]) : null;
+			update((state) => ({ ...state, pending: false, events, error: errorMsg }));
 			console.log(isError, eventsMsg);
-			if (isError) throw new Error(eventsMsg[eventsMsg.length - 1]);
+			if (errorMsg) throw new Error(errorMsg);
+
 			toast.pop(submitToast);
 			toast.push('Tx confirmed!', {
 				theme: {
@@ -59,7 +62,7 @@ const useSendTx = () => {
 			});
 		} catch (error: any) {
 			const errorMsg = EventDecoder.decodeError(error.message).split('"')[0];
-			update((state) => ({ ...state, error: errorMsg }));
+			update((state) => ({ ...state, pending: false, error: errorMsg }));
 
 			toast.pop();
 			toast.push(errorMsg, {
@@ -74,7 +77,7 @@ const useSendTx = () => {
 	};
 
 	subscribe((state) => {
-		console.log(state);
+		if (state.txId) console.log(state);
 	});
 
 	return {

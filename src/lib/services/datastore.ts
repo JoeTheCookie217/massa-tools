@@ -1,9 +1,10 @@
-import { Args, bytesToU256, strToBytes } from '@massalabs/massa-web3';
+import { EventPoller, bytesToU256 } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
 import { IERC20, parseUnits } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
+import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -31,6 +32,11 @@ export const getDatastore = (address: string) =>
 				.sort((a, b) => a.localeCompare(b))
 		);
 
+export const getBigDatastore = (address: string, prefix: string) =>
+	fetch(
+		`https://indexer-mainnet-dusa.up.railway.app/datastore-keys?address=${address}&prefix=${prefix}`
+	).then((res) => res.json());
+
 export const fetchTokenAllowances = async (
 	address: string,
 	owner: string
@@ -48,7 +54,7 @@ export const fetchTokenAllowances = async (
 		.getDatastoreEntries(toDatastoreInput(address, keys))
 		.then((res) => {
 			return res.map((r, i) => {
-				const amount = r.final_value ? bytesToU256(r.final_value) : 0n;
+				const amount = r.candidate_value ? bytesToU256(r.candidate_value) : 0n;
 				const spender = keys[i].slice(owner.length);
 				return {
 					owner,
@@ -57,4 +63,20 @@ export const fetchTokenAllowances = async (
 				};
 			});
 		});
+};
+
+export const fetchEvents = async (txId: string) => {
+	const eventPoller = EventPoller.startEventsPolling(
+		{ ...eventsFilter, original_operation_id: txId },
+		1000,
+		baseClient
+	);
+	return pollAsyncEvents(eventPoller)
+		.catch(
+			(): IEventPollerResult => ({
+				isError: true,
+				events: []
+			})
+		)
+		.finally(() => eventPoller.stopPolling());
 };

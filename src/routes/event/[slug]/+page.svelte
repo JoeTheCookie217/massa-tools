@@ -8,8 +8,7 @@
 	import type { IEvent } from '@massalabs/massa-web3';
 
 	$: url = $page.url.pathname;
-	$: console.log($page.url.searchParams);
-	let txHash = '';
+	let txHash = url?.split('/').pop();
 	let events: IEvent[] = [];
 	let showDetails = false;
 	let decodeSmart = false;

@@ -7,8 +7,14 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import Highlight from 'svelte-highlight';
 	import { typescript } from 'svelte-highlight/languages';
-	import styles from 'svelte-highlight/styles/dracula';
+	// import stylesDark from 'svelte-highlight/styles/tokyo-night-dark';
+	// import stylesLight from 'svelte-highlight/styles/tokyo-night-light';
+	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
+	import { modeCurrent } from '$lib/components/light-switch/light-switch';
+	import RedirectModal from './redirect-modal.svelte';
+
+	let tokenAddress: string;
 
 	let name: string;
 	let symbol: string;
@@ -37,14 +43,19 @@ export * from '${importPath}/token-burn';`
 			: ''
 	}
 
+import * as FT from '${importPath}';
 import { Args } from '@massalabs/as-types';
-import { constructor as _constructor } from '${importPath}/token';
+import { u256 } from 'as-bignum/assembly/integer/u256';
 
 export function constructor(_: StaticArray<u8>): void {
-	const args = new Args().add('${name || defaultName}').add('${symbol || defaultSymbol}').add(${
+	const args = new Args()
+		.add('${name || defaultName}')
+		.add('${symbol || defaultSymbol}')
+		.add(${decimals || defaultDecimals})
+		.add(u256.mul(u256.from(${supply || defaultSupply}), u256.from(10 ** ${
 		decimals || defaultDecimals
-	}).add(${supply || defaultSupply} * 10 ** ${decimals || defaultDecimals});
-	_constructor(args.serialize());
+	})));
+	FT.constructor(args.serialize());
 }
 	`;
 
@@ -52,7 +63,8 @@ export function constructor(_: StaticArray<u8>): void {
 
 	const { send, subscribe } = useSendTx();
 	subscribe((tx) => {
-		console.log('tx', tx);
+		console.log(tx.events.length);
+		if (tx.events.length) tokenAddress = tx.events.at(-1)!.data;
 	});
 
 	async function deploy() {
@@ -63,11 +75,15 @@ export function constructor(_: StaticArray<u8>): void {
 </script>
 
 <svelte:head>
-	<title>Create Token</title>
+	<title>Create Token - Massa Tools</title>
+	<!-- {@html `<style>${modeCurrent ? stylesDark : stylesLight}</style>`} -->
 	{@html styles}
 </svelte:head>
 
-<div class="flex gap-4">
+<div class="flex gap-10">
+	{#if tokenAddress}
+		<RedirectModal {tokenAddress} />
+	{/if}
 	<div class="grid grid-cols-2">
 		<div>
 			<Label for="name">Name</Label>
@@ -109,11 +125,11 @@ export function constructor(_: StaticArray<u8>): void {
 			</Label>
 		</div>
 		<Button on:click={deploy} {disabled}>Deploy</Button>
-	</div>
-	<div>
-		<Button on:click={() => copy(code)}>
+		<Button variant="ghost" on:click={() => copy(code)}>
 			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
+	</div>
+	<div>
 		<Highlight language={typescript} {code} />
 	</div>
 </div>

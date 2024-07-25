@@ -1,34 +1,32 @@
 import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
-import { Transaction } from '$lib/services/serialize';
+import { Transaction } from '@dusalabs/sdk';
 import clientStore from '$lib/store/client';
-import { strToBytes, bytesToI32, byteToBool, boolToByte } from '@massalabs/massa-web3';
+import { strToBytes, bytesToI32, byteToBool, bytesToU64 } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
-import {
-	parseBalance,
-	providerToChainId,
-	toDatastoreInput,
-	tokenAddresses
-} from '$lib/utils/methods';
+import { parseBalance, toDatastoreInput, tokenAddresses } from '$lib/utils/methods';
+import { CHAIN_ID } from '$lib/utils/config';
 
 const client = get(clientStore);
-const selectedNetwork = providerToChainId(client.getPublicProviders()[0]);
 
 type Approval = {
 	address: string;
 	support: boolean;
 };
 
-type FullTransaction = { tx: Transaction; approvals: Approval[] };
+export type FullTransaction = { tx: Transaction; approvals: Approval[] };
 
 type MultisigInfo = {
 	address: string;
 	balance: bigint;
 	required: number;
+	upgradeDelay: number;
+	executionDelay: number;
 	owners: string[];
 	transactions: FullTransaction[];
 	erc20Balances: bigint[];
+	usdBalance: number;
 };
 
 export async function load({ params }: { params: RouteParams }): Promise<MultisigInfo> {
@@ -38,36 +36,41 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const datastore = await getDatastore(address);
 	const OWNER_PREFIX = 'is_owner::';
 	const TX_PREFIX = 'transactions::';
+	const APPROVAL_PREFIX = 'approved::';
 	const ownerKeys = datastore.filter((entry) => entry.startsWith(OWNER_PREFIX));
 	const txKeys = datastore.filter((entry) => entry.startsWith(TX_PREFIX));
-	const approvalsKeys = datastore.filter((entry) => entry.startsWith('approved::'));
-	const erc20BalancesKeys = tokenAddresses.map((token) => ({
-		address: token[selectedNetwork].address,
+	const approvalsKeys = datastore.filter((entry) => entry.startsWith(APPROVAL_PREFIX));
+	const erc20BalancesInput = tokenAddresses.map((token) => ({
+		address: token.address,
 		key: strToBytes(`BALANCE${address}`)
 	}));
+	const multisigKeys = ['required', 'delay', 'upgradeable_period'];
 
 	const r = await client
 		.publicApi()
 		.getDatastoreEntries([
-			{
-				address,
-				key: strToBytes('required')
-			},
+			...toDatastoreInput(address, multisigKeys),
 			...toDatastoreInput(address, ownerKeys),
 			...toDatastoreInput(address, txKeys),
 			...toDatastoreInput(address, approvalsKeys),
-			...erc20BalancesKeys
+			...erc20BalancesInput
 		])
-		.then((result) => {
-			const requiredRes = result[0].final_value;
+		.then(async (result) => {
+			const requiredRes = result[0].candidate_value;
 			if (!requiredRes) throw error(404, 'Multisig invalid');
 			const required = bytesToI32(requiredRes);
+			const executionDelayRes = result[1].candidate_value;
+			if (!executionDelayRes) throw error(404, 'Multisig invalid');
+			const executionDelay = Number(bytesToU64(executionDelayRes));
+			const upgradeDelayRes = result[2].candidate_value;
+			if (!upgradeDelayRes) throw error(404, 'Multisig invalid');
+			const upgradeDelay = Number(bytesToU64(upgradeDelayRes));
 
-			let len = ownerKeys.length + 1;
-			const ownersRes = result.slice(1, len);
+			let len = ownerKeys.length + multisigKeys.length;
+			const ownersRes = result.slice(multisigKeys.length, len);
 			const owners = [];
 			for (let i = 0; i < ownersRes.length; i++) {
-				const res = ownersRes[i].final_value;
+				const res = ownersRes[i].candidate_value;
 				if (res) {
 					if (byteToBool(res)) {
 						const caller = ownerKeys[i].slice(OWNER_PREFIX.length);
@@ -79,7 +82,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const txRes = result.slice(len, len + txKeys.length);
 			const transactions: FullTransaction[] = [];
 			for (let i = 0; i < txRes.length; i++) {
-				const res = txRes[i].final_value;
+				const res = txRes[i].candidate_value;
 				if (res) {
 					const tx = new Transaction().deserialize(res, 0);
 					transactions.push({ tx: tx.instance, approvals: [] });
@@ -89,8 +92,9 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 
 			const approvalsRes = result.slice(len, len + approvalsKeys.length);
 			for (let i = 0; i < approvalsRes.length; i++) {
-				const res = approvalsRes[i].final_value;
-				const regexPattern = /approved::(\d+)(AS1|AU1)(.*)/;
+				const res = approvalsRes[i].candidate_value;
+				// const regexPattern = /${APPROVAL_PREFIX}(\d+)(AS1|AU1)(.*)/;
+				const regexPattern = new RegExp(`${APPROVAL_PREFIX}(\\d+)(AS1|AU1)(.*)`);
 				const match = approvalsKeys[i].match(regexPattern);
 
 				if (res && match) {
@@ -100,28 +104,25 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			}
 			len += approvalsKeys.length;
 
-			const resBalances = result.slice(-erc20BalancesKeys.length);
+			const resBalances = result.slice(-erc20BalancesInput.length);
 			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
 
-			return { required, owners, transactions, erc20Balances };
+			const usdBalance = await Promise.resolve(234567);
+
+			return {
+				required,
+				owners,
+				transactions,
+				erc20Balances,
+				upgradeDelay,
+				executionDelay,
+				usdBalance
+			};
 		})
 		.catch((err) => {
 			console.log(err);
 			throw error(404, 'Multisig not found');
 		});
-
-	// const transactions = await client
-	// 	.smartContracts()
-	// 	.readSmartContract({
-	// 		targetAddress: address,
-	// 		targetFunction: 'getTransactions',
-	// 		parameter: [],
-	// 		maxGas: 100_000_000n
-	// 	})
-	// 	.then((res) => {
-	// 		console.log(res);
-	// 		return bytesToSerializableObjectArray(res.returnValue, Transaction);
-	// 	});
 
 	return { ...r, address, balance };
 }

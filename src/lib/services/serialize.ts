@@ -1,18 +1,11 @@
-import { erc20Deployer, multisigDeployer } from '$lib/utils/config';
+import { ERC20_DEPLOYER, MULTISIG_DEPLOYER } from '$lib/utils/config';
 import { Token, parseUnits } from '@dusalabs/sdk';
-import {
-	Args,
-	MassaUnits,
-	type ICallData,
-	ArrayTypes,
-	type ISerializable,
-	type IDeserializedResult
-} from '@massalabs/massa-web3';
+import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
 
 export const baseCallData: Pick<ICallData, 'fee' | 'coins' | 'maxGas'> = {
 	coins: 0n,
 	maxGas: 100_000_000n,
-	fee: 0n
+	fee: MassaUnits.oneMassa / 100n // 0.01 MAS
 };
 
 // TOKEN
@@ -74,6 +67,27 @@ export const buildDecreaseAllowance = (
 	};
 };
 
+// WMAS
+
+export const buildWrap = (amount: bigint, wmasAddress: string): ICallData => {
+	return {
+		...baseCallData,
+		targetAddress: wmasAddress,
+		targetFunction: 'deposit',
+		parameter: new Args(),
+		coins: amount
+	};
+};
+
+export const buildUnwrap = (amount: bigint, to: string, wmasAddress: string): ICallData => {
+	return {
+		...baseCallData,
+		targetAddress: wmasAddress,
+		targetFunction: 'withdraw',
+		parameter: new Args().addU64(amount).addString(to)
+	};
+};
+
 // STAKING
 
 export const buildDeposit = (depositAmount: bigint, stakingAddress: string): ICallData => {
@@ -118,9 +132,10 @@ export const buildDeployToken = (
 	mintable: boolean,
 	burnable: boolean
 ): ICallData => {
+	console.log(ERC20_DEPLOYER);
 	return {
 		...baseCallData,
-		targetAddress: erc20Deployer,
+		targetAddress: ERC20_DEPLOYER,
 		targetFunction: 'deploy',
 		parameter: new Args()
 			.addString(name)
@@ -134,48 +149,22 @@ export const buildDeployToken = (
 	};
 };
 
-export const buildDeployMultisig = (owners: string[], required: number): ICallData => {
+export const buildDeployMultisig = (
+	owners: string[],
+	required: number,
+	upgradeDelay: number,
+	executionDelay: number
+): ICallData => {
 	return {
 		...baseCallData,
-		targetAddress: multisigDeployer,
+		targetAddress: MULTISIG_DEPLOYER,
 		targetFunction: 'deploy',
-		parameter: new Args().addArray(owners, ArrayTypes.STRING).addI32(required),
+		parameter: new Args()
+			.addArray(owners, ArrayTypes.STRING)
+			.addI32(required)
+			.addU64(BigInt(upgradeDelay))
+			.addU64(BigInt(executionDelay)),
 		maxGas: 1_000_000_000n,
 		coins: 35n * MassaUnits.oneMassa
 	};
 };
-
-// SERIALIZABLE
-
-export class Transaction implements ISerializable<Transaction> {
-	constructor(
-		public to: string = '',
-		public method: string = '',
-		public value: bigint = 0n,
-		public data: Uint8Array = new Uint8Array(0),
-		public executed: boolean = false
-	) {}
-
-	serialize(): Uint8Array {
-		const args = new Args()
-			.addString(this.to)
-			.addString(this.method)
-			.addU64(this.value)
-			.addUint8Array(this.data)
-			.addBool(this.executed);
-		return Uint8Array.from(args.serialize());
-	}
-
-	deserialize(data: Uint8Array, offset: number): IDeserializedResult<Transaction> {
-		const args = new Args(data, offset);
-		this.to = args.nextString();
-		this.method = args.nextString();
-		this.value = args.nextU64();
-		this.data = args.nextUint8Array();
-		this.executed = args.nextBool();
-		return {
-			instance: this,
-			offset: args.getOffset()
-		};
-	}
-}

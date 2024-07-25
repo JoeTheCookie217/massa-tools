@@ -1,17 +1,23 @@
 <script lang="ts">
-	import { ChainId, Token, TokenAmount } from '@dusalabs/sdk';
+	import { Token, TokenAmount, WMAS as _WMAS } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
-	import { printAddress, printTokenAmount, providerToChainId } from '$lib/utils/methods';
+	import { printAddress, printTokenAmount } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
-	import { fetchTokenAllowances, fetchTokenBalance } from '$lib/services/datastore';
+	import {
+		fetchMasBalance,
+		fetchTokenAllowances,
+		fetchTokenBalance
+	} from '$lib/services/datastore';
 	import type { Allowance } from '$lib/utils/types';
 	import {
 		buildBurn,
 		buildDecreaseAllowance,
 		buildMint,
-		buildTransfer
+		buildTransfer,
+		buildUnwrap,
+		buildWrap
 	} from '$lib/services/serialize';
-	import useSendTx from '$lib/hooks/useSendTx.js';
+	import useSendTx from '$lib/hooks/useSendTx';
 	import { onMount } from 'svelte';
 	import { addRecentAddress } from '$lib/utils/localStorage';
 	// import Label from '$lib/components/ui/label/label.svelte';
@@ -21,6 +27,9 @@
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import AccountTypeCell from '$lib/components/account-type-cell.svelte';
 	import CopyButton from '$lib/components/copy-button.svelte';
+	import TokenAmountInput from '$lib/components/TokenAmountInput.svelte';
+	import AddressInput from '$lib/components/AddressInput.svelte';
+	import { CHAIN_ID, WMAS } from '$lib/utils/config';
 
 	export let data;
 	const { properties, balances } = data;
@@ -29,12 +38,26 @@
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
 
 	let allowances: Allowance[] = [];
-	let userBalance: bigint;
+	let masBalance: bigint;
+	$: parsedMasBalance = new TokenAmount(WMAS, masBalance ?? 0n);
+	$: fullyParsedMasBalance = Number(parsedMasBalance.toSignificant(6));
 
-	let transferReceiver: string;
+	let userBalance: bigint;
+	$: parsedBalance = new TokenAmount(
+		new Token(CHAIN_ID, tokenAddress, properties.decimals),
+		userBalance ?? 0n
+	);
+	$: fullyParsedBalance = Number(parsedBalance.toSignificant(properties.decimals));
+
+	let transferReceiver: string = '';
 	let transferAmount: number;
+	let valid = false;
 	$: disabledTransfer =
-		!connectedAddress || !transferReceiver || !transferAmount || transferAmount > userBalance;
+		!connectedAddress ||
+		!transferReceiver ||
+		!transferAmount ||
+		transferAmount > userBalance ||
+		!valid;
 
 	let burnAmount: number;
 	$: disabledBurn = !connectedAddress || !burnAmount || burnAmount > userBalance;
@@ -42,6 +65,12 @@
 	let mintReceiver: string;
 	let mintAmount: number;
 	$: disabledMint = !connectedAddress || !mintReceiver || !mintAmount;
+
+	let wrapAmount: number;
+	$: disabledWrap = !connectedAddress || !wrapAmount || wrapAmount > masBalance;
+
+	let unwrapAmount: number;
+	$: disabledUnwrap = !connectedAddress || !unwrapAmount || unwrapAmount > userBalance;
 
 	$: {
 		fetch(connectedAddress);
@@ -56,10 +85,12 @@
 		fetchTokenBalance(tokenAddress, address).then((balance) => {
 			userBalance = balance;
 		});
+		fetchMasBalance(address).then((balance) => {
+			masBalance = balance;
+		});
 	};
 
-	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
-	const token = new Token(selectedNetwork, tokenAddress, properties.decimals);
+	const token = new Token(CHAIN_ID, tokenAddress, properties.decimals);
 
 	const { send } = useSendTx();
 
@@ -82,16 +113,31 @@
 		const burnData = buildBurn(amount, tokenAddress);
 		send(burnData);
 	};
+	const unwrap = async () => {
+		const amount = BigInt(unwrapAmount * 10 ** properties.decimals);
+		if (!connectedAddress) return;
+		const unwrapData = buildUnwrap(amount, connectedAddress, tokenAddress);
+		send(unwrapData);
+	};
+	const wrap = async () => {
+		const amount = BigInt(wrapAmount * 10 ** properties.decimals);
+		if (!connectedAddress) return;
+		const wrapData = buildWrap(amount, tokenAddress);
+		send(wrapData);
+	};
 
 	onMount(() => {
 		addRecentAddress({
 			address: tokenAddress,
-			chainId: selectedNetwork,
-			name: properties.name,
-			symbol: properties.symbol
+			label: properties.name,
+			type: 'token'
 		});
 	});
 </script>
+
+<svelte:head>
+	<title>{properties.name} ({properties.symbol}) - Massa Tools</title>
+</svelte:head>
 
 <div class="flex flex-col gap-4">
 	<h1 class="text-4xl">{properties.name} ({properties.symbol})</h1>
@@ -110,13 +156,14 @@
 		</div>
 		<div>
 			<span>Owner:</span>
-			<a href={`${properties.owner}`}>
+			<a href={`/explorer/${properties.owner}`}>
 				{printAddress(properties.owner, 8)}
 			</a>
 		</div>
 		<div>Holders: {properties.holders}</div>
 		<div>Mintable: {properties.mintable}</div>
 		<div>Burnable: {properties.burnable}</div>
+		<div>Contract page: <a href={`/explorer/${properties.address}`} class="underline">View</a></div>
 	</div>
 	{#if balances.length > 0}
 		<h2 class="text-2xl">Balances</h2>
@@ -162,15 +209,8 @@
 				<div>
 					<h3 class="text-lg">Transfer</h3>
 					<div class="flex items-center gap-2">
-						<div>
-							<!-- <Label for="transferReceiver">Receiver address</Label> -->
-							<Input
-								type="text"
-								placeholder="Receiver address"
-								id="transferReceiver"
-								bind:value={transferReceiver}
-							/>
-						</div>
+						<AddressInput bind:recipient={transferReceiver} bind:valid />
+
 						<div>
 							<!-- <Label for="transferAmount">Amount</Label> -->
 							<Input
@@ -186,13 +226,14 @@
 				{#if properties.burnable}
 					<div>
 						<h3 class="text-lg">Burn</h3>
-						<div class="flex items-center gap-2">
-							<div>
-								<!-- <Label for="burnAmount">Amount</Label> -->
-								<Input type="number" placeholder="Amount" id="burnAmount" bind:value={burnAmount} />
-							</div>
-							<Button on:click={burn} disabled={disabledBurn}>Burn</Button>
-						</div>
+						<TokenAmountInput
+							bind:amount={burnAmount}
+							disabled={disabledBurn}
+							onClick={burn}
+							setMaxAmount={() => (burnAmount = fullyParsedBalance)}
+							text="Burn"
+							{parsedBalance}
+						/>
 					</div>
 				{/if}
 			{/if}
@@ -209,11 +250,40 @@
 								bind:value={mintReceiver}
 							/>
 						</div>
-						<div>
-							<!-- <Label for="mintAmount">Amount</Label> -->
-							<Input type="number" placeholder="Amount" id="mintAmount" bind:value={mintAmount} />
-						</div>
-						<Button on:click={mint} disabled={disabledMint}>Mint</Button>
+						<TokenAmountInput
+							bind:amount={mintAmount}
+							disabled={disabledMint}
+							onClick={mint}
+							setMaxAmount={() => (mintAmount = fullyParsedBalance)}
+							text="Mint"
+							{parsedBalance}
+						/>
+					</div>
+				</div>
+			{/if}
+			{#if properties.address === _WMAS[CHAIN_ID].address}
+				<div class="flex justify-between">
+					<div>
+						<h3 class="text-lg">Wrap</h3>
+						<TokenAmountInput
+							bind:amount={wrapAmount}
+							disabled={disabledWrap}
+							onClick={wrap}
+							setMaxAmount={() => (wrapAmount = fullyParsedMasBalance)}
+							text="Wrap"
+							parsedBalance={parsedMasBalance}
+						/>
+					</div>
+					<div>
+						<h3 class="text-lg">Unwrap</h3>
+						<TokenAmountInput
+							bind:amount={unwrapAmount}
+							disabled={disabledUnwrap}
+							onClick={unwrap}
+							setMaxAmount={() => (unwrapAmount = fullyParsedBalance)}
+							text="Unwrap"
+							{parsedBalance}
+						/>
 					</div>
 				</div>
 			{/if}

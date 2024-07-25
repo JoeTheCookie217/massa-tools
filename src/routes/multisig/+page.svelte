@@ -3,22 +3,24 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import {
-		clearRecentMultisigs,
-		getRecentMultisigs,
-		removeRecentMultisig
+		clearRecentAddresses,
+		getRecentAddresses,
+		removeRecentAddress,
+		type Address
 	} from '$lib/utils/localStorage';
+	import { printAddress } from '$lib/utils/methods';
 
 	let address: string;
-	let history = getRecentMultisigs();
+	let history = getRecentAddresses();
 
 	const handleClear = () => {
-		clearRecentMultisigs();
+		clearRecentAddresses();
 		history = [];
 	};
 
-	const handleRemove = (item: string) => {
-		removeRecentMultisig(item);
-		history = getRecentMultisigs();
+	const handleRemove = (item: Address) => {
+		removeRecentAddress(item);
+		history = getRecentAddresses();
 	};
 </script>
 
@@ -46,8 +48,14 @@
 				<Button variant="link" on:click={handleClear}>Clear</Button>
 			</div>
 			{#each history as historyItem}
-				<div>
-					<a href="/multisig/{historyItem}">{historyItem}</a>
+				<div class="">
+					{#if historyItem.label}
+						<span>
+							{historyItem.label}
+						</span>
+					{/if}
+
+					<a href="/multisig/{historyItem.address}">{printAddress(historyItem.address)}</a>
 					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
 				</div>
 			{/each}

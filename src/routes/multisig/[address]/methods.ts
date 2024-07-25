@@ -1,13 +1,12 @@
 import { baseCallData } from '$lib/services/serialize';
-import { Token, parseUnits } from '@dusalabs/sdk';
 import { Args, MassaUnits, type ICallData, ArrayTypes } from '@massalabs/massa-web3';
 
 export const buildReceive = (multisigAddress: string, value: bigint): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'receive',
-		parameter: new Args().addBool(false), // temp fix
+		targetFunction: 'receiveCoins',
+		parameter: new Args(),
 		coins: value
 	};
 };
@@ -16,13 +15,13 @@ export const buildSubmit = (
 	multisigAddress: string,
 	to: string,
 	method: string,
-	value: bigint,
-	data: Uint8Array
+	value: bigint = 0n,
+	data: Uint8Array = new Uint8Array()
 ): ICallData => {
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'submit',
+		targetFunction: 'submit',
 		parameter: new Args().addString(to).addString(method).addU64(value).addUint8Array(data)
 	};
 };
@@ -31,7 +30,7 @@ export const buildApprove = (multisigAddress: string, txId: number): ICallData =
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'approve',
+		targetFunction: 'approve',
 		parameter: new Args().addU64(BigInt(txId))
 	};
 };
@@ -40,7 +39,7 @@ export const buildRevoke = (multisigAddress: string, txId: number): ICallData =>
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'revoke',
+		targetFunction: 'revoke',
 		parameter: new Args().addU64(BigInt(txId))
 	};
 };
@@ -49,7 +48,7 @@ export const buildExecute = (multisigAddress: string, txId: number): ICallData =
 	return {
 		...baseCallData,
 		targetAddress: multisigAddress,
-		functionName: 'execute',
+		targetFunction: 'execute',
 		parameter: new Args().addU64(BigInt(txId))
 	};
 };

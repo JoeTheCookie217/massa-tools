@@ -6,6 +6,7 @@ import { get } from 'svelte/store';
 import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
 import { getDatastore } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
+import { MAX_PER_REQUEST } from '$lib/utils/config';
 
 type TokenInfo = {
 	balances: BalanceEntry[];
@@ -24,7 +25,7 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 			console.error(err);
 			return [];
 		});
-	const keys = [...new Set([...ERC20_KEYS, ...balanceKeys.slice(0, 100)])];
+	const keys = [...new Set([...ERC20_KEYS, ...balanceKeys.slice(0, MAX_PER_REQUEST)])];
 	console.log(keys);
 
 	const r = await client
@@ -35,16 +36,18 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 			throw error(404, 'Token invalid');
 		});
 
-	const balanceEntries = r.filter((entry, i) => keys[i].startsWith('BALANCE') && entry.final_value);
+	const balanceEntries = r.filter(
+		(entry, i) => keys[i].startsWith('BALANCE') && entry.candidate_value
+	);
 	const balances: BalanceEntry[] = balanceEntries
 		.map((entry) => ({
 			address: keys[r.indexOf(entry)].slice(7),
-			value: bytesToBigInt(entry.final_value!)
+			value: bytesToBigInt(entry.candidate_value!)
 		}))
 		.sort((a, b) => Number(b.value - a.value));
 
 	const erc20entries = r.filter(
-		(entry, i) => ERC20_KEYS.includes(keys[i] as ERC20_KEY) && entry.final_value
+		(entry, i) => ERC20_KEYS.includes(keys[i] as ERC20_KEY) && entry.candidate_value
 	);
 
 	const find = (key: ERC20_KEY) => erc20entries.find((entry) => keys[r.indexOf(entry)] === key);
@@ -56,11 +59,11 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 
 	if (!symbolEntry || !nameEntry || !ownerEntry || !totalSupplyEntry || !decimalsEntry)
 		throw error(404, 'ERC20 not found');
-	const symbol = bytesToStr(symbolEntry.final_value!);
-	const name = bytesToStr(nameEntry.final_value!);
-	const owner = bytesToStr(ownerEntry.final_value!);
-	const totalSupply = bytesToBigInt(totalSupplyEntry.final_value!);
-	const decimals = byteToU8(decimalsEntry.final_value!);
+	const symbol = bytesToStr(symbolEntry.candidate_value!);
+	const name = bytesToStr(nameEntry.candidate_value!);
+	const owner = bytesToStr(ownerEntry.candidate_value!);
+	const totalSupply = bytesToBigInt(totalSupplyEntry.candidate_value!);
+	const decimals = byteToU8(decimalsEntry.candidate_value!);
 	const mintable = await functionExists(address, 'mint');
 	const burnable = await functionExists(address, 'burn');
 
@@ -83,14 +86,14 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 	};
 }
 
-const functionExists = async (address: string, functionName: string) => {
+const functionExists = async (targetAddress: string, targetFunction: string) => {
 	return client
 		.smartContracts()
 		.readSmartContract({
 			maxGas: 100_000_000n,
 			parameter: [],
-			targetAddress: address,
-			targetFunction: functionName
+			targetAddress,
+			targetFunction
 		})
 		.then(() => true)
 		.catch((err) => {

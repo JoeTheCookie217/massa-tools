@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import {
 		clearRecentAddresses,
 		getRecentAddresses,
@@ -38,21 +37,16 @@
 		</Button>
 	</div>
 	{#if history.length}
-		<div>
+		<div class="mt-4">
 			<div class="flex items-center gap-2">
 				<h2>Recent addresses</h2>
 				<Button variant="link" on:click={handleClear}>Clear</Button>
 			</div>
 			{#each history as historyItem}
-				<div>
-					{#if historyItem.name}
+				<div class="">
+					{#if historyItem.label}
 						<span>
-							{historyItem.name}
-						</span>
-					{/if}
-					{#if historyItem.symbol}
-						<span>
-							{historyItem.symbol}
+							{historyItem.label}
 						</span>
 					{/if}
 

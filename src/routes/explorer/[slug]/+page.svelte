@@ -5,7 +5,7 @@
 		isAddress,
 		printAddress,
 		printMasBalance,
-		providerToChainId,
+		printUint8Array,
 		tokenAddresses
 	} from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
@@ -15,21 +15,32 @@
 	// import Label from '$lib/components/ui/label/label.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as Table from '$lib/components/ui/table';
-	import { Args, byteToU8, bytesToStr, bytesToU256, toMAS } from '@massalabs/massa-web3';
+	import {
+		Args,
+		byteToU8,
+		bytesToStr,
+		bytesToU256,
+		strToBytes,
+		toMAS
+	} from '@massalabs/massa-web3';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
 	import DecodeSelect from '$lib/components/decode-select.svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
 	import { decodeFeeParameters, decodePairInformation, decodePreset } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
+	import { getBigDatastore } from '$lib/services/datastore.js';
 
 	export let data;
-	const { entries, address, isVerified, isToken, balance, erc20Balances } = data;
+	// prettier-ignore
+	const { keys: k, address, isVerified, isToken, isMultisig, balance, erc20Balances, tooBig } = data;
 
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
-	$: selectedNetwork = providerToChainId($clientStore.getPublicProviders()[0]);
+	// TODO: highlight keys that contain the `connectedAddress`
+	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
+
+	const isPMEntry = (key: string) =>
+		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
 	const separator = '::';
 	let prefixes = entries
@@ -45,11 +56,43 @@
 	//   );
 
 	onMount(() => {
+	let showPersistentMap = false;
+	let keys = k;
+	let filter = '';
+	$: filteredEntries = filter ? keys.filter((key) => key.includes(filter)) : keys;
+	$: displayedEntries = showPersistentMap
+		? filteredEntries
+		: filteredEntries.filter((key) => !isPMEntry(key));
+
+	$: {
+		if (tooBig) {
+			if (!filter.length) keys = [];
+			else getBigDatastore(address, filter).then((res) => (keys = res));
+		}
+	}
+
+	let values: Uint8Array[] = [];
+	$: values = Array(displayedEntries.length).fill(null);
+
+	const fetchEntry = async (key: string, index: number) => {
+		const res = await $clientStore
+			.publicApi()
+			.getDatastoreEntries([
+				{
+					address,
+					key: strToBytes(key)
+				}
+			])
+			.then((result) => result[0].candidate_value);
+		if (res) values[index] = res;
+	};
+
+	const save = (label: string) =>
 		addRecentAddress({
 			address,
-			chainId: selectedNetwork
+			label,
+			type: 'address'
 		});
-	});
 </script>
 
 <div class="flex flex-col gap-4">
@@ -63,26 +106,32 @@
 				<CopyButton copyText={address} />
 				<span>{printMasBalance(toMAS(balance).toFixed(2))}</span>
 				{#each erc20Balances as b, i}
-					{@const token = tokenAddresses[i][selectedNetwork]}
+					{@const token = tokenAddresses[i]}
 					{#if b > 0 && b < 2n ** 256n - 1n}
 						<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
 					{/if}
 				{/each}
 			</div>
 			{#if isVerified}
-				<div class="text-sm text-green-500">Verified</div>
-				<div class="text-sm">{getAddressLabel(address)}</div>
+				<div class="text-sm">
+					<span class="text-green-500 pr-1">Verified</span>{getAddressLabel(address)}
+				</div>
 			{/if}
 			{#if isToken}
 				<a href={`/token/${address}`}>
 					<div class="text-sm underline">Token page</div>
 				</a>
 			{/if}
+			{#if isMultisig}
+				<a href={`/multisig/${address}`}>
+					<div class="text-sm underline">Multisig page</div>
+				</a>
+			{/if}
 		</div>
 	</div>
 
-	{#if displayedEntries.length > 0}
-		<h2 class="text-2xl">Datastore</h2>
+	<h2 class="text-2xl">Datastore</h2>
+	<div class="flex items-end gap-2">
 		<div>
 			<Label
 				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -103,23 +152,41 @@
 				{/each}
 			</div>
 		</div>
-		<Table.Root>
-			<Table.Header>
+	</div>
+
+	{#if tooBig}
+		<div class="text-center text-sm">Too many keys to display. Please specify a prefix</div>
+	{/if}
+
+	<Table.Root>
+		<Table.Header>
+			<Table.Row>
+				<Table.Head>#</Table.Head>
+				<Table.Head>Key</Table.Head>
+				<Table.Head class="text-center">Value</Table.Head>
+				<Table.Head>Decode</Table.Head>
+			</Table.Row>
+		</Table.Header>
+		<Table.Body>
+			{#each displayedEntries as key, i}
+				{@const value = values[i]}
 				<Table.Row>
-					<Table.Head>Key</Table.Head>
-					<Table.Head>Value</Table.Head>
-					<Table.Head>Decode</Table.Head>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{#each displayedEntries as { key, value }, i}
-					<Table.Row>
-						<Table.Cell>{key}</Table.Cell>
-						{#if key === 'PAIR_INFORMATION'}
+					<Table.Cell>{i + 1}</Table.Cell>
+					<Table.Cell>{key}</Table.Cell>
+					<Table.Cell>
+						{#if !value}
+							<Button variant="ghost" on:click={() => fetchEntry(key, i)}>Fetch</Button>
+						{:else}
+							{printUint8Array(value)}
+							<CopyButton copyText={value.toString()} />
+						{/if}
+					</Table.Cell>
+					<Table.Cell>
+						{#if !value}
+							&nbsp;
+						{:else if key.startsWith('PAIR_INFORMATION')}
 							{@const params = decodePairInformation(value)}
-							<Table.Cell>
-								{JSON.stringify(params, undefined, 2)}
-							</Table.Cell>
+							{JSON.stringify(params, undefined, 2)}
 						{:else if key.startsWith('PAIR_INFORMATION::')}
 							{@const params = decodePreset(value)}
 							<Table.Cell>
@@ -127,20 +194,29 @@
 							</Table.Cell>
 						{:else if key === 'FEES_PARAMETERS'}
 							{@const params = decodeFeeParameters(value)}
-							<Table.Cell>
-								{JSON.stringify(params, undefined, 2)}
-							</Table.Cell>
+							{JSON.stringify(params, undefined, 2)}
+						{:else if key.startsWith('accrued_debts::')}
+							{@const args = new Args(value)}
+							{@const debtX = args.nextU256()}
+							{@const debtY = args.nextU256()}
+							{JSON.stringify({ debtX, debtY }, undefined, 2)}
+						{:else if key.startsWith('bin::')}
+							{@const args = new Args(value)}
+							{@const reserveX = args.nextU256()}
+							{@const reserveY = args.nextU256()}
+							{@const accTokenXPerShare = args.nextU256()}
+							{@const accTokenYPerShare = args.nextU256()}
+							{JSON.stringify(
+								{ reserveX, reserveY, accTokenXPerShare, accTokenYPerShare },
+								undefined,
+								2
+							)}
 						{:else}
-							<Table.Cell>
-								<Textarea value={value.toString()} />
-							</Table.Cell>
-						{/if}
-						<Table.Cell>
 							<DecodeSelect {value} />
-						</Table.Cell>
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
-	{/if}
+						{/if}
+					</Table.Cell>
+				</Table.Row>
+			{/each}
+		</Table.Body>
+	</Table.Root>
 </div>

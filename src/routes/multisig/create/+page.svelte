@@ -6,20 +6,31 @@
 	import { Input } from '$lib/components/ui/input';
 	import Highlight from 'svelte-highlight';
 	import { typescript } from 'svelte-highlight/languages';
-	import styles from 'svelte-highlight/styles/dracula';
+	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
 	import { isAddress } from '$lib/utils/methods';
+	import AddressInput from '$lib/components/AddressInput.svelte';
+	import dayjs from 'dayjs';
+	import relativeTime from 'dayjs/plugin/relativeTime';
+	dayjs.extend(relativeTime);
 
 	let owners: string[] = [];
+	let validOwners: boolean[] = [];
 	let ownersLength: number = 0;
 	let required: number;
-	$: disabled =
-		!owners ||
-		!required ||
-		required > owners.length ||
-		required < 1 ||
-		owners.some((owner) => !isAddress(owner)) ||
-		owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0; // contains duplicates
+	let executionDelay: number = 3600000;
+	let upgradeDelay: number = 86400000;
+	$: disabledText =
+		(!owners && 'No owners set') ||
+		((!required || required < 1) && 'No requirement set') ||
+		(required > owners.length && 'Not enough owners set') ||
+		(validOwners.some((valid) => !valid) && 'Invalid owners') ||
+		(owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0 &&
+			'Duplicate owners') ||
+		(upgradeDelay > 31_536_000_000 && 'Upgrade delay too long') ||
+		(executionDelay > 2_592_000_000 && 'Execution delay too long');
+
+	$: disabled = !!disabledText;
 
 	$: defaultOwners = owners;
 	$: defaultRequired = required || 2;
@@ -29,14 +40,16 @@
 	const increment = () => {
 		ownersLength++;
 		owners = [...owners, ''];
+		validOwners = [...validOwners, false];
 	};
 	const decrement = () => {
 		ownersLength--;
 		owners = owners.slice(0, ownersLength);
+		validOwners = validOwners.slice(0, ownersLength);
 	};
 
 	async function deploy() {
-		const deployData = buildDeployMultisig(owners, required);
+		const deployData = buildDeployMultisig(owners, required, upgradeDelay, executionDelay);
 		send(deployData);
 	}
 
@@ -48,10 +61,13 @@ import { Args } from '@massalabs/as-types';
 import { constructor as _constructor } from '${importPath}';
 
 export function constructor(_: StaticArray<u8>): void {
-	const owners = ${JSON.stringify(defaultOwners, undefined, 4)};
+	const owners: string[] = ${JSON.stringify(defaultOwners, undefined, 2)};
 	const required = ${defaultRequired};
+	const upgradeDelay = ${upgradeDelay};
+	const executionDelay = ${executionDelay};
 
-	const args = new Args().add(owners).add(required);
+
+	const args = new Args().add(owners).add(required).add(upgradeDelay).add(executionDelay);
 	_constructor(args.serialize());
 }
 	`;
@@ -60,30 +76,51 @@ export function constructor(_: StaticArray<u8>): void {
 </script>
 
 <svelte:head>
-	<title>Create Multisig</title>
+	<title>Create Multisig - Massa Tools</title>
 	{@html styles}
 </svelte:head>
 
-<div class="flex">
-	<div class="">
+<div class="flex gap-10">
+	<div class="flex flex-col gap-6">
 		<div>
 			<Label for="required">Required</Label>
 			<Input type="number" id="required" placeholder="2" bind:value={required} />
 		</div>
-		<Button variant="ghost" on:click={increment}>+</Button>
-		<Button variant="ghost" on:click={decrement}>-</Button>
-		{#each Array(ownersLength) as _, i}
-			<div>
-				<Label for="owner">Owner {i + 1}</Label>
-				<Input type="text" id="owner" placeholder="0x..." bind:value={owners[i]} />
-			</div>
-		{/each}
-		<Button on:click={deploy} {disabled}>Deploy</Button>
-	</div>
-	<div>
-		<Button on:click={() => copy(code)}>
+
+		<div>
+			<Label>Owners: {owners.length}</Label>
+			<Button variant="outline" on:click={increment}>+</Button>
+			<Button variant="outline" on:click={decrement} disabled={!ownersLength}>-</Button>
+			{#each Array(ownersLength) as _, i}
+				<div>
+					<Label for="owner">Owner {i + 1}</Label>
+					<AddressInput bind:recipient={owners[i]} bind:valid={validOwners[i]} />
+				</div>
+			{/each}
+		</div>
+
+		<div>
+			<Label for="upgradeDelay">Upgrade Delay (in ms)</Label>
+			<Input type="number" id="upgradeDelay" bind:value={upgradeDelay} />
+			<span class="text-xs">{dayjs(Date.now() + Number(upgradeDelay)).fromNow(true)}</span>
+		</div>
+
+		<div>
+			<Label for="executionDelay">Execution Delay (in ms)</Label>
+			<Input type="number" id="executionDelay" bind:value={executionDelay} />
+			<span class="text-xs">{dayjs(Date.now() + Number(executionDelay)).fromNow(true)}</span>
+		</div>
+
+		<div class="flex flex-col">
+			<Button on:click={deploy} {disabled}>Deploy</Button>
+			<span class="text-xs">{disabledText}</span>
+		</div>
+
+		<Button variant="ghost" on:click={() => copy(code)}>
 			{$copied ? 'Copied!' : 'Copy to clipboard'}
 		</Button>
+	</div>
+	<div>
 		<Highlight language={typescript} {code} />
 	</div>
 </div>
