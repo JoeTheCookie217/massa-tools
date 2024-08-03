@@ -17,7 +17,10 @@
 				goto(`/explorer/${value}`);
 			} else if (value.startsWith('O1')) {
 				address = '';
-				goto(`/event/${value}`);
+				goto(`/operation/${value}`);
+			} else if (value.startsWith('B1')) {
+				address = '';
+				goto(`/block/${value}`);
 			}
 		}
 	};

@@ -3,6 +3,7 @@
 	import {
 		getAddressLabel,
 		isAddress,
+		LB_FACTORY_ADDRESS,
 		printAddress,
 		printMasBalance,
 		printUint8Array,
@@ -184,14 +185,12 @@
 					<Table.Cell>
 						{#if !value}
 							&nbsp;
+						{:else if key.startsWith('PAIR_INFORMATION::') && address === LB_FACTORY_ADDRESS}
+							{@const params = decodePreset(value)}
+							{JSON.stringify(params, undefined, 2)}
 						{:else if key.startsWith('PAIR_INFORMATION')}
 							{@const params = decodePairInformation(value)}
 							{JSON.stringify(params, undefined, 2)}
-						{:else if key.startsWith('PAIR_INFORMATION::')}
-							{@const params = decodePreset(value)}
-							<Table.Cell>
-								{JSON.stringify(params, undefined, 2)}
-							</Table.Cell>
 						{:else if key === 'FEES_PARAMETERS'}
 							{@const params = decodeFeeParameters(value)}
 							{JSON.stringify(params, undefined, 2)}
