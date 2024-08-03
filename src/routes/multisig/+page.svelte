@@ -41,7 +41,7 @@
 		<Button variant="link">Don't have a multisig wallet? Create one</Button>
 	</a>
 
-	{#if history.length}
+	<!-- {#if history.length}
 		<div>
 			<div class="flex items-center gap-2">
 				<h2>Recent addresses</h2>
@@ -60,5 +60,5 @@
 				</div>
 			{/each}
 		</div>
-	{/if}
+	{/if} -->
 </div>

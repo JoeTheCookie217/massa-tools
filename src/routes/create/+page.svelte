@@ -82,7 +82,7 @@ export function constructor(_: StaticArray<u8>): void {
 
 <div class="flex gap-10">
 	{#if tokenAddress}
-		<RedirectModal {tokenAddress} />
+		<RedirectModal address={tokenAddress} type="token" />
 	{/if}
 	<div class="grid grid-cols-2">
 		<div>
