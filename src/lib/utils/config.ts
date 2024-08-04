@@ -11,7 +11,7 @@ import { CHAIN_ID as MassaChainId } from '@massalabs/massa-web3';
 
 const _MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
-	[ChainId.BUILDNET]: ''
+	[ChainId.BUILDNET]: 'AS12W4sj9ES8XAj426x3ugCyoT2QxDncBDJiADZoFnWuM34Wwh9YF'
 };
 const _ERC20_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
