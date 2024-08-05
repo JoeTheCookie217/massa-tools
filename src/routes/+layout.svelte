@@ -4,6 +4,8 @@
 	import type { SvelteToastOptions } from '@zerodevx/svelte-toast/stores';
 	import ConnectModal from '$lib/components/connect-modal.svelte';
 	import LightSwitch from '$lib/components/light-switch/light-switch.svelte';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
+	import { trpc } from '$lib/trpc/client';
 	import { ExternalLink } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
 	import { page } from '$app/stores';
@@ -84,7 +86,9 @@
 	</header>
 
 	<section class="grow grid place-items-center m-12">
-		<slot />
+		<QueryClientProvider client={trpc.queryClient}>
+			<slot />
+		</QueryClientProvider>
 	</section>
 
 	<footer class="flex flex-col items-center text-center p-2">

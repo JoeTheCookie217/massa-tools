@@ -9,7 +9,7 @@ import {
 } from '@massalabs/massa-web3';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
-import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
+import { fetchMasBalance, getDatastoreKeys } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
 import { isVerified, parseBalance, tokenAddresses } from '$lib/utils/methods';
 import { ERC20_KEYS } from '$lib/utils/types';
@@ -34,7 +34,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Address
 	const notFoundError = error(404, 'Address not found');
 
 	let tooBig = false;
-	const keys = await getDatastore(address).catch((err) => {
+	const keys = await getDatastoreKeys(address).catch((err) => {
 		if (err.message === 'Response is too big') {
 			tooBig = true;
 			return [];

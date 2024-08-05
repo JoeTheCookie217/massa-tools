@@ -1,11 +1,11 @@
-import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
-import { Transaction } from '@dusalabs/sdk';
+import { fetchMasBalance, getDatastoreKeys, getTokenValue } from '$lib/services/datastore';
+import { TokenAmount, Transaction } from '@dusalabs/sdk';
 import clientStore from '$lib/store/client';
 import { strToBytes, bytesToI32, byteToBool, bytesToU64 } from '@massalabs/massa-web3';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { RouteParams } from './$types';
-import { parseBalance, toDatastoreInput, tokenAddresses } from '$lib/utils/methods';
+import { parseBalance, toDatastoreInput, toFraction, tokenAddresses } from '$lib/utils/methods';
 import { CHAIN_ID } from '$lib/utils/config';
 
 const client = get(clientStore);
@@ -26,6 +26,7 @@ type MultisigInfo = {
 	owners: string[];
 	transactions: FullTransaction[];
 	erc20Balances: bigint[];
+	erc20Values: number[];
 	usdBalance: number;
 };
 
@@ -33,7 +34,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const address = params.address;
 	const balance = await fetchMasBalance(address);
 
-	const datastore = await getDatastore(address);
+	const datastore = await getDatastoreKeys(address);
 	const OWNER_PREFIX = 'is_owner::';
 	const TX_PREFIX = 'transactions::';
 	const APPROVAL_PREFIX = 'approved::';
@@ -107,13 +108,24 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const resBalances = result.slice(-erc20BalancesInput.length);
 			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
 
-			const usdBalance = await Promise.resolve(234567);
+			const erc20Values = await Promise.all(tokenAddresses.map((token) => getTokenValue(token)));
+			const usdBalance = erc20Values.reduce(
+				(acc, val, i) =>
+					acc +
+					Number(
+						new TokenAmount(tokenAddresses[i], erc20Balances[i])
+							.multiply(toFraction(val))
+							.toSignificant(2)
+					),
+				0
+			);
 
 			return {
 				required,
 				owners,
 				transactions,
 				erc20Balances,
+				erc20Values,
 				upgradeDelay,
 				executionDelay,
 				usdBalance

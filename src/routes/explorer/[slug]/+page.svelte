@@ -3,6 +3,7 @@
 	import {
 		getAddressLabel,
 		isAddress,
+		LB_FACTORY_ADDRESS,
 		printAddress,
 		printMasBalance,
 		printUint8Array,
@@ -27,10 +28,10 @@
 	import { Label } from '$lib/components/ui/label';
 	import DecodeSelect from '$lib/components/decode-select.svelte';
 	import AddressCell from '$lib/components/address-cell.svelte';
-	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
+	import { decodeFeeParameters, decodePairInformation, decodePreset } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
-	import { getBigDatastore } from '$lib/services/datastore.js';
+	import { getLargeDatastoreKeys } from '$lib/services/datastore.js';
 
 	export let data;
 	// prettier-ignore
@@ -42,6 +43,16 @@
 	const isPMEntry = (key: string) =>
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
+	const separator = '::';
+	let prefixes = k
+		.map((key) => (key.includes(separator) ? key.split(separator)[0] : ''))
+		.filter((v, i, a) => v && a.indexOf(v) === i);
+	let prefixFilters = prefixes.map((p) => false);
+
+	// : entries.filter(
+	// 		({ key }) => !(key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE'))
+	//   );
+
 	let showPersistentMap = false;
 	let keys = k;
 	let filter = '';
@@ -50,10 +61,14 @@
 		? filteredEntries
 		: filteredEntries.filter((key) => !isPMEntry(key));
 
+	// $: displayedEntries = k.filter((key ) =>
+	// 	key.includes(separator) ? prefixFilters[prefixes.indexOf(key.split(separator)[0])] : true
+	// );
+
 	$: {
 		if (tooBig) {
 			if (!filter.length) keys = [];
-			else getBigDatastore(address, filter).then((res) => (keys = res));
+			else getLargeDatastoreKeys(address, filter).then((res) => (keys = res));
 		}
 	}
 
@@ -119,11 +134,24 @@
 	<h2 class="text-2xl">Datastore</h2>
 	<div class="flex items-end gap-2">
 		<div>
-			<Checkbox id="mintable" bind:checked={showPersistentMap} />
-			<Label for="mintable">Show Persistent Map entries</Label>
-		</div>
-		<div>
-			<Input type="text" id="filter" placeholder="Filter by key" bind:value={filter} />
+			<Label
+				class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+			>
+				Show Persistent Map entries
+			</Label>
+			<div class="flex flex-col gap-1">
+				{#each prefixes as prefix, i}
+					<div>
+						<Checkbox id={`mintable${i}`} bind:checked={prefixFilters[i]} />
+						<Label
+							for={`mintable${i}`}
+							class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+						>
+							{prefix}
+						</Label>
+					</div>
+				{/each}
+			</div>
 		</div>
 	</div>
 
@@ -157,10 +185,13 @@
 					<Table.Cell>
 						{#if !value}
 							&nbsp;
+						{:else if key.startsWith('PAIR_INFORMATION::') && address === LB_FACTORY_ADDRESS}
+							{@const params = decodePreset(value)}
+							{JSON.stringify(params, undefined, 2)}
 						{:else if key.startsWith('PAIR_INFORMATION')}
 							{@const params = decodePairInformation(value)}
 							{JSON.stringify(params, undefined, 2)}
-						{:else if key.startsWith('FEES_PARAMETERS')}
+						{:else if key === 'FEES_PARAMETERS'}
 							{@const params = decodeFeeParameters(value)}
 							{JSON.stringify(params, undefined, 2)}
 						{:else if key.startsWith('accrued_debts::')}

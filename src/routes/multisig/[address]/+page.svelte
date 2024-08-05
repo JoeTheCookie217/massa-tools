@@ -12,6 +12,7 @@
 		printMasBalance,
 		printTokenAmount,
 		printUSD,
+		toFraction,
 		tokenAddresses
 	} from '$lib/utils/methods';
 	import { onMount } from 'svelte';
@@ -30,7 +31,7 @@
 	export let data;
 
 	// prettier-ignore
-	const { address: multisigAddress, balance, owners, required, transactions, erc20Balances: rawErc20Balances, executionDelay, upgradeDelay, usdBalance } = data;
+	const { address: multisigAddress, balance, owners, required, transactions, erc20Balances: rawErc20Balances, erc20Values, executionDelay, upgradeDelay, usdBalance } = data;
 	const argsPlaceholder = '{"0": 45, "1": 19, "2": 0, "3": 21}';
 	const erc20Balances = rawErc20Balances.filter((b) => b > 0n);
 
@@ -86,19 +87,25 @@
 						<CopyButton copyText={multisigAddress} />
 					</div>
 
-					<!-- <div>
+					<div>
 						<span>Token Balance:</span>
 						<span>${printUSD(usdBalance, false)}</span>
-					</div> -->
+					</div>
 
 					{#if erc20Balances.length > 0}
 						<span>Owned Tokens:</span>
-						<div class="flex gap-2 mx-2">
+						<div class="flex flex-col gap-2 mx-2">
 							<span>{printMasBalance(toMAS(balance).toFixed())}</span>
 							{#each rawErc20Balances as b, i}
 								{@const token = tokenAddresses[i]}
 								{#if b > 0}
-									<span>{printTokenAmount(new TokenAmount(token, b))} {token.symbol}</span>
+									{@const usdValue = Number(
+										new TokenAmount(token, b).multiply(toFraction(erc20Values[i])).toSignificant(4)
+									)}
+									<div>
+										<span>{printTokenAmount(new TokenAmount(token, b))} {token.symbol}</span>
+										<span class="text-sm">${printUSD(usdValue, false)}</span>
+									</div>
 								{/if}
 							{/each}
 						</div>
@@ -177,7 +184,7 @@
 				</div>
 				<div class="flex flex-col gap-1 mt-1 text-sm">
 					<i
-						>Leave <strong>method</strong> and <strong>arguments</strong> fields empty for MAS transfer</i
+						>Leave <strong>method</strong> and <strong>arguments</strong> fields empty for MAS transfers</i
 					>
 					<i
 						>Use this <a
@@ -186,6 +193,10 @@
 							rel="noreferrer"
 							class="text-blue-500 underline">massexplo tool</a
 						> to build arguments</i
+					>
+					<i
+						>For swaps or liq management on Dusa, setup the tx <strong>w/o signing</strong> and copy
+						values in the console</i
 					>
 				</div>
 			</div>

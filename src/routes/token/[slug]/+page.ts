@@ -4,7 +4,7 @@ import { bytesToBigInt, toDatastoreInput } from '$lib/utils/methods';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
-import { getDatastore } from '$lib/services/datastore';
+import { getDatastoreKeys } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
 import { MAX_PER_REQUEST } from '$lib/utils/config';
 
@@ -19,7 +19,7 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 	const address = params.slug;
 
 	const notFoundError = error(404, 'Address not found');
-	const balanceKeys = await getDatastore(address)
+	const balanceKeys = await getDatastoreKeys(address)
 		.then((res) => res.filter((entry) => entry.startsWith('BALANCE')))
 		.catch((err) => {
 			console.error(err);

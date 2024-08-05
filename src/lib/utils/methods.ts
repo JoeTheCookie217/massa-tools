@@ -7,7 +7,8 @@ import {
 	MULTICALL_ADDRESS as _MULTICALL_ADDRESS,
 	Token,
 	TokenAmount,
-	VAULT_MANAGER_ADDRESS as _VAULT_MANAGER_ADDRESS
+	VAULT_MANAGER_ADDRESS as _VAULT_MANAGER_ADDRESS,
+	Fraction
 } from '@dusalabs/sdk';
 import { bytesToU256, bytesToU64, strToBytes, Args, Address } from '@massalabs/massa-web3';
 import { CHAIN_ID, DAI, USDC, WETH, WMAS, WETH_B, USDT } from './config';
@@ -82,6 +83,12 @@ export const printUSD = (value: number, keepCents = true, precision = 2) =>
 		maximumFractionDigits: keepCents ? precision : 0,
 		minimumFractionDigits: keepCents ? precision : 0
 	});
+
+export const toFraction = (val: number): Fraction => {
+	if (val === 0) return new Fraction(0n, 1n);
+	const value = BigInt(Math.round(val * 1e18));
+	return new Fraction(value, BigInt(1e18));
+};
 
 export const bytesToBigInt = (bytes: Uint8Array): bigint => {
 	try {
