@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { bytesToStr, toMAS } from '@massalabs/massa-web3';
 	import { printMasBalance } from '$lib/utils/methods';
-	import { readable } from 'svelte/store';
+	import { writable } from 'svelte/store';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
@@ -12,17 +12,18 @@
 	import DataTable from '$lib/components/data-table.svelte';
 
 	const blockHash = $page.params.slug;
-	const query = trpc.getBlock.query({ blockHash });
-	const operations = $query.data?.operations || [];
-	const ledgerChanges = $query.data?.ledgerChanges || [];
+	$: query = trpc.getBlock.query({ blockHash });
+	$: operations = $query.data?.operations || [];
+	$: ledgerChanges = $query.data?.ledgerChanges || [];
 
-	const operationTable = createTable(readable(operations));
-	const operationColumns = operationTable.createColumns([
+	$: operationTable = createTable(writable(operations));
+	$: operationColumns = operationTable.createColumns([
 		operationTable.column({
 			accessor: 'targetAddress',
 			header: 'Smart contract',
 			cell: ({ value }) => {
-				return createRender(CopyLink, { copyText: value });
+				return '';
+				//	return createRender(CopyLink, { copyText: value });
 			}
 		}),
 		operationTable.column({
@@ -33,7 +34,8 @@
 			accessor: 'callerAddress',
 			header: 'Caller',
 			cell: ({ value }) => {
-				return createRender(CopyLink, { copyText: value });
+				return '';
+				// return createRender(CopyLink, { copyText: value });
 			}
 		}),
 		operationTable.column({
@@ -51,14 +53,16 @@
 			}
 		})
 	]);
-	const operationModel = operationTable.createViewModel(operationColumns);
+	$: operationModel = operationTable.createViewModel(operationColumns);
 
-	const ledgerChangeTable = createTable(readable(ledgerChanges));
-	const ledgerChangeColumns = ledgerChangeTable.createColumns([
+	$: ledgerChangeTable = createTable(writable(ledgerChanges));
+	$: ledgerChangeColumns = ledgerChangeTable.createColumns([
 		ledgerChangeTable.column({
 			accessor: 'address',
 			header: 'Address',
 			cell: ({ value }) => {
+				return '';
+				//
 				return createRender(CopyLink, { copyText: value });
 			}
 		}),
@@ -77,14 +81,13 @@
 			}
 		})
 	]);
-	const ledgerChangeModel = ledgerChangeTable.createViewModel(ledgerChangeColumns);
+	$: ledgerChangeModel = ledgerChangeTable.createViewModel(ledgerChangeColumns);
 </script>
 
 {#if $query.isSuccess && $query.data}
 	<div>
 		<p>Timestamp: {$query.data.createdAt}</p>
-		<p>Period: {$query.data.period}</p>
-		<p>Thread: {$query.data.thread}</p>
+		<p>Period: {$query.data.period} | Thread: {$query.data.thread}</p>
 		<p>Operations: {$query.data.operations.length}</p>
 		<p>Ledger changes: {$query.data.ledgerChanges.length}</p>
 	</div>
