@@ -52,4 +52,5 @@ export const ERC20_DEPLOYER = _ERC20_DEPLOYER[CHAIN_ID];
 
 export const baseApi = `https://api-${CHAIN_NAME}-dusa.up.railway.app`;
 export const indexerApi = `https://indexer-${CHAIN_NAME}-dusa.up.railway.app`;
+export const rawTrpcApi = `${baseApi}/api`;
 export const trpcApi = `${baseApi}/trpc`;

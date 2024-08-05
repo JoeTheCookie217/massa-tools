@@ -5,7 +5,8 @@ import clientStore from '$lib/store/client';
 import { IERC20, parseUnits, Token as BaseToken } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
 import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
-import { indexerApi, trpcApi } from '$lib/utils/config';
+import { indexerApi } from '$lib/utils/config';
+import { trpcClient } from '$lib/trpc/client';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -43,9 +44,10 @@ export const getBytecodeExports = (address: string): Promise<string[]> =>
 export const getTokenValue = (
 	token: BaseToken | { address: string; decimals: number }
 ): Promise<number> =>
-	fetch(
-		`${trpcApi}/token-value?tokenAddress=${token.address}&tokenDecimals=${token.decimals}`
-	).then((res) => res.json());
+	// fetch(
+	// 	`${rawTrpcApi}/token-value?tokenAddress=${token.address}&tokenDecimals=${token.decimals}`
+	// ).then((res) => res.json());
+	trpcClient.getTokenValue.query({ tokenAddress: token.address, tokenDecimals: token.decimals });
 
 export const fetchTokenAllowances = async (
 	address: string,
