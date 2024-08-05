@@ -50,5 +50,6 @@ export const USDT = _USDT[CHAIN_ID];
 export const MULTISIG_DEPLOYER = _MULTISIG_DEPLOYER[CHAIN_ID];
 export const ERC20_DEPLOYER = _ERC20_DEPLOYER[CHAIN_ID];
 
-export const trpcApi = 'http://localhost:3001/trpc';
-// export const trpcApi = `https://api-${CHAIN_NAME}-dusa.up.railway.app/trpc`;
+export const baseApi = `https://api-${CHAIN_NAME}-dusa.up.railway.app`;
+export const indexerApi = `https://indexer-${CHAIN_NAME}-dusa.up.railway.app`;
+export const trpcApi = `${baseApi}.app/trpc`;

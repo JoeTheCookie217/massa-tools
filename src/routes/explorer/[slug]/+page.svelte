@@ -31,7 +31,7 @@
 	import { decodeFeeParameters, decodePairInformation, decodePreset } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
-	import { getBigDatastore } from '$lib/services/datastore.js';
+	import { getLargeDatastoreKeys } from '$lib/services/datastore.js';
 
 	export let data;
 	// prettier-ignore
@@ -68,7 +68,7 @@
 	$: {
 		if (tooBig) {
 			if (!filter.length) keys = [];
-			else getBigDatastore(address, filter).then((res) => (keys = res));
+			else getLargeDatastoreKeys(address, filter).then((res) => (keys = res));
 		}
 	}
 

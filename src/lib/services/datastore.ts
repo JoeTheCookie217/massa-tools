@@ -2,9 +2,10 @@ import { EventPoller, bytesToU256 } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
-import { IERC20, parseUnits } from '@dusalabs/sdk';
+import { IERC20, parseUnits, Token as BaseToken } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
 import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
+import { indexerApi, trpcApi } from '$lib/utils/config';
 
 const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
@@ -22,7 +23,7 @@ export const fetchMasBalance = (account: string): Promise<bigint> =>
 export const fetchTokenBalance = (address: string, account: string): Promise<bigint> =>
 	new IERC20(address, baseClient).balanceOf(account);
 
-export const getDatastore = (address: string) =>
+export const getDatastoreKeys = (address: string) =>
 	baseClient
 		.publicApi()
 		.getAddresses([address])
@@ -32,16 +33,25 @@ export const getDatastore = (address: string) =>
 				.sort((a, b) => a.localeCompare(b))
 		);
 
-export const getBigDatastore = (address: string, prefix: string) =>
+export const getLargeDatastoreKeys = (address: string, prefix: string): Promise<string[]> =>
+	fetch(`${indexerApi}/datastore-keys?address=${address}&prefix=${prefix}`).then((res) =>
+		res.json()
+	);
+export const getBytecodeExports = (address: string): Promise<string[]> =>
+	fetch(`${indexerApi}/bytecode-exports?address=${address}`).then((res) => res.json());
+
+export const getTokenValue = (
+	token: BaseToken | { address: string; decimals: number }
+): Promise<number> =>
 	fetch(
-		`https://indexer-mainnet-dusa.up.railway.app/datastore-keys?address=${address}&prefix=${prefix}`
+		`${trpcApi}/token-value?tokenAddress=${token.address}&tokenDecimals=${token.decimals}`
 	).then((res) => res.json());
 
 export const fetchTokenAllowances = async (
 	address: string,
 	owner: string
 ): Promise<Allowance[]> => {
-	const keys = await getDatastore(address)
+	const keys = await getDatastoreKeys(address)
 		.then((entries) => {
 			const filteredEntries = entries.filter((e) => e.startsWith(owner));
 			return filteredEntries;

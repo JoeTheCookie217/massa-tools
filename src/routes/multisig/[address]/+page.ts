@@ -1,4 +1,4 @@
-import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
+import { fetchMasBalance, getDatastoreKeys, getTokenValue } from '$lib/services/datastore';
 import { Transaction } from '@dusalabs/sdk';
 import clientStore from '$lib/store/client';
 import { strToBytes, bytesToI32, byteToBool, bytesToU64 } from '@massalabs/massa-web3';
@@ -33,7 +33,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const address = params.address;
 	const balance = await fetchMasBalance(address);
 
-	const datastore = await getDatastore(address);
+	const datastore = await getDatastoreKeys(address);
 	const OWNER_PREFIX = 'is_owner::';
 	const TX_PREFIX = 'transactions::';
 	const APPROVAL_PREFIX = 'approved::';
@@ -107,7 +107,11 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 			const resBalances = result.slice(-erc20BalancesInput.length);
 			const erc20Balances = resBalances.map((entry, i) => parseBalance(entry.candidate_value));
 
-			const usdBalance = await Promise.resolve(234567);
+			const tokenValues = await Promise.all(tokenAddresses.map((token) => getTokenValue(token)));
+			const usdBalance = tokenValues.reduce(
+				(acc, val, i) => acc + val * Number(erc20Balances[i]),
+				0
+			);
 
 			return {
 				required,

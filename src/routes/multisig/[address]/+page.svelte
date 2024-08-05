@@ -86,10 +86,10 @@
 						<CopyButton copyText={multisigAddress} />
 					</div>
 
-					<!-- <div>
+					<div>
 						<span>Token Balance:</span>
 						<span>${printUSD(usdBalance, false)}</span>
-					</div> -->
+					</div>
 
 					{#if erc20Balances.length > 0}
 						<span>Owned Tokens:</span>
