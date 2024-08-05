@@ -2,28 +2,80 @@
 	import { onMount } from 'svelte';
 	import { printAddress, printMasBalance } from '$lib/utils/methods';
 	import type { IAccount, IProvider } from '@massalabs/wallet-provider';
-	import { providers as getProviders } from '@massalabs/wallet-provider';
+	import { providers as getProviders, ProvidersListener } from '@massalabs/wallet-provider';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from './ui/button';
 	import clientStore, { baseClient } from '$lib/store/client';
 	import { ClientFactory, toMAS } from '@massalabs/massa-web3';
 	import useCopy from '$lib/hooks/useCopy';
 
+	type Listener = {
+		unsubscribe: () => void;
+	};
+
 	let accounts: IAccount[] = [];
 	let selectedWallet: IProvider;
 	let stationWallet: IProvider | undefined;
 	let bearbyWallet: IProvider | undefined;
 
+	let accountListener: Listener | undefined;
+	let networkListener: Listener | undefined;
+
+	const providerListener = new ProvidersListener();
+
+	onMount(() => {
+		providerListener.subscribe((p) => {
+			console.log('providers', p);
+		});
+	});
+
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() || '';
 	let balance: string | undefined;
+
 	$: {
-		connectedAddress &&
+		if (connectedAddress) {
 			$clientStore
 				.wallet()
 				.getAccountBalance(connectedAddress)
 				.then((res) => {
 					if (res) balance = toMAS(res.final).toFixed(2);
 				});
+			accountListener && accountListener.unsubscribe();
+
+			if (selectedWallet?.name() === 'BEARBY') {
+				const _listener = selectedWallet.listenAccountChanges((address) => {
+					console.log('account changed', address);
+					if (connectedAddress === address) return;
+
+					accounts.forEach((a) => console.log(accounts.length, 'acc', a.address()));
+					const index = accounts.findIndex((acc) => acc.address() === address);
+					console.log('index', index);
+					if (index === -1) return;
+
+					const acc = accounts[index];
+					select(acc, index);
+					// fetchAccounts(selectedWallet);
+				});
+				accountListener = _listener;
+			}
+		}
+	}
+
+	$: {
+		networkListener && networkListener.unsubscribe();
+
+		if (selectedWallet) {
+			const _listener = selectedWallet.listenNetworkChanges((_network) => {
+				console.log('network changed', _network);
+				// setNetwork(_network);
+			});
+
+			networkListener = _listener;
+
+			if (accounts) {
+				// fetchAccountsBalance(accounts).then(setMasBalances);
+			}
+		}
 	}
 
 	const { copy, copied } = useCopy();
@@ -103,10 +155,6 @@
 					{printAddress(connectedAddress)} -->
 				{/if}
 			</Dialog.Title>
-			<!-- <Dialog.Description>
-				This action cannot be undone. This will permanently delete your account and remove your data
-				from our servers.
-			</Dialog.Description> -->
 		</Dialog.Header>
 		<div>
 			{#if connectedAddress}

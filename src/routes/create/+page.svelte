@@ -52,9 +52,9 @@ export function constructor(_: StaticArray<u8>): void {
 		.add('${name || defaultName}')
 		.add('${symbol || defaultSymbol}')
 		.add(${decimals || defaultDecimals})
-		.add(u256.mul(u256.from(${supply || defaultSupply}), u256.from(10 ** ${
+		.add(u256.mul(u256.from(${supply || defaultSupply}), u256.from(u64(10 ** ${
 		decimals || defaultDecimals
-	})));
+	}))));
 	FT.constructor(args.serialize());
 }
 	`;
@@ -82,7 +82,7 @@ export function constructor(_: StaticArray<u8>): void {
 
 <div class="flex gap-10">
 	{#if tokenAddress}
-		<RedirectModal {tokenAddress} />
+		<RedirectModal address={tokenAddress} type="token" />
 	{/if}
 	<div class="grid grid-cols-2">
 		<div>

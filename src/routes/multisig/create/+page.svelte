@@ -12,7 +12,10 @@
 	import AddressInput from '$lib/components/AddressInput.svelte';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
+	import RedirectModal from '../../create/redirect-modal.svelte';
 	dayjs.extend(relativeTime);
+
+	let multisigAddress: string;
 
 	let owners: string[] = [];
 	let validOwners: boolean[] = [];
@@ -35,7 +38,11 @@
 	$: defaultOwners = owners;
 	$: defaultRequired = required || 2;
 
-	const { send } = useSendTx();
+	const { send, subscribe } = useSendTx();
+	subscribe((tx) => {
+		console.log(tx.events.length);
+		if (tx.events.length) multisigAddress = tx.events.at(-1)!.data;
+	});
 
 	const increment = () => {
 		ownersLength++;
@@ -81,6 +88,9 @@ export function constructor(_: StaticArray<u8>): void {
 </svelte:head>
 
 <div class="flex gap-10">
+	{#if multisigAddress}
+		<RedirectModal address={multisigAddress} type="multisig" />
+	{/if}
 	<div class="flex flex-col gap-6">
 		<div>
 			<Label for="required">Required</Label>

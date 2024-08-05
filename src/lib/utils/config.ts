@@ -11,7 +11,7 @@ import { CHAIN_ID as MassaChainId } from '@massalabs/massa-web3';
 
 const _MULTISIG_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
-	[ChainId.BUILDNET]: ''
+	[ChainId.BUILDNET]: 'AS12W4sj9ES8XAj426x3ugCyoT2QxDncBDJiADZoFnWuM34Wwh9YF'
 };
 const _ERC20_DEPLOYER: { [chainId in ChainId]: string } = {
 	[ChainId.MAINNET]: '',
@@ -28,8 +28,8 @@ export const OTHER_CHAIN_NAME =
 export const OTHER_CHAIN_DOMAIN =
 	'https://' +
 	(Number(CHAIN_ID) === Number(ChainId.BUILDNET)
-		? 'massa-tools.netlify.app'
-		: 'massa-tools-buildnet.netlify.app');
+		? 'massa-tools.vercel.app'
+		: 'massa-tools-buildnet.vercel.app');
 export const MASSA_CHAIN_ID =
 	Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? MassaChainId.BuildNet : MassaChainId.MainNet;
 

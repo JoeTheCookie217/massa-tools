@@ -2,7 +2,8 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
 
-	export let tokenAddress: string;
+	export let address: string;
+	export let type: 'token' | 'multisig';
 
 	let open = true;
 	const onOpenChange = (e: boolean | undefined) => {
@@ -15,11 +16,11 @@
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Token Created</Dialog.Title>
-			<Dialog.Description>{tokenAddress}</Dialog.Description>
+			<Dialog.Description>{address}</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer class="flex justify-center">
 			<Button variant="link">
-				<a href={`/token/${tokenAddress}`} />
+				<a href={`/${type}/${address}`}>Visit</a>
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

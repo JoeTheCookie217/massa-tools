@@ -62,25 +62,4 @@
 			{/each}
 		</div>
 	{/if}
-
-	{#if history.length}
-		<div>
-			<div class="flex items-center gap-2">
-				<h2>Recent addresses</h2>
-				<Button variant="link" on:click={handleClear}>Clear</Button>
-			</div>
-			{#each history as historyItem}
-				<div class="">
-					{#if historyItem.label}
-						<span>
-							{historyItem.label}
-						</span>
-					{/if}
-
-					<a href="/multisig/{historyItem.address}">{printAddress(historyItem.address)}</a>
-					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
-				</div>
-			{/each}
-		</div>
-	{/if}
 </div>
