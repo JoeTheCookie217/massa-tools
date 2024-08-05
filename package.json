@@ -40,7 +40,7 @@
 	"dependencies": {
 		"@dusalabs/sdk": "^0.6.2",
 		"@fontsource-variable/space-grotesk": "^5.0.18",
-		"@massalabs/massa-web3": "4.0.1",
+		"@massalabs/massa-web3": "4.0.3",
 		"@massalabs/wallet-provider": "2.0.0",
 		"@tanstack/svelte-query": "^5.25.0",
 		"@trpc/client": "^10.45.1",
