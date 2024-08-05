@@ -20,15 +20,23 @@
 		table.column({
 			accessor: 'emitterAddress',
 			header: 'Address',
-			cell: ({ value }) => {
-				return createRender(CopyLink, { copyText: value });
-			}
+			cell: ({ value }) => createRender(CopyLink, { copyText: value })
 		}),
 		table.column({
 			accessor: 'data',
 			header: 'Data',
 			cell: ({ value }) => {
-				return '';
+				const strEvent = bytesToStr(Uint8Array.from(value.data));
+				if (strEvent.startsWith('SWAP:')) {
+					return JSON.stringify(EventDecoder.decodeSwap(strEvent));
+				} else if (
+					strEvent.startsWith('DEPOSITED_TO_BIN:') ||
+					strEvent.startsWith('WITHDRAWN_FROM_BIN:')
+				) {
+					return JSON.stringify(EventDecoder.decodeLiquidity(strEvent));
+				} else {
+					return strEvent;
+				}
 			}
 		})
 	]);
