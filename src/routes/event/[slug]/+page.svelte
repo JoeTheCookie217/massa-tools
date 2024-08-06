@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import { Label } from '$lib/components/ui/label';
 	import { fetchEvents } from '$lib/services/datastore';
 	import { EventDecoder } from '@dusalabs/sdk';
 	import type { IEvent } from '@massalabs/massa-web3';
+	import { onMount } from 'svelte';
 
 	$: url = $page.url.pathname;
 	let txHash = url?.split('/').pop();
@@ -15,20 +15,10 @@
 
 	const extractKeyword = (bytes: string): string => bytes.split(':')[0];
 
-	const handleSearch = async (txId: string) => {
-		console.log('handleSearch', txId);
-		const { isError, events: e } = await fetchEvents(txId);
-		console.log({ isError, e });
-		events = e;
-	};
-
-	$: {
-		if (txHash) handleSearch(txHash);
-		else events = [];
-	}
+	onMount(async () => {
+		if (txHash) fetchEvents(txHash).then((r) => (events = r.events));
+	});
 </script>
-
-<Input bind:value={txHash} />
 
 <div class="flex flex-col gap-2">
 	<div class="flex gap-2">

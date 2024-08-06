@@ -40,7 +40,6 @@
 
 	const { send, subscribe } = useSendTx();
 	subscribe((tx) => {
-		console.log(tx.events.length);
 		if (tx.events.length) multisigAddress = tx.events.at(-1)!.data;
 	});
 

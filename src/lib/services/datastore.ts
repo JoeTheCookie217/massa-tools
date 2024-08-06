@@ -6,7 +6,6 @@ import { IERC20, parseUnits } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
 import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
 
-const maxGas = 100_000_000n;
 const baseClient = get(clientStore);
 
 export const fetchMasBalance = (account: string): Promise<bigint> =>

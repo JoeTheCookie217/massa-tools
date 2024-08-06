@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { byteToU8, bytesToStr, strToBytes } from '@massalabs/massa-web3';
-import { bytesToBigInt, toDatastoreInput } from '$lib/utils/methods';
+import { bytesToBigInt, isVerified, toDatastoreInput } from '$lib/utils/methods';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
 import { ERC20_KEYS, type BalanceEntry, type Properties, type ERC20_KEY } from '$lib/utils/types';
@@ -11,6 +11,7 @@ import { MAX_PER_REQUEST } from '$lib/utils/config';
 type TokenInfo = {
 	balances: BalanceEntry[];
 	properties: Properties;
+	isVerified?: boolean;
 };
 
 const client = get(clientStore);
@@ -18,7 +19,6 @@ const client = get(clientStore);
 export async function load({ params }: { params: RouteParams }): Promise<TokenInfo> {
 	const address = params.slug;
 
-	const notFoundError = error(404, 'Address not found');
 	const balanceKeys = await getDatastore(address)
 		.then((res) => res.filter((entry) => entry.startsWith('BALANCE')))
 		.catch((err) => {
@@ -26,7 +26,6 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 			return [];
 		});
 	const keys = [...new Set([...ERC20_KEYS, ...balanceKeys.slice(0, MAX_PER_REQUEST)])];
-	console.log(keys);
 
 	const r = await client
 		.publicApi()
@@ -79,10 +78,10 @@ export async function load({ params }: { params: RouteParams }): Promise<TokenIn
 		burnable
 	};
 
-	console.log(properties, balances);
 	return {
 		balances,
-		properties
+		properties,
+		isVerified: isVerified(address)
 	};
 }
 

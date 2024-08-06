@@ -132,7 +132,6 @@ export const buildDeployToken = (
 	mintable: boolean,
 	burnable: boolean
 ): ICallData => {
-	console.log(ERC20_DEPLOYER);
 	return {
 		...baseCallData,
 		targetAddress: ERC20_DEPLOYER,

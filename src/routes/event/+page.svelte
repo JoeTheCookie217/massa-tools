@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { Label } from '$lib/components/ui/label';
@@ -7,8 +6,6 @@
 	import { EventDecoder } from '@dusalabs/sdk';
 	import type { IEvent } from '@massalabs/massa-web3';
 
-	$: url = $page.url.pathname;
-	$: console.log($page.url.searchParams);
 	let txHash = '';
 	let events: IEvent[] = [];
 	let showDetails = false;
@@ -17,9 +14,7 @@
 	const extractKeyword = (bytes: string): string => bytes.split(':')[0];
 
 	const handleSearch = async (txId: string) => {
-		console.log('handleSearch', txId);
-		const { isError, events: e } = await fetchEvents(txId);
-		console.log({ isError, e });
+		const { events: e } = await fetchEvents(txId);
 		events = e;
 	};
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Token, TokenAmount, WMAS as _WMAS } from '@dusalabs/sdk';
 	import { Button } from '$lib/components/ui/button';
-	import { printAddress, printTokenAmount } from '$lib/utils/methods';
+	import { getAddressLabel, printAddress, printTokenAmount } from '$lib/utils/methods';
 	import clientStore from '$lib/store/client';
 	import {
 		fetchMasBalance,
@@ -32,7 +32,7 @@
 	import { CHAIN_ID, WMAS } from '$lib/utils/config';
 
 	export let data;
-	const { properties, balances } = data;
+	const { properties, balances, isVerified } = data;
 	const tokenAddress = properties.address;
 
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
@@ -79,15 +79,9 @@
 	const fetch = (address: string | undefined) => {
 		if (!address) return;
 
-		fetchTokenAllowances(tokenAddress, address).then((res) => {
-			allowances = res;
-		});
-		fetchTokenBalance(tokenAddress, address).then((balance) => {
-			userBalance = balance;
-		});
-		fetchMasBalance(address).then((balance) => {
-			masBalance = balance;
-		});
+		fetchTokenAllowances(tokenAddress, address).then((res) => (allowances = res));
+		fetchTokenBalance(tokenAddress, address).then((balance) => (userBalance = balance));
+		fetchMasBalance(address).then((balance) => (masBalance = balance));
 	};
 
 	const token = new Token(CHAIN_ID, tokenAddress, properties.decimals);
@@ -141,11 +135,16 @@
 
 <div class="flex flex-col gap-4">
 	<h1 class="text-4xl">{properties.name} ({properties.symbol})</h1>
-	<div class="flex">
+	<div class="flex items-center">
 		<h2 class="text-xl">
 			{printAddress(properties.address)}
 		</h2>
 		<CopyButton copyText={properties.address} />
+		{#if isVerified}
+			<div class="text-sm">
+				<span class="text-green-500 pr-1">Verified</span>{getAddressLabel(properties.address)}
+			</div>
+		{/if}
 	</div>
 	<h2 class="text-2xl">Properties</h2>
 	<div class="grid grid-cols-3 gap-4">
