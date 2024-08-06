@@ -10,7 +10,7 @@ import {
 	VAULT_MANAGER_ADDRESS as _VAULT_MANAGER_ADDRESS
 } from '@dusalabs/sdk';
 import { bytesToU256, bytesToU64, strToBytes, Args, Address } from '@massalabs/massa-web3';
-import { CHAIN_ID, DAI, USDC, WETH, WMAS, WETH_B, USDT } from './config';
+import { CHAIN_ID, DAI, USDC, WETH, WMAS, WETH_B, USDT, PUR } from './config';
 
 export const toTitle = (str: string): string => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -42,7 +42,7 @@ export const dexAddresses = [
 	VAULT_MANAGER_ADDRESS,
 	MULTICALL_ADDRESS
 ];
-export const tokenAddresses = [WMAS, USDC, WETH, DAI, WETH_B, USDT];
+export const tokenAddresses = [WMAS, USDC, WETH, DAI, WETH_B, USDT, PUR];
 
 export const isVerified = (address: string) => isDusaContract(address) || isTokenAddress(address);
 export const isDusaContract = (address: string) => dexAddresses.some((addr) => addr === address);

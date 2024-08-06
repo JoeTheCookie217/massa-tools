@@ -5,7 +5,8 @@ import {
 	USDT as _USDT,
 	DAI as _DAI,
 	WETH as _WETH,
-	WETH_B as _WETH_B
+	WETH_B as _WETH_B,
+	Token
 } from '@dusalabs/sdk';
 import { CHAIN_ID as MassaChainId } from '@massalabs/massa-web3';
 
@@ -41,11 +42,33 @@ export const FEATURE_FLAGS = {
 	CREATE_MULTISIG: false
 };
 
+const purDecimals = 18;
+const purSymbol = 'PUR';
+const purName = 'Purrfect Universe';
+const _PUR: typeof _WMAS = {
+	[ChainId.BUILDNET]: new Token(
+		ChainId.BUILDNET,
+		'AS12EWaHZ3AhJvPUBE74BM1x1NJAFdkM6Ryu12AqxyXNvrk64vgPQ',
+		purDecimals,
+		purSymbol,
+		purName
+	),
+	[ChainId.MAINNET]: new Token(
+		ChainId.MAINNET,
+		'AS133eqPPaPttJ6hJnk3sfoG5cjFFqBDi1VGxdo2wzWkq8AfZnan',
+		purDecimals,
+		purSymbol,
+		purName
+	)
+};
+
 export const WMAS = _WMAS[CHAIN_ID];
 export const USDC = _USDC[CHAIN_ID];
 export const DAI = _DAI[CHAIN_ID];
 export const WETH = _WETH[CHAIN_ID];
 export const WETH_B = _WETH_B[CHAIN_ID];
 export const USDT = _USDT[CHAIN_ID];
+export const PUR = _PUR[CHAIN_ID];
+
 export const MULTISIG_DEPLOYER = _MULTISIG_DEPLOYER[CHAIN_ID];
 export const ERC20_DEPLOYER = _ERC20_DEPLOYER[CHAIN_ID];
