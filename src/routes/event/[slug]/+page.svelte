@@ -7,8 +7,7 @@
 	import type { IEvent } from '@massalabs/massa-web3';
 	import { onMount } from 'svelte';
 
-	$: url = $page.url.pathname;
-	let txHash = url?.split('/').pop();
+	$: txHash = $page.params.slug;
 	let events: IEvent[] = [];
 	let showDetails = false;
 	let decodeSmart = false;
@@ -50,10 +49,12 @@
 						: data.startsWith('TransferSingle:')
 						? EventDecoder.decodeLBTransfer
 						: EventDecoder.decodeError}
-					{EventDecoder.extractParams(data).length ? extractKeyword(data) : null}
+					{#if method !== EventDecoder.decodeError}
+						{extractKeyword(data)}
+					{/if}
 					{JSON.stringify(method(data))}
 				{:else}
-					{EventDecoder.decodeError(data)}
+					{!data.includes('Contract deployed at address:') ? EventDecoder.decodeError(data) : data}
 				{/if}
 			</div>
 		{/each}
