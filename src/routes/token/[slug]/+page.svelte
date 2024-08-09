@@ -211,12 +211,10 @@
 						<AddressInput bind:recipient={transferReceiver} bind:valid />
 
 						<div>
-							<!-- <Label for="transferAmount">Amount</Label> -->
-							<Input
-								type="number"
-								placeholder="Amount"
-								id="transferAmount"
-								bind:value={transferAmount}
+							<TokenAmountInput
+								amount={transferAmount}
+								{parsedBalance}
+								setMaxAmount={() => (transferAmount = fullyParsedBalance)}
 							/>
 						</div>
 						<Button on:click={transfer} disabled={disabledTransfer}>Transfer</Button>
