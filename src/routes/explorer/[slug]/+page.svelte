@@ -117,7 +117,7 @@
 	</div>
 
 	<h2 class="text-2xl">Datastore</h2>
-	<div class="flex items-end gap-2">
+	<div class="flex flex-col items-end gap-2">
 		<div>
 			<Checkbox id="mintable" bind:checked={showPersistentMap} />
 			<Label for="mintable">Show Persistent Map entries</Label>
@@ -125,11 +125,11 @@
 		<div>
 			<Input type="text" id="filter" placeholder="Filter by key" bind:value={filter} />
 		</div>
+		<span>{keys.length} keys found</span>
+		{#if tooBig && !keys.length}
+			<div class="text-center text-sm">Too many keys to display. Please specify a prefix</div>
+		{/if}
 	</div>
-
-	{#if tooBig}
-		<div class="text-center text-sm">Too many keys to display. Please specify a prefix</div>
-	{/if}
 
 	<Table.Root>
 		<Table.Header>

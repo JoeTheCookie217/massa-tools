@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 
 	$: txHash = $page.params.slug;
-	let events: IEvent[] = [];
+	let events: IEvent[];
 	let showDetails = false;
 	let decodeSmart = false;
 
@@ -29,7 +29,12 @@
 		<Checkbox id="smart" bind:checked={decodeSmart} />
 	</div>
 </div>
-{#if events.length}
+
+{#if events === undefined}
+	<div>Loading...</div>
+{:else if events.length === 0}
+	<div>No events found</div>
+{:else}
 	<div class="flex flex-col gap-2">
 		{#each events as { data, context }}
 			<div>
