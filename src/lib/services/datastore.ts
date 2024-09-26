@@ -2,7 +2,7 @@ import { EventPoller, bytesToU256 } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
-import { IERC20, parseUnits, Token as BaseToken } from '@dusalabs/sdk';
+import { IERC20, parseUnits, Token as BaseToken, IBaseContract } from '@dusalabs/sdk';
 import { toDatastoreInput } from '$lib/utils/methods';
 import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
 import { indexerApi } from '$lib/utils/config';
@@ -61,20 +61,17 @@ export const fetchTokenAllowances = async (
 		.catch(() => [] as string[]);
 	if (!keys) return Promise.reject();
 
-	return baseClient
-		.publicApi()
-		.getDatastoreEntries(toDatastoreInput(address, keys))
-		.then((res) => {
-			return res.map((r, i) => {
-				const amount = r.candidate_value ? bytesToU256(r.candidate_value) : 0n;
-				const spender = keys[i].slice(owner.length);
-				return {
-					owner,
-					spender,
-					amount
-				};
-			});
+	return new IBaseContract(address, baseClient).extract(keys).then((res) => {
+		return res.map((r, i) => {
+			const amount = r ? bytesToU256(r) : 0n;
+			const spender = keys[i].slice(owner.length);
+			return {
+				owner,
+				spender,
+				amount
+			};
 		});
+	});
 };
 
 export const fetchEvents = async (txId: string) => {
