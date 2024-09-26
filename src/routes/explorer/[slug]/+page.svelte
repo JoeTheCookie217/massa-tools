@@ -31,7 +31,12 @@
 	import { decodeFeeParameters, decodePairInformation, decodePreset } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
-	import { getLargeDatastoreKeys } from '$lib/services/datastore.js';
+	import { getLargeDatastoreKeys } from '$lib/services/datastore';
+	import { trpc } from '$lib/trpc/client';
+	import { createTable, createRender } from 'svelte-headless-table';
+	import { writable } from 'svelte/store';
+	import CopyLink from '$lib/components/copy-link.svelte';
+	import DataTable from '$lib/components/data-table.svelte';
 
 	export let data;
 	// prettier-ignore
@@ -39,6 +44,38 @@
 
 	// TODO: highlight keys that contain the `connectedAddress`
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
+
+	$: query = trpc.getTxs.query({ address });
+	$: operations = $query.data || [];
+
+	$: operationTable = createTable(writable(operations));
+	$: operationColumns = operationTable.createColumns([
+		operationTable.column({
+			accessor: 'targetAddress',
+			header: 'Smart contract',
+			cell: ({ value }) => createRender(CopyLink, { copyText: value })
+		}),
+		operationTable.column({
+			accessor: 'targetFunction',
+			header: 'Method'
+		}),
+		operationTable.column({
+			accessor: 'callerAddress',
+			header: 'Caller',
+			cell: ({ value }) => createRender(CopyLink, { copyText: value })
+		}),
+		// operationTable.column({
+		// 	accessor: 'data',
+		// 	header: 'Data',
+		// 	cell: ({ value }) => bytesToStr(Uint8Array.from(value.data))
+		// }),
+		operationTable.column({
+			accessor: 'value',
+			header: 'Value',
+			cell: ({ value }) => printMasBalance(toMAS(value).toFixed(2))
+		})
+	]);
+	$: operationModel = operationTable.createViewModel(operationColumns);
 
 	const isPMEntry = (key: string) =>
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
@@ -76,7 +113,7 @@
 	$: values = Array(displayedEntries.length).fill(null);
 
 	const fetchEntry = async (key: string, index: number) => {
-		const res = await $clientStore
+		const res = await new IBaseContract(address, $clientStore)
 			.publicApi()
 			.getDatastoreEntries([
 				{
@@ -219,3 +256,14 @@
 		</Table.Body>
 	</Table.Root>
 </div>
+
+{#if $query.isSuccess && $query.data}
+	<h2>Operations</h2>
+	<DataTable model={operationModel} />
+	<br />
+	<br />
+{:else if $query.isError}
+	<p>{$query.error.message}</p>
+{:else}
+	<p>Loading...</p>
+{/if}
