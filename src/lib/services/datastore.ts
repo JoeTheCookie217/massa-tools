@@ -1,10 +1,10 @@
-import { EventPoller, bytesToU256 } from '@massalabs/massa-web3';
+import { Args, EventPoller, bytesToStr, bytesToU256 } from '@massalabs/massa-web3';
 import type { Allowance } from '$lib/utils/types';
 import { get } from 'svelte/store';
 import clientStore from '$lib/store/client';
-import { IERC20, parseUnits } from '@dusalabs/sdk';
-import { toDatastoreInput } from '$lib/utils/methods';
+import { IBaseContract, IERC20, parseUnits } from '@dusalabs/sdk';
 import { pollAsyncEvents, type IEventPollerResult, eventsFilter } from './events';
+import { CHAIN_NAME, MNS_RESOLVER } from '$lib/utils/config';
 
 const baseClient = get(clientStore);
 
@@ -77,4 +77,18 @@ export const fetchEvents = async (txId: string) => {
 			})
 		)
 		.finally(() => eventPoller.stopPolling());
+};
+
+export const resolveMNS = async (slug: string): Promise<string> => {
+	return baseClient
+		.mnsResolver()
+		.resolve(slug)
+		.catch(() =>
+			new IBaseContract(MNS_RESOLVER, baseClient)
+				.read({
+					targetFunction: 'dnsResolve',
+					parameter: new Args().addString(slug)
+				})
+				.then((r) => bytesToStr(r.returnValue))
+		);
 };
