@@ -31,21 +31,23 @@ export const getDatastore = (address: string) =>
 				.sort((a, b) => a.localeCompare(b))
 		);
 
-export const getBigDatastore = (address: string, prefix: string) =>
-	fetch(
-		`https://indexer-mainnet-dusa.up.railway.app/datastore-keys?address=${address}&prefix=${prefix}`
-	).then((res) => res.json());
+export const getBigDatastore = async (address: string, prefix: string) => {
+	const url = `https://indexer-${CHAIN_NAME}-dusa.up.railway.app/datastore-keys?address=${address}&prefix=${prefix}`;
+	return fetch(url).then((res) => res.json());
+};
 
 export const fetchTokenAllowances = async (
 	address: string,
 	owner: string
 ): Promise<Allowance[]> => {
+	const prefix = 'ALLOWANCE' + owner;
 	const keys = await getDatastore(address)
-		.then((entries) => {
-			const filteredEntries = entries.filter((e) => e.startsWith(owner));
-			return filteredEntries;
+		.then((entries) => entries.filter((e) => e.startsWith(prefix)))
+		.catch((err) => {
+			console.log('err', err);
+			getBigDatastore(address, prefix);
 		})
-		.catch(() => [] as string[]);
+		.catch(() => null);
 	if (!keys) return Promise.reject();
 
 	return baseClient
