@@ -8,7 +8,6 @@
 	import { typescript } from 'svelte-highlight/languages';
 	import styles from 'svelte-highlight/styles/an-old-hope';
 	import useCopy from '$lib/hooks/useCopy';
-	import { isAddress } from '$lib/utils/methods';
 	import AddressInput from '$lib/components/AddressInput.svelte';
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';

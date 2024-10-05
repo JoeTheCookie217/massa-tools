@@ -34,6 +34,9 @@ export const OTHER_CHAIN_DOMAIN =
 export const MASSA_CHAIN_ID =
 	Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? MassaChainId.BuildNet : MassaChainId.MainNet;
 
+export const DUSA_DOMAIN =
+	'https://' + (Number(CHAIN_ID) === Number(ChainId.BUILDNET) ? 'app.dusa.io' : 'beta.dusa.io');
+
 // max number of datastore entries to fetch in a single request
 export const MAX_PER_REQUEST = 1000;
 
@@ -72,3 +75,4 @@ export const PUR = _PUR[CHAIN_ID];
 
 export const MULTISIG_DEPLOYER = _MULTISIG_DEPLOYER[CHAIN_ID];
 export const ERC20_DEPLOYER = _ERC20_DEPLOYER[CHAIN_ID];
+export const MNS_RESOLVER = 'AS1q5hUfxLXNXLKsYQVXZLK7MPUZcWaNZZsK7e9QzqhGdAgLpUGT'; // CHAIN_ID_DNS_ADDRESS_MAP

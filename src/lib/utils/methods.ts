@@ -21,7 +21,6 @@ export const isAddress = (address: string): boolean => {
 		new Address(address);
 		return true;
 	} catch (e) {
-		console.log(e);
 		return false;
 	}
 };
@@ -116,3 +115,12 @@ export const chunk = (arr: string[], size: number) =>
 	Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
 		arr.slice(i * size, i * size + size)
 	);
+
+export const debounce = (callback: Function, wait = 300) => {
+	let timeout: ReturnType<typeof setTimeout>;
+
+	return (...args: any[]) => {
+		clearTimeout(timeout);
+		timeout = setTimeout(() => callback(...args), wait);
+	};
+};
