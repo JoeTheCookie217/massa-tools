@@ -37,9 +37,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@dusalabs/sdk": "^0.6.2",
+		"@dusalabs/sdk": "^0.6.7",
 		"@fontsource-variable/space-grotesk": "^5.0.18",
-		"@massalabs/massa-web3": "4.0.1",
+		"@massalabs/massa-web3": "4.0.3",
 		"@massalabs/wallet-provider": "2.0.0",
 		"@vercel/analytics": "^1.1.2",
 		"@vercel/speed-insights": "^1.0.10",

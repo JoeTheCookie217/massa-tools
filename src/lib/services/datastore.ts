@@ -50,20 +50,17 @@ export const fetchTokenAllowances = async (
 		.catch(() => null);
 	if (!keys) return Promise.reject();
 
-	return baseClient
-		.publicApi()
-		.getDatastoreEntries(toDatastoreInput(address, keys))
-		.then((res) => {
-			return res.map((r, i) => {
-				const amount = r.candidate_value ? bytesToU256(r.candidate_value) : 0n;
-				const spender = keys[i].slice(owner.length);
-				return {
-					owner,
-					spender,
-					amount
-				};
-			});
+	return new IBaseContract(address, baseClient).extract(keys).then((res) => {
+		return res.map((r, i) => {
+			const amount = r ? bytesToU256(r) : 0n;
+			const spender = keys[i].slice(prefix.length);
+			return {
+				owner,
+				spender,
+				amount
+			};
 		});
+	});
 };
 
 export const fetchEvents = async (txId: string) => {
