@@ -1,33 +1,52 @@
 <script lang="ts">
-	import { isAddress, isToken } from '$lib/utils/methods';
+	import { isAddress, isTokenAddress, isTokenSymbol, tokenAddresses } from '$lib/utils/methods';
 	import { Input } from './ui/input';
 	import { goto } from '$app/navigation';
 
-	let address: string;
+	let value: string;
+	let focus = false;
+
+	const redirect = (value: string) => {
+		if (isTokenSymbol(value) || isTokenAddress(value)) {
+			goto(`/token/${value}`);
+			value = '';
+		} else if (isAddress(value)) {
+			goto(`/explorer/${value}`);
+			value = '';
+		} else if (value.startsWith('O1')) {
+			goto(`/event/${value}`);
+			value = '';
+		}
+	};
 
 	const onKeyDown = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') {
-			const value = (event.target as HTMLInputElement).value;
-			console.log('Enter key pressed', value);
-			if (isToken(value)) {
-				address = '';
-				goto(`/token/${value}`);
-			} else if (isAddress(value)) {
-				address = '';
-				goto(`/explorer/${value}`);
-			} else if (value.startsWith('O1')) {
-				address = '';
-				goto(`/event/${value}`);
-			}
+			redirect(value);
 		}
+	};
+
+	const onClick = (value: string) => {
+		redirect(value);
 	};
 </script>
 
-<div class="grow">
+<div class="grow relative">
 	<Input
 		type="text"
 		placeholder="Search by address, transaction hash or token"
-		bind:value={address}
+		bind:value
 		on:keydown={onKeyDown}
+		on:focus={() => (focus = true)}
+		on:blur={() => (focus = false)}
 	/>
+	{#if focus}
+		<div class="absolute inset-x-0 top-full">
+			<div class="">Examples:</div>
+			{#each tokenAddresses as token}
+				<div class="text-sm text-gray-500" on:click={() => onClick(token.address)}>
+					{token.address}
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>

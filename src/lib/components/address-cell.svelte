@@ -12,6 +12,9 @@
 		<Tooltip.Trigger>
 			<a href={`/explorer/${address}`}>
 				{printAddress(address, 8)}
+
+				<!-- to appear in `Ctrl/Cmd + F` -->
+				<span class="hidden">{address}</span>
 			</a>
 		</Tooltip.Trigger>
 		<Tooltip.Content>

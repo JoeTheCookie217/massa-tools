@@ -7,6 +7,8 @@
 		removeRecentAddress,
 		type Address
 	} from '$lib/utils/localStorage';
+	import { printAddress } from '$lib/utils/methods';
+	import { LB_FACTORY_ADDRESS } from '@dusalabs/sdk';
 
 	let address: string;
 
@@ -36,6 +38,18 @@
 			>
 		</Button>
 	</div>
+
+	<div class="flex">
+		<div>Popular addresses</div>
+		<div>
+			<div>Dusa Core</div>
+			<div>
+				<span> Factory </span>
+				<a href="/explorer/${LB_FACTORY_ADDRESS}" class="text-blue-500" />
+			</div>
+		</div>
+	</div>
+
 	{#if history.length}
 		<div class="mt-4">
 			<div class="flex items-center gap-2">
@@ -50,7 +64,7 @@
 						</span>
 					{/if}
 
-					<a href="/explorer/{historyItem.address}">{historyItem.address}</a>
+					<a href="/explorer/{historyItem.address}">{printAddress(historyItem.address)}</a>
 					<Button variant="ghost" on:click={() => handleRemove(historyItem)}>-</Button>
 				</div>
 			{/each}
