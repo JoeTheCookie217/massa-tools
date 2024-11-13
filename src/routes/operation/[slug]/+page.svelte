@@ -2,7 +2,13 @@
 	import { trpc } from '$lib/trpc/client';
 	import { page } from '$app/stores';
 	import { bytesToStr } from '@massalabs/massa-web3';
-	import { EventDecoder } from '@dusalabs/sdk';
+	import {
+		decodeLiquidityTx,
+		decodeSwapTx,
+		EventDecoder,
+		isLiquidtyMethod,
+		isSwapMethod
+	} from '@dusalabs/sdk';
 	import { writable } from 'svelte/store';
 	import { createRender, createTable } from 'svelte-headless-table';
 	import dayjs from 'dayjs';
@@ -49,22 +55,28 @@
 	// hide certain values in output from JSON.stringify
 	// https://stackoverflow.com/questions/4910567/hide-certain-values-in-output-from-json-stringify
 	function replacer(key: X, value: any) {
-		const dismissKeys: X[] = ['createdAt', 'blockId', 'id', 'events'];
+		const dismissKeys: X[] = ['createdAt', 'blockId', 'id', 'events', 'data'];
 		if (dismissKeys.includes(key)) return undefined;
 		else return value;
 	}
 </script>
 
 {#if $query.isSuccess && $query.data}
-	{@const {
-		data: { createdAt, blockId }
-	} = $query}
+	{@const { data } = $query}
+	{@const decoded = isSwapMethod(data.targetFunction)
+		? decodeSwapTx(data.targetFunction, Uint8Array.from(data.data.data), data.value)
+		: isLiquidtyMethod(data.targetFunction)
+		? decodeLiquidityTx(data.targetFunction, Uint8Array.from(data.data.data), data.value)
+		: undefined}
 	<div>
-		<p>Timestamp: {dayjs(createdAt).fromNow()}</p>
+		<p>Timestamp: {dayjs(data.createdAt).fromNow()}</p>
 		<div>{JSON.stringify($query.data, replacer, 4)}</div>
+		{#if decoded}
+			<div>{JSON.stringify(decoded, null, 4)}</div>
+		{/if}
 
 		<CopyButton copyText={txHash} />
-		<CopyLink copyText={blockId} />
+		<CopyLink copyText={data.blockId} />
 	</div>
 
 	<DataTable {model} />
