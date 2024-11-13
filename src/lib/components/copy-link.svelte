@@ -11,7 +11,9 @@
 		: 'explorer';
 </script>
 
-<a href={`/${path}/${copyText}`} class="hover:underline">
-	{printAddress(copyText)}
-</a>
-<CopyButton {copyText} />
+<div>
+	<a href={`/${path}/${copyText}`} class="hover:underline">
+		{printAddress(copyText)}
+	</a>
+	<CopyButton {copyText} />
+</div>

@@ -10,9 +10,12 @@
 	dayjs.extend(relativeTime);
 	import CopyLink from '$lib/components/copy-link.svelte';
 	import DataTable from '$lib/components/data-table.svelte';
+	import CopyButton from '$lib/components/copy-button.svelte';
 
 	const txHash = $page.params.slug;
 	$: query = trpc.getOperation.query({ txHash }, { enabled: !!txHash });
+	type X = keyof NonNullable<typeof $query.data>;
+
 	$: console.log(txHash, $query.data?.events);
 
 	$: table = createTable(writable($query.data?.events));
@@ -45,9 +48,9 @@
 
 	// hide certain values in output from JSON.stringify
 	// https://stackoverflow.com/questions/4910567/hide-certain-values-in-output-from-json-stringify
-	function replacer(key: string, value: any) {
-		if (key == 'recentSwaps') return undefined;
-		else if (key == 'recentLiq') return undefined;
+	function replacer(key: X, value: any) {
+		const dismissKeys: X[] = ['createdAt', 'blockId', 'id', 'events'];
+		if (dismissKeys.includes(key)) return undefined;
 		else return value;
 	}
 </script>
@@ -58,7 +61,9 @@
 	} = $query}
 	<div>
 		<p>Timestamp: {dayjs(createdAt).fromNow()}</p>
-		<div>{JSON.stringify($query.data, replacer, 2)}</div>
+		<div>{JSON.stringify($query.data, replacer, 4)}</div>
+
+		<CopyButton copyText={txHash} />
 		<CopyLink copyText={blockId} />
 	</div>
 
