@@ -42,14 +42,23 @@
 	]);
 
 	$: model = table.createViewModel(columns);
+
+	// hide certain values in output from JSON.stringify
+	// https://stackoverflow.com/questions/4910567/hide-certain-values-in-output-from-json-stringify
+	function replacer(key: string, value: any) {
+		if (key == 'recentSwaps') return undefined;
+		else if (key == 'recentLiq') return undefined;
+		else return value;
+	}
 </script>
 
 {#if $query.isSuccess && $query.data}
 	{@const {
-		data: { createdAt, blockId, events }
+		data: { createdAt, blockId }
 	} = $query}
 	<div>
 		<p>Timestamp: {dayjs(createdAt).fromNow()}</p>
+		<div>{JSON.stringify($query.data, replacer, 2)}</div>
 		<CopyLink copyText={blockId} />
 	</div>
 
