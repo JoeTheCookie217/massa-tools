@@ -2,7 +2,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import {
 		getAddressLabel,
-		isAddress,
 		printAddress,
 		printMasBalance,
 		printUint8Array,
@@ -30,32 +29,23 @@
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
-	import { getBigDatastore } from '$lib/services/datastore.js';
+	import { getBigDatastore } from '$lib/services/datastore';
+	import { DUSA_DOMAIN } from '$lib/utils/config';
+	import { createRender, createTable } from 'svelte-headless-table';
+	import { writable } from 'svelte/store';
+	import { AddressInfo } from './+page';
 
-	export let data;
+	let data: AddressInfo = $props();
 	// prettier-ignore
 	const { keys: k, address, isVerified, isToken, isMultisig, balance, erc20Balances, tooBig } = data;
 
 	// TODO: highlight keys that contain the `connectedAddress`
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
+	const connectedAddress = $derived($clientStore.wallet().getBaseAccount()?.address() || '');
 
 	const isPMEntry = (key: string) =>
 		key.includes('::') || key.includes('ALLOWANCE') || key.includes('BALANCE');
 
 	let showPersistentMap = false;
-	let keys = k;
-	let filter = '';
-	$: filteredEntries = filter ? keys.filter((key) => key.includes(filter)) : keys;
-	$: displayedEntries = showPersistentMap
-		? filteredEntries
-		: filteredEntries.filter((key) => !isPMEntry(key));
-
-	$: {
-		if (tooBig) {
-			if (!filter.length) keys = [];
-			else getBigDatastore(address, filter).then((res) => (keys = res));
-		}
-	}
 
 	let values: Uint8Array[] = [];
 	$: values = Array(displayedEntries.length).fill(null);
@@ -79,6 +69,38 @@
 			label,
 			type: 'address'
 		});
+
+	const operationTable = createTable(writable(displayedEntries));
+	$: operationColumns = operationTable.createColumns([
+		operationTable.column({
+			accessor: '',
+			header: 'Smart contract',
+			cell: ({ value }) => createRender(CopyLink, { copyText: value })
+		}),
+		operationTable.column({
+			accessor: 'targetFunction',
+			header: 'Method'
+		}),
+		operationTable.column({
+			accessor: 'callerAddress',
+			header: 'Caller',
+			cell: ({ value }) => createRender(CopyLink, { copyText: value })
+		}),
+		// operationTable.column({
+		// 	accessor: 'data',
+		// 	header: 'Data',
+		// 	cell: ({ value }) => bytesToStr(Uint8Array.from(value.data))
+		// }),
+		operationTable.column({
+			accessor: 'value',
+			header: 'Value',
+			cell: ({ value }) => printMasBalance(toMAS(value).toFixed(2))
+		})
+	]);
+	$: operationModel = operationTable.createViewModel(operationColumns);
+
+	const MAX_DISPLAYED_ENTRIES = 100;
+	let page = 0;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -97,6 +119,9 @@
 						<span>{new TokenAmount(token, b).toSignificant()} {token.symbol}</span>
 					{/if}
 				{/each}
+				<a href={`${DUSA_DOMAIN}/portfolio/${address}`}>
+					<div class="text-sm underline">Portfolio</div>
+				</a>
 			</div>
 			{#if isVerified}
 				<div class="text-sm">

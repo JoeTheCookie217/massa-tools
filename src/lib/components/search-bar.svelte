@@ -1,24 +1,23 @@
 <script lang="ts">
-	import { isAddress, isToken } from '$lib/utils/methods';
+	import { isToken } from '$lib/utils/methods';
 	import { Input } from './ui/input';
 	import { goto } from '$app/navigation';
 
-	let address: string;
+	let search: string;
 
 	const onKeyDown = (event: KeyboardEvent) => {
-		if (event.key === 'Enter') {
-			const value = (event.target as HTMLInputElement).value;
-			console.log('Enter key pressed', value);
-			if (isToken(value)) {
-				address = '';
-				goto(`/token/${value}`);
-			} else if (isAddress(value)) {
-				address = '';
-				goto(`/explorer/${value}`);
-			} else if (value.startsWith('O1')) {
-				address = '';
-				goto(`/event/${value}`);
-			}
+		if (event.key !== 'Enter') return;
+		const value = (event.target as HTMLInputElement).value;
+		console.log('Enter key pressed', value);
+		if (isToken(value)) {
+			search = '';
+			goto(`/token/${value}`);
+		} else if (value.startsWith('O1')) {
+			search = '';
+			goto(`/event/${value}`);
+		} else {
+			search = '';
+			goto(`/explorer/${value}`);
 		}
 	};
 </script>
@@ -27,7 +26,7 @@
 	<Input
 		type="text"
 		placeholder="Search by address, transaction hash or token"
-		bind:value={address}
+		bind:value={search}
 		on:keydown={onKeyDown}
 	/>
 </div>

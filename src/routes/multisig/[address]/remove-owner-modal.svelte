@@ -6,11 +6,14 @@
 	import { Args } from '@massalabs/massa-web3';
 	import OwnerSelect from './owner-select.svelte';
 
-	export let multisigAddress: string;
-	export let owners: string[];
+	interface Props {
+		owners: string[];
+		multisigAddress: string;
+	}
+	let { owners, multisigAddress }: Props = $props();
 
-	let removeOwnerAddress: string = '';
-	$: disabled = !removeOwnerAddress;
+	let removeOwnerAddress: string = $state('');
+	const disabled = $derived(!removeOwnerAddress);
 
 	const { send } = useSendTx();
 
@@ -25,7 +28,7 @@
 		send(submitData);
 	};
 
-	let open = false;
+	let open = $state(false);
 	const onOpenChange = (e: boolean | undefined) => {
 		if (e) open = e;
 	};

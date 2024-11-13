@@ -1,21 +1,13 @@
 import { error } from '@sveltejs/kit';
-import {
-	byteToU8,
-	bytesToStr,
-	strToBytes,
-	type IDatastoreEntry,
-	bytesToU256,
-	Args
-} from '@massalabs/massa-web3';
+import { strToBytes } from '@massalabs/massa-web3';
 import clientStore from '$lib/store/client';
 import { get } from 'svelte/store';
-import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
+import { fetchMasBalance, getDatastore, resolveMNS } from '$lib/services/datastore';
 import type { RouteParams } from './$types';
-import { isVerified, parseBalance, tokenAddresses } from '$lib/utils/methods';
+import { isAddress, isVerified, parseBalance, tokenAddresses } from '$lib/utils/methods';
 import { ERC20_KEYS } from '$lib/utils/types';
-import { CHAIN_ID, MAX_PER_REQUEST } from '$lib/utils/config';
 
-type AddressInfo = {
+export type AddressInfo = {
 	address: string;
 	keys: string[];
 	isVerified: boolean;
@@ -29,7 +21,8 @@ type AddressInfo = {
 const client = get(clientStore);
 
 export async function load({ params }: { params: RouteParams }): Promise<AddressInfo> {
-	const address = params.slug;
+	const address: string = isAddress(params.slug) ? params.slug : await resolveMNS(params.slug);
+	if (!isAddress(address)) throw error(404, 'Address invalid');
 
 	const notFoundError = error(404, 'Address not found');
 

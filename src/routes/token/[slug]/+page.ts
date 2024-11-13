@@ -9,7 +9,7 @@ import type { RouteParams } from './$types';
 import { MAX_PER_REQUEST } from '$lib/utils/config';
 import { IBaseContract } from '@dusalabs/sdk';
 
-type TokenInfo = {
+export type TokenInfo = {
 	balances: BalanceEntry[];
 	properties: Properties;
 	isVerified?: boolean;

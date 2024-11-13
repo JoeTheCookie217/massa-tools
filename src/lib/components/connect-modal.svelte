@@ -29,52 +29,52 @@
 		});
 	});
 
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() || '';
+	const connectedAddress = $derived($clientStore.wallet().getBaseAccount()?.address() || '');
 	let balance: string | undefined;
 
 	$: {
-		if (connectedAddress) {
-			$clientStore
-				.wallet()
-				.getAccountBalance(connectedAddress)
-				.then((res) => {
-					if (res) balance = toMAS(res.final).toFixed(2);
-				});
-			accountListener && accountListener.unsubscribe();
+		if (!connectedAddress) return;
 
-			if (selectedWallet?.name() === 'BEARBY') {
-				const _listener = selectedWallet.listenAccountChanges((address) => {
-					console.log('account changed', address);
-					if (connectedAddress === address) return;
+		$clientStore
+			.wallet()
+			.getAccountBalance(connectedAddress)
+			.then((res) => {
+				if (res) balance = toMAS(res.final).toFixed(2);
+			});
+		accountListener && accountListener.unsubscribe();
 
-					accounts.forEach((a) => console.log(accounts.length, 'acc', a.address()));
-					const index = accounts.findIndex((acc) => acc.address() === address);
-					console.log('index', index);
-					if (index === -1) return;
+		if (selectedWallet?.name() !== 'BEARBY') return;
 
-					const acc = accounts[index];
-					select(acc, index);
-					// fetchAccounts(selectedWallet);
-				});
-				accountListener = _listener;
-			}
-		}
+		const _listener = selectedWallet.listenAccountChanges((address) => {
+			console.log('account changed', address);
+			if (connectedAddress === address) return;
+
+			accounts.forEach((a) => console.log(accounts.length, 'acc', a.address()));
+			const index = accounts.findIndex((acc) => acc.address() === address);
+			console.log('index', index);
+			if (index === -1) return;
+
+			const acc = accounts[index];
+			select(acc, index);
+			// fetchAccounts(selectedWallet);
+		});
+		accountListener = _listener;
 	}
 
 	$: {
 		networkListener && networkListener.unsubscribe();
 
-		if (selectedWallet) {
-			const _listener = selectedWallet.listenNetworkChanges((_network) => {
-				console.log('network changed', _network);
-				// setNetwork(_network);
-			});
+		if (!selectedWallet) return;
 
-			networkListener = _listener;
+		const _listener = selectedWallet.listenNetworkChanges((_network) => {
+			console.log('network changed', _network);
+			// setNetwork(_network);
+		});
 
-			if (accounts) {
-				// fetchAccountsBalance(accounts).then(setMasBalances);
-			}
+		networkListener = _listener;
+
+		if (accounts) {
+			// fetchAccountsBalance(accounts).then(setMasBalances);
 		}
 	}
 
@@ -124,7 +124,7 @@
 		acc?.length && select(acc[accountIndex], accountIndex);
 	});
 
-	let open = false;
+	let open = $state(false);
 	const onOpenChange = (e: boolean | undefined) => {
 		if (e) open = e;
 		if (e === false) {

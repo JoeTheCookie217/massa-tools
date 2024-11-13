@@ -14,28 +14,29 @@
 	import RedirectModal from '../../create/redirect-modal.svelte';
 	dayjs.extend(relativeTime);
 
-	let multisigAddress: string;
+	let multisigAddress: string = $state('');
 
-	let owners: string[] = [];
-	let validOwners: boolean[] = [];
-	let ownersLength: number = 0;
-	let required: number;
-	let executionDelay: number = 3600000;
-	let upgradeDelay: number = 86400000;
-	$: disabledText =
+	let owners: string[] = $state([]);
+	let validOwners: boolean[] = $state([]);
+	let ownersLength: number = $state(0);
+	let required: number = $state(0);
+	let executionDelay: number = $state(3600000);
+	let upgradeDelay: number = $state(86400000);
+	const disabledText = $derived(
 		(!owners && 'No owners set') ||
-		((!required || required < 1) && 'No requirement set') ||
-		(required > owners.length && 'Not enough owners set') ||
-		(validOwners.some((valid) => !valid) && 'Invalid owners') ||
-		(owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0 &&
-			'Duplicate owners') ||
-		(upgradeDelay > 31_536_000_000 && 'Upgrade delay too long') ||
-		(executionDelay > 2_592_000_000 && 'Execution delay too long');
+			((!required || required < 1) && 'No requirement set') ||
+			(required > owners.length && 'Not enough owners set') ||
+			(validOwners.some((valid) => !valid) && 'Invalid owners') ||
+			(owners.filter((owner, index) => owners.indexOf(owner) !== index).length > 0 &&
+				'Duplicate owners') ||
+			(upgradeDelay > 31_536_000_000 && 'Upgrade delay too long') ||
+			(executionDelay > 2_592_000_000 && 'Execution delay too long')
+	);
 
-	$: disabled = !!disabledText;
+	const disabled = $derived(!!disabledText);
 
-	$: defaultOwners = owners;
-	$: defaultRequired = required || 2;
+	const defaultOwners = $derived(owners);
+	const defaultRequired = $derived(required || 2);
 
 	const { send, subscribe } = useSendTx();
 	subscribe((tx) => {
@@ -60,7 +61,7 @@
 
 	const importPath = '@dusalabs/periphery/assembly/contracts/multisig';
 
-	$: code = `export * from '${importPath}';
+	const code = $derived(`export * from '${importPath}';
 
 import { Args } from '@massalabs/as-types';
 import { constructor as _constructor } from '${importPath}';
@@ -75,7 +76,7 @@ export function constructor(_: StaticArray<u8>): void {
 	const args = new Args().add(owners).add(required).add(upgradeDelay).add(executionDelay);
 	_constructor(args.serialize());
 }
-	`;
+	`);
 
 	const { copy, copied } = useCopy();
 </script>

@@ -21,7 +21,7 @@
 	inject({ mode: dev ? 'development' : 'production' });
 	!dev && injectSpeedInsights();
 
-	let currentBlock: number;
+	let currentBlock: number | undefined = $state();
 
 	onMount(() => {
 		setInterval(() => {
@@ -32,7 +32,7 @@
 		}, 16_000);
 	});
 
-	$: url = $page.url.pathname;
+	const url = $derived($page.url.pathname);
 </script>
 
 <main class="h-screen flex flex-col">

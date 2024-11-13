@@ -30,51 +30,52 @@
 	import TokenAmountInput from '$lib/components/TokenAmountInput.svelte';
 	import AddressInput from '$lib/components/AddressInput.svelte';
 	import { CHAIN_ID, WMAS } from '$lib/utils/config';
+	import { TokenInfo } from './+page';
 
-	export let data;
+	let data: TokenInfo = $props();
 	const { properties, balances, isVerified } = data;
 	const tokenAddress = properties.address;
 
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
+	const connectedAddress = $derived($clientStore.wallet().getBaseAccount()?.address());
 
 	let allowances: Allowance[] = [];
-	let masBalance: bigint;
-	$: parsedMasBalance = new TokenAmount(WMAS, masBalance ?? 0n);
-	$: fullyParsedMasBalance = Number(parsedMasBalance.toSignificant(6));
+	let masBalance: bigint = 0n;
+	const parsedMasBalance = $derived(new TokenAmount(WMAS, masBalance));
+	const fullyParsedMasBalance = $derived(Number(parsedMasBalance.toSignificant(6)));
 
-	let userBalance: bigint;
-	$: parsedBalance = new TokenAmount(
-		new Token(CHAIN_ID, tokenAddress, properties.decimals),
-		userBalance ?? 0n
+	let userBalance: bigint = 0n;
+	const parsedBalance = $derived(
+		new TokenAmount(new Token(CHAIN_ID, tokenAddress, properties.decimals), userBalance)
 	);
-	$: fullyParsedBalance = Number(parsedBalance.toSignificant(properties.decimals));
+	const fullyParsedBalance = $derived(Number(parsedBalance.toSignificant(properties.decimals)));
 
 	let transferReceiver: string = '';
-	let transferAmount: number;
+	let transferAmount: number = 0;
 	let valid = false;
-	$: disabledTransfer =
+	const disabledTransfer = $derived(
 		!connectedAddress ||
-		!transferReceiver ||
-		!transferAmount ||
-		transferAmount > userBalance ||
-		!valid;
+			!transferReceiver ||
+			!transferAmount ||
+			transferAmount > userBalance ||
+			!valid
+	);
 
-	let burnAmount: number;
-	$: disabledBurn = !connectedAddress || !burnAmount || burnAmount > userBalance;
+	let burnAmount: number = 0;
+	const disabledBurn = $derived(!connectedAddress || !burnAmount || burnAmount > userBalance);
 
-	let mintReceiver: string;
-	let mintAmount: number;
-	$: disabledMint = !connectedAddress || !mintReceiver || !mintAmount;
+	let mintReceiver: string = '';
+	let mintAmount: number = 0;
+	const disabledMint = $derived(!connectedAddress || !mintReceiver || !mintAmount);
 
-	let wrapAmount: number;
-	$: disabledWrap = !connectedAddress || !wrapAmount || wrapAmount > masBalance;
+	let wrapAmount: number = 0;
+	const disabledWrap = $derived(!connectedAddress || !wrapAmount || wrapAmount > masBalance);
 
-	let unwrapAmount: number;
-	$: disabledUnwrap = !connectedAddress || !unwrapAmount || unwrapAmount > userBalance;
+	let unwrapAmount: number = 0;
+	const disabledUnwrap = $derived(!connectedAddress || !unwrapAmount || unwrapAmount > userBalance);
 
-	$: {
+	$effect(() => {
 		fetch(connectedAddress);
-	}
+	});
 
 	const fetch = (address: string | undefined) => {
 		if (!address) return;

@@ -13,7 +13,7 @@
 		ArrayTypes
 	} from '@massalabs/massa-web3';
 
-	export let value: Uint8Array;
+	let { value }: { value: Uint8Array } = $props();
 	let decodedValue: string | number | boolean | bigint | {} | undefined = undefined;
 
 	const bytesToStrArray = (arr: Uint8Array) => bytesToArray(arr, ArrayTypes.STRING);
@@ -46,8 +46,8 @@
 	const getMethod = (label: string) =>
 		label && methods.find((method) => getLabel(method) === label.replace(' ', ''));
 
-	$: selected = { value: methods[0], label: getLabel(methods[0]) };
-	$: {
+	const selected = $derived({ value: methods[0], label: getLabel(methods[0]) });
+	$effect(() => {
 		const fn = getMethod(selected.label);
 		if (fn && value instanceof Uint8Array)
 			try {
@@ -56,7 +56,7 @@
 				decodedValue = undefined;
 				console.log(e);
 			}
-	}
+	});
 </script>
 
 <div class="flex flex-col items-center gap-2">

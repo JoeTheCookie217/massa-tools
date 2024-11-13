@@ -6,11 +6,14 @@
 	import { Args } from '@massalabs/massa-web3';
 	import AddressInput from '$lib/components/AddressInput.svelte';
 
-	export let multisigAddress: string;
+	interface Props {
+		multisigAddress: string;
+	}
+	let { multisigAddress }: Props = $props();
 
-	let addOwnerAddress: string = '';
-	let valid: boolean = false;
-	$: disabled = !addOwnerAddress || !valid;
+	let addOwnerAddress: string = $state('');
+	let valid: boolean = $state(false);
+	const disabled = $derived(!addOwnerAddress || !valid);
 
 	const { send } = useSendTx();
 
@@ -25,7 +28,7 @@
 		send(submitData);
 	};
 
-	let open = false;
+	let open = $state(false);
 	const onOpenChange = (e: boolean | undefined) => {
 		if (e) open = e;
 	};

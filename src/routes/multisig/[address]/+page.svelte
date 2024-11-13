@@ -27,22 +27,22 @@
 	import RemoveOwnerModal from './remove-owner-modal.svelte';
 	import ReplaceOwnerModal from './replace-owner-modal.svelte';
 
-	export let data;
+	let data = $props();
 
 	// prettier-ignore
 	const { address: multisigAddress, balance, owners, required, transactions, erc20Balances: rawErc20Balances, executionDelay, upgradeDelay, usdBalance } = data;
 	const argsPlaceholder = '{"0": 45, "1": 19, "2": 0, "3": 21}';
 	const erc20Balances = rawErc20Balances.filter((b) => b > 0n);
 
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
+	const connectedAddress = $derived($clientStore.wallet().getBaseAccount()?.address() || '');
 
-	let submitTo: string;
-	let submitMethod: string = '';
-	let submitArgs: string = '';
-	let submitValue: number;
-	$: disabledSubmit = !submitTo && (!submitValue || !submitMethod || !submitArgs);
-	let receiveValue: number;
-	$: disabledDeposit = !receiveValue;
+	let submitTo: string = $state('');
+	let submitMethod: string = $state('');
+	let submitArgs: string = $state('');
+	let submitValue: number = $state(0);
+	const disabledSubmit = $derived(!submitTo && (!submitValue || !submitMethod || !submitArgs));
+	let receiveValue: number = $state(0);
+	const disabledDeposit = $derived(!receiveValue);
 
 	const { send } = useSendTx();
 

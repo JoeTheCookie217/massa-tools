@@ -2,10 +2,14 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
 
-	export let address: string;
-	export let type: 'token' | 'multisig';
+	interface Props {
+		address: string;
+		type: 'token' | 'multisig';
+	}
 
-	let open = true;
+	let { address, type }: Props = $props();
+
+	let open = $state(true);
 	const onOpenChange = (e: boolean | undefined) => {
 		if (e) open = e;
 	};

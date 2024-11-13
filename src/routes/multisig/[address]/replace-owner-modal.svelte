@@ -8,13 +8,16 @@
 	import AddressInput from '$lib/components/AddressInput.svelte';
 	import { Label } from '$lib/components/ui/label';
 
-	export let multisigAddress: string;
-	export let owners: string[];
+	interface Props {
+		multisigAddress: string;
+		owners: string[];
+	}
+	let { multisigAddress, owners }: Props = $props();
 
-	let oldOwnerAddress: string = '';
-	let newOwnerAddress: string = '';
-	let valid: boolean = false;
-	$: disabled = !oldOwnerAddress || !newOwnerAddress || !valid;
+	let oldOwnerAddress: string = $state('');
+	let newOwnerAddress: string = $state('');
+	let valid: boolean = $state(false);
+	const disabled = $derived(!oldOwnerAddress || !newOwnerAddress || !valid);
 
 	const { send } = useSendTx();
 
@@ -29,7 +32,7 @@
 		send(submitData);
 	};
 
-	let open = false;
+	let open = $state(false);
 	const onOpenChange = (e: boolean | undefined) => {
 		if (e) open = e;
 	};

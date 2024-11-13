@@ -3,15 +3,16 @@
 	import { Button } from './ui/button';
 	import { Input } from './ui/input';
 
-	// mandatory
-	export let parsedBalance: TokenAmount;
-	export let amount: number;
-	export let setMaxAmount: () => void;
+	interface Props {
+		parsedBalance: TokenAmount;
+		amount: number;
+		setMaxAmount: () => void;
+		onClick?: () => void;
+		text?: string;
+		disabled?: boolean;
+	}
 
-	// optional
-	export let onClick: () => void = () => {};
-	export let text: string = '';
-	export let disabled: boolean = false;
+	let { parsedBalance, amount, setMaxAmount, onClick, text, disabled }: Props = $props();
 </script>
 
 <div class="flex items-center gap-1">

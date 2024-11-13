@@ -23,11 +23,17 @@
 	import { decodeSwapTx, isSwapMethod } from '@dusalabs/sdk';
 	import { CHAIN_ID } from '$lib/utils/config';
 
-	export let multisigAddress: string;
-	export let transactions: FullTransaction[];
-	export let required: number;
+	interface Props {
+		multisigAddress: string;
+		transactions: FullTransaction[];
+		required: number;
+	}
 
-	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address();
+	let { multisigAddress, transactions, required }: Props = $props();
+	//  let transactions: FullTransaction[];
+	// export let required: number;
+
+	const connectedAddress = $derived($clientStore.wallet().getBaseAccount()?.address() || '');
 
 	const { send } = useSendTx();
 

@@ -14,15 +14,15 @@
 	import { modeCurrent } from '$lib/components/light-switch/light-switch';
 	import RedirectModal from './redirect-modal.svelte';
 
-	let tokenAddress: string;
+	let tokenAddress: string = $state('');
 
-	let name: string;
-	let symbol: string;
-	let decimals: number;
-	let supply: number;
-	let mintable = false;
-	let burnable = false;
-	$: disabled = !name || !symbol || !decimals || !supply;
+	let name: string = $state('');
+	let symbol: string = $state('');
+	let decimals: number = $state(0);
+	let supply: number = $state(0);
+	let mintable = $state(false);
+	let burnable = $state(false);
+	const disabled = $derived(!name || !symbol || !decimals || !supply);
 
 	const defaultName = 'MyToken';
 	const defaultSymbol = 'MYT';
@@ -31,7 +31,7 @@
 
 	const importPath = '@massalabs/sc-standards/assembly/contracts/FT';
 
-	$: code = `export * from '${importPath}/token';${
+	const code = $derived(`export * from '${importPath}/token';${
 		mintable
 			? `
 export * from '${importPath}/token-mint';`
@@ -57,7 +57,7 @@ export function constructor(_: StaticArray<u8>): void {
 	}))));
 	FT.constructor(args.serialize());
 }
-	`;
+	`);
 
 	const { copy, copied } = useCopy();
 
