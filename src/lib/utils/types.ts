@@ -1,3 +1,17 @@
+import { Token as _Token } from '@dusalabs/sdk';
+
+export class Token extends _Token {
+	constructor(
+		chainId: number,
+		address: string,
+		decimals: number,
+		public readonly logoURI: string,
+		public readonly symbol: string,
+		public readonly name: string
+	) {
+		super(chainId, address, decimals, symbol, name);
+	}
+}
 export type Allowance = {
 	owner: string;
 	spender: string;
