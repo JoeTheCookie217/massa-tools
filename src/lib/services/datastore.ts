@@ -25,11 +25,10 @@ export const getDatastore = (address: string) =>
 	baseClient
 		.publicApi()
 		.getAddresses([address])
-		.then((r) =>
-			r[0].final_datastore_keys
-				.map((v) => String.fromCharCode(...v))
-				.sort((a, b) => a.localeCompare(b))
-		);
+		.then((r) => r[0].final_datastore_keys);
+
+export const parseDatastore = (keys: number[][]): string[] =>
+	keys.map((v) => String.fromCharCode(...v)).sort((a, b) => a.localeCompare(b));
 
 export const getBigDatastore = async (address: string, prefix: string) => {
 	const url = `https://indexer-${CHAIN_NAME}-dusa.up.railway.app/datastore-keys?address=${address}&prefix=${prefix}`;
@@ -42,7 +41,7 @@ export const fetchTokenAllowances = async (
 ): Promise<Allowance[]> => {
 	const prefix = 'ALLOWANCE' + owner;
 	const keys = await getDatastore(address)
-		.then((entries) => entries.filter((e) => e.startsWith(prefix)))
+		.then((entries) => parseDatastore(entries).filter((e) => e.startsWith(prefix)))
 		.catch((err) => {
 			console.log('err', err);
 			getBigDatastore(address, prefix);

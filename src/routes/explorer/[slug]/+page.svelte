@@ -30,11 +30,13 @@
 	import { decodeFeeParameters, decodePairInformation } from '$lib/utils/decoder';
 	import CopyButton from '$lib/components/copy-button.svelte';
 	import { TokenAmount } from '@dusalabs/sdk';
-	import { getBigDatastore } from '$lib/services/datastore.js';
+	import { getBigDatastore, parseDatastore } from '$lib/services/datastore';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	export let data;
 	// prettier-ignore
-	const { keys: k, address, isVerified, isToken, isMultisig, balance, erc20Balances, tooBig } = data;
+	const { keys: rawK, address, isVerified, isToken, isMultisig, balance, erc20Balances, tooBig } = data;
+	const k = parseDatastore(rawK);
 
 	// TODO: highlight keys that contain the `connectedAddress`
 	$: connectedAddress = $clientStore.wallet().getBaseAccount()?.address() ?? '';
@@ -145,7 +147,18 @@
 				{@const value = values[i]}
 				<Table.Row>
 					<Table.Cell>{i + 1}</Table.Cell>
-					<Table.Cell>{key}</Table.Cell>
+					<Table.Cell>
+						<Tooltip.Root openDelay={50}>
+							<Tooltip.Trigger>
+								<span>{key}</span>
+							</Tooltip.Trigger>
+							<Tooltip.Content>
+								<span>
+									{rawK[i]}
+								</span>
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Table.Cell>
 					<Table.Cell>
 						{#if !value}
 							<Button variant="ghost" on:click={() => fetchEntry(key, i)}>Fetch</Button>

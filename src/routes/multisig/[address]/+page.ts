@@ -1,4 +1,4 @@
-import { fetchMasBalance, getDatastore } from '$lib/services/datastore';
+import { fetchMasBalance, getDatastore, parseDatastore } from '$lib/services/datastore';
 import { Transaction } from '@dusalabs/sdk';
 import clientStore from '$lib/store/client';
 import { strToBytes, bytesToI32, byteToBool, bytesToU64 } from '@massalabs/massa-web3';
@@ -33,7 +33,7 @@ export async function load({ params }: { params: RouteParams }): Promise<Multisi
 	const address = params.address;
 	const balance = await fetchMasBalance(address);
 
-	const datastore = await getDatastore(address);
+	const datastore = await getDatastore(address).then(parseDatastore);
 	const OWNER_PREFIX = 'is_owner::';
 	const TX_PREFIX = 'transactions::';
 	const APPROVAL_PREFIX = 'approved::';
